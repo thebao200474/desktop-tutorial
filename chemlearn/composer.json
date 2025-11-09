@@ -1,0 +1,11 @@
+{
+    "name": "chemlearn/chemlearn",
+    "description": "ChemLearn - Nen tang hoc Hoa hoc truc tuyen",
+    "type": "project",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "ChemLearn\\": ""
+        }
+    }
+}
