@@ -75,3 +75,31 @@ use function htmlspecialchars as h;
         <div class="alert alert-secondary">Chưa có bài giảng nào trong hệ thống. Vui lòng thêm dữ liệu mẫu.</div>
     <?php endif; ?>
 </section>
+
+<div class="floating-settings" data-settings>
+    <button class="btn btn-primary rounded-circle shadow" type="button" data-settings-toggle aria-expanded="false" aria-controls="quickSettingsPanel">
+        <span aria-hidden="true">⚙️</span>
+        <span class="visually-hidden">Mở bảng cài đặt nhanh</span>
+    </button>
+    <div class="card shadow settings-panel d-none" id="quickSettingsPanel" data-settings-panel>
+        <div class="card-body p-3">
+            <h6 class="card-title h6 mb-3">Cài đặt nhanh</h6>
+            <button class="btn btn-outline-secondary btn-sm w-100 mb-2" type="button" disabled>
+                Chế độ tối <span class="text-muted">(đang phát triển)</span>
+            </button>
+            <a class="btn btn-primary btn-sm w-100" href="tien_do.php">Xem tiến độ học tập</a>
+        </div>
+    </div>
+</div>
+
+<div class="chat-bubble" data-chat>
+    <button class="chat-bubble__button shadow" type="button" data-chat-toggle aria-expanded="false" aria-controls="chatPreview">
+        <span aria-hidden="true">💬</span>
+        <span class="visually-hidden">Mở trò chuyện với ChemBot</span>
+    </button>
+    <div class="chat-bubble__panel shadow d-none" id="chatPreview" data-chat-panel>
+        <div class="chat-bubble__header">ChemBot</div>
+        <p class="mb-2">Xin chào! Tôi có thể giúp bạn giải đáp các câu hỏi Hóa học.</p>
+        <a class="btn btn-success btn-sm w-100" href="hoi_dap.php">Hỏi ChemBot</a>
+    </div>
+</div>
