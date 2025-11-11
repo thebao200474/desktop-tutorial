@@ -25,6 +25,8 @@ use function htmlspecialchars as h;
                 <li class="nav-item"><a class="nav-link" href="chuyende.php">Chuyên đề</a></li>
                 <li class="nav-item"><a class="nav-link" href="canbang.php">Cân bằng PTHH</a></li>
                 <li class="nav-item"><a class="nav-link" href="cauhoi.php">Câu hỏi</a></li>
+                <li class="nav-item"><a class="nav-link" href="bang_tuan_hoan.php">Bảng tuần hoàn</a></li>
+                <li class="nav-item"><a class="nav-link" href="de_thi.php">Đề thi</a></li>
                 <li class="nav-item"><a class="nav-link" href="hoi_dap.php">Hỏi đáp AI</a></li>
             </ul>
             <ul class="navbar-nav ms-auto">
@@ -32,6 +34,7 @@ use function htmlspecialchars as h;
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="accountMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <?= h($currentUser['hoten'] ?? $currentUser['tendangnhap']); ?>
+                            <span class="badge text-bg-warning ms-2">Rank <?= (int)($currentUser['diem_rank'] ?? 0); ?></span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountMenu">
                             <li><a class="dropdown-item" href="tien_do.php">Tiến độ học</a></li>

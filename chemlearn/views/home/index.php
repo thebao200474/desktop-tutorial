@@ -87,19 +87,52 @@ use function htmlspecialchars as h;
             <button class="btn btn-outline-secondary btn-sm w-100 mb-2" type="button" disabled>
                 Chế độ tối <span class="text-muted">(đang phát triển)</span>
             </button>
-            <a class="btn btn-primary btn-sm w-100" href="tien_do.php">Xem tiến độ học tập</a>
+            <a class="btn btn-primary btn-sm w-100 mb-2" href="tien_do.php">Xem tiến độ học tập</a>
+            <button class="btn btn-outline-primary btn-sm w-100" type="button" data-decor-toggle>
+                🎨 Trang trí màn hình
+            </button>
         </div>
     </div>
 </div>
 
-<div class="chat-bubble" data-chat>
-    <button class="chat-bubble__button shadow" type="button" data-chat-toggle aria-expanded="false" aria-controls="chatPreview">
-        <span aria-hidden="true">💬</span>
-        <span class="visually-hidden">Mở trò chuyện với ChemBot</span>
-    </button>
-    <div class="chat-bubble__panel shadow d-none" id="chatPreview" data-chat-panel>
-        <div class="chat-bubble__header">ChemBot</div>
-        <p class="mb-2">Xin chào! Tôi có thể giúp bạn giải đáp các câu hỏi Hóa học.</p>
-        <a class="btn btn-success btn-sm w-100" href="hoi_dap.php">Hỏi ChemBot</a>
+<div class="decor-panel card shadow d-none" data-decor-panel>
+    <div class="card-body p-3">
+        <h6 class="card-title h6 mb-3">Kéo thả icon Hóa học</h6>
+        <div class="decor-icons" role="list">
+            <?php $decorIcons = ['⚗️', '🧪', '🧬', '🔬', '⚛️', '🧊']; ?>
+            <?php foreach ($decorIcons as $icon): ?>
+                <button type="button" class="btn btn-outline-secondary btn-sm decor-icons__item" data-decor-icon="<?= h($icon); ?>" aria-label="Thả biểu tượng <?= h($icon); ?>">
+                    <?= h($icon); ?>
+                </button>
+            <?php endforeach; ?>
+        </div>
+        <p class="small text-muted mb-0">Nhấn vào biểu tượng để thêm, sau đó kéo thả đến vị trí bạn thích.</p>
     </div>
 </div>
+
+<div class="chat-bubble" data-chat data-chat-token="<?= h($csrfToken); ?>">
+    <button class="chat-bubble__button shadow" type="button" data-chat-toggle aria-expanded="false" aria-controls="chatWindow">
+        <span aria-hidden="true">💬</span>
+        <span class="visually-hidden">Mở trò chuyện với ChemTutor</span>
+    </button>
+    <div class="chat-bubble__panel shadow d-none" id="chatWindow" data-chat-panel>
+        <div class="chat-bubble__header">ChemTutor</div>
+        <div class="chat-window" data-chat-window>
+            <div class="chat-message chat-message--assistant">
+                <div class="chat-message__avatar">🤖</div>
+                <div class="chat-message__content">
+                    <p class="mb-1">Chào bạn! Mình là gia sư Hóa học ChemTutor. Bạn muốn ôn chủ đề nào hôm nay?</p>
+                </div>
+            </div>
+        </div>
+        <form class="chat-form" data-chat-form>
+            <div class="input-group input-group-sm">
+                <input type="text" class="form-control" placeholder="Nhập câu hỏi của bạn..." autocomplete="off" data-chat-input>
+                <button class="btn btn-success" type="submit">Gửi</button>
+            </div>
+            <div class="chat-error text-danger small mt-2 d-none" data-chat-error></div>
+        </form>
+    </div>
+</div>
+
+<div class="decor-layer" data-decor-layer aria-hidden="true"></div>

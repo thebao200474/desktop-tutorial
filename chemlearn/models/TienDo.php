@@ -6,9 +6,9 @@ namespace ChemLearn\Models;
 
 class TienDo extends BaseModel
 {
-    public function ghiNhan(?int $userId, ?int $maBaiGiang, int $soCauDung, int $soCauSai, string $ngayLam): void
+    public function ghiNhan(?int $userId, ?int $maBaiGiang, int $soCauDung, int $soCauSai, string $ngayLam, ?string $ghiChu = null): void
     {
-        $statement = $this->db->prepare('INSERT INTO tien_do_hoc (ma_user, ma_baigiang, so_cau_dung, so_cau_sai, ngay_lam) VALUES (:user, :lesson, :correct, :wrong, :date)');
+        $statement = $this->db->prepare('INSERT INTO tien_do_hoc (ma_user, ma_baigiang, so_cau_dung, so_cau_sai, ngay_lam, ghi_chu) VALUES (:user, :lesson, :correct, :wrong, :date, :note)');
         if ($userId === null) {
             $statement->bindValue(':user', null, \PDO::PARAM_NULL);
         } else {
@@ -24,6 +24,11 @@ class TienDo extends BaseModel
         $statement->bindValue(':correct', $soCauDung, \PDO::PARAM_INT);
         $statement->bindValue(':wrong', $soCauSai, \PDO::PARAM_INT);
         $statement->bindValue(':date', $ngayLam, \PDO::PARAM_STR);
+        if ($ghiChu === null) {
+            $statement->bindValue(':note', null, \PDO::PARAM_NULL);
+        } else {
+            $statement->bindValue(':note', $ghiChu, \PDO::PARAM_STR);
+        }
         $statement->execute();
     }
 

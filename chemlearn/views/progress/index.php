@@ -8,20 +8,26 @@ use function htmlspecialchars as h;
                 <h1 class="h4 mb-3">Tiến độ học tập</h1>
                 <p class="text-muted">Theo dõi số câu làm đúng, sai và các lần luyện tập gần đây.</p>
 
-                <div class="row text-center">
-                    <div class="col-md-4">
+                <div class="row text-center g-3">
+                    <div class="col-md-3">
+                        <div class="p-3 bg-light rounded-3">
+                            <div class="text-muted">Điểm rank</div>
+                            <div class="display-6 fw-bold text-warning"><?= (int)$rank; ?></div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
                         <div class="p-3 bg-light rounded-3">
                             <div class="text-muted">Tổng câu đúng</div>
                             <div class="display-6 fw-bold text-success"><?= (int)$tongDung; ?></div>
                         </div>
                     </div>
-                    <div class="col-md-4 mt-3 mt-md-0">
+                    <div class="col-md-3 mt-3 mt-md-0">
                         <div class="p-3 bg-light rounded-3">
                             <div class="text-muted">Tổng câu sai</div>
                             <div class="display-6 fw-bold text-danger"><?= (int)$tongSai; ?></div>
                         </div>
                     </div>
-                    <div class="col-md-4 mt-3 mt-md-0">
+                    <div class="col-md-3 mt-3 mt-md-0">
                         <div class="p-3 bg-light rounded-3">
                             <div class="text-muted">Số lần luyện tập</div>
                             <div class="display-6 fw-bold text-primary"><?= count($records); ?></div>
@@ -47,6 +53,7 @@ use function htmlspecialchars as h;
                                     <th>Bài giảng</th>
                                     <th>Câu đúng</th>
                                     <th>Câu sai</th>
+                                    <th>Ghi chú</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -56,6 +63,7 @@ use function htmlspecialchars as h;
                                         <td><?= h($record['ten_baigiang'] ?? 'Bài trắc nghiệm tổng hợp'); ?></td>
                                         <td class="text-success fw-semibold"><?= (int)$record['so_cau_dung']; ?></td>
                                         <td class="text-danger fw-semibold"><?= (int)$record['so_cau_sai']; ?></td>
+                                        <td><?= h($record['ghi_chu'] ?? ''); ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>

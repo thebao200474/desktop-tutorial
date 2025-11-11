@@ -21,9 +21,8 @@ class HoiDap extends BaseModel
 
     public function latest(int $limit = 5): array
     {
-        $statement = $this->db->prepare('SELECT * FROM hoi_dap_ai ORDER BY thoigian DESC LIMIT :limit');
-        $statement->bindValue(':limit', $limit, \PDO::PARAM_INT);
-        $statement->execute();
+        $limit = max(1, (int)$limit);
+        $statement = $this->db->query('SELECT * FROM hoi_dap_ai ORDER BY thoigian DESC LIMIT ' . $limit);
         return $statement->fetchAll();
     }
 }

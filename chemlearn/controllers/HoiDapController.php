@@ -5,15 +5,18 @@ declare(strict_types=1);
 namespace ChemLearn\Controllers;
 
 use ChemLearn\Models\HoiDap;
+use ChemLearn\Services\TutorBot;
 
 class HoiDapController extends BaseController
 {
     private HoiDap $hoiDapModel;
+    private TutorBot $tutorBot;
 
     public function __construct()
     {
         parent::__construct();
         $this->hoiDapModel = new HoiDap();
+        $this->tutorBot = new TutorBot();
     }
 
     public function index(): void
@@ -31,10 +34,14 @@ class HoiDapController extends BaseController
                 if ($questionText === '') {
                     $message = 'Vui lòng nhập câu hỏi.';
                 } else {
-                    $answer = $this->generateAnswer($questionText);
+                    $history = $_SESSION['chat_history'] ?? [];
+                    $answer = $this->tutorBot->respond($questionText, $history);
                     $currentUser = $this->getCurrentUser();
                     $userId = is_array($currentUser) && isset($currentUser['ma_user']) ? (int)$currentUser['ma_user'] : null;
                     $this->hoiDapModel->store($userId, $questionText, $answer);
+                    $history[] = ['role' => 'user', 'message' => $questionText];
+                    $history[] = ['role' => 'assistant', 'message' => $answer];
+                    $_SESSION['chat_history'] = array_slice($history, -20);
                 }
             }
         }
@@ -47,24 +54,5 @@ class HoiDapController extends BaseController
             'message' => $message,
             'history' => $history,
         ]);
-    }
-
-    private function generateAnswer(string $question): string
-    {
-        $questionLower = mb_strtolower($question);
-        $patterns = [
-            'oxi' => 'Oxi (O) là phi kim phổ biến, tham gia vào nhiều phản ứng oxi hóa khử.',
-            'axit' => 'Axit là hợp chất khi tan trong nước phân li ra ion H+. Ví dụ: HCl, H2SO4.',
-            'bazo' => 'Bazơ là chất khi tan trong nước phân li ra ion OH−. Ví dụ: NaOH, KOH.',
-            'cân bằng' => 'Để cân bằng PTHH, hãy đảm bảo số nguyên tử mỗi nguyên tố ở hai vế bằng nhau và áp dụng phương pháp thăng bằng electron hoặc đại số.',
-        ];
-
-        foreach ($patterns as $key => $response) {
-            if (str_contains($questionLower, $key)) {
-                return $response;
-            }
-        }
-
-        return 'ChemLearn AI đang học hỏi thêm. Vui lòng tham khảo giáo trình hoặc giảng viên để có câu trả lời chính xác.';
     }
 }
