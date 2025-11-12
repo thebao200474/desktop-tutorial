@@ -1,0 +1,14 @@
+{
+    "name": "chemlearn/homepage",
+    "description": "ChemLearn MVC skeleton with home page",
+    "type": "project",
+    "require": {
+        "php": "^8.0",
+        "bramus/router": "^1.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "ChemLearn\\": "controllers/"
+        }
+    }
+}

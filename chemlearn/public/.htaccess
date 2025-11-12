@@ -1,0 +1,6 @@
+# Đảm bảo tất cả yêu cầu được chuyển đến index.php để Router xử lý.
+Options -MultiViews
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [QSA,L]
