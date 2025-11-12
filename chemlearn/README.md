@@ -1,6 +1,6 @@
 # ChemLearn
 
-Dự án web học Hóa học trực tuyến – CT275 Công nghệ Web  
+Dự án web học Hóa học trực tuyến – CT275 Công nghệ Web
 Trường Đại học Cần Thơ
 
 ## 🎯 Tính năng
@@ -16,9 +16,16 @@ PHP 8, MySQL, Bootstrap 5, PDO, Composer Autoload (PSR-4)
 
 ## 🚀 Khởi chạy nhanh
 1. Sao chép thư mục `chemlearn` vào `htdocs` (XAMPP) hoặc máy chủ PHP phù hợp.
-2. Cập nhật thông tin kết nối cơ sở dữ liệu trong `config/config.php` hoặc thiết lập biến môi trường `CHEMLEARN_DB_*`.
-3. Tạo database `chemlearn` và chạy file `chemlearn.sql` để khởi tạo bảng.
-4. Truy cập `http://localhost/chemlearn/` để trải nghiệm trang web.
+2. Đảm bảo PHP đã cài Composer và cài phụ thuộc bằng `composer install` (đã bao gồm `bramus/router`).
+3. Nếu dùng Apache/XAMPP, bật `mod_rewrite` bằng cách mở `xampp\apache\conf\httpd.conf`, bỏ dấu `#` trước dòng `LoadModule rewrite_module modules/mod_rewrite.so`, sau đó khởi động lại Apache.
+4. Trỏ DocumentRoot đến thư mục `chemlearn/public` (ví dụ cập nhật VirtualHost trong XAMPP). Nếu không thể thay đổi, có thể truy cập trực tiếp `http://localhost/chemlearn/public/`.
+5. Truy cập `http://localhost/chemlearn/` (hoặc `/public/` tùy cấu hình) để kiểm tra router. Các route mẫu:
+   - `GET /chemlearn/` → Trang chủ kiểm tra router
+   - `GET /chemlearn/health` → kiểm tra nhanh tình trạng server (`OK`)
+   - `GET /chemlearn/periodic-table` → trang bảng tuần hoàn demo
+   - `POST /chemlearn/ai/ask` với JSON `{ "question": "Liên kết ion là gì?" }`
+6. Cập nhật thông tin kết nối cơ sở dữ liệu trong `config/config.php` hoặc thiết lập biến môi trường `CHEMLEARN_DB_*`.
+7. Tạo database `chemlearn` và chạy file `chemlearn.sql` để khởi tạo bảng.
 
 ## 🧪 Gợi ý dữ liệu mẫu
 - Thêm bài giảng vào bảng `baigiang` để hiển thị ở chuyên đề.
