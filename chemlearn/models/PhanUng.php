@@ -8,7 +8,11 @@ class PhanUng extends BaseModel
 {
     public function findByEquation(string $equation): ?array
     {
-        $statement = $this->db->prepare('SELECT * FROM phanung WHERE mota = :equation LIMIT 1');
+        if (!$this->hasConnection()) {
+            return null;
+        }
+
+        $statement = $this->requireConnection()->prepare('SELECT * FROM phanung WHERE mota = :equation LIMIT 1');
         $statement->bindValue(':equation', $equation, \PDO::PARAM_STR);
         $statement->execute();
 

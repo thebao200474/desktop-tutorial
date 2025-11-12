@@ -8,13 +8,21 @@ class BaiGiang extends BaseModel
 {
     public function all(): array
     {
-        $statement = $this->db->query('SELECT * FROM baigiang ORDER BY ma_baigiang DESC');
+        if (!$this->hasConnection()) {
+            return [];
+        }
+
+        $statement = $this->requireConnection()->query('SELECT * FROM baigiang ORDER BY ma_baigiang DESC');
         return $statement->fetchAll();
     }
 
     public function find(int $id): ?array
     {
-        $statement = $this->db->prepare('SELECT * FROM baigiang WHERE ma_baigiang = :id');
+        if (!$this->hasConnection()) {
+            return null;
+        }
+
+        $statement = $this->requireConnection()->prepare('SELECT * FROM baigiang WHERE ma_baigiang = :id');
         $statement->bindValue(':id', $id, \PDO::PARAM_INT);
         $statement->execute();
 

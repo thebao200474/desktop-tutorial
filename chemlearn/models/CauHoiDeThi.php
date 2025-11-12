@@ -8,7 +8,11 @@ class CauHoiDeThi extends BaseModel
 {
     public function forExam(int $examId): array
     {
-        $statement = $this->db->prepare('SELECT * FROM cau_hoi_de_thi WHERE de_thi_id = :id ORDER BY id');
+        if (!$this->hasConnection()) {
+            return [];
+        }
+
+        $statement = $this->requireConnection()->prepare('SELECT * FROM cau_hoi_de_thi WHERE de_thi_id = :id ORDER BY id');
         $statement->bindValue(':id', $examId, \PDO::PARAM_INT);
         $statement->execute();
         return $statement->fetchAll();

@@ -29,7 +29,11 @@ class Database
                     PDO::ATTR_EMULATE_PREPARES => false,
                 ]);
             } catch (PDOException $exception) {
-                die('Không thể kết nối cơ sở dữ liệu: ' . htmlspecialchars($exception->getMessage()));
+                throw new PDOException(
+                    'Không thể kết nối cơ sở dữ liệu: ' . $exception->getMessage(),
+                    (int) $exception->getCode(),
+                    $exception
+                );
             }
         }
 

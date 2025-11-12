@@ -8,7 +8,11 @@ class CauHoi extends BaseModel
 {
     public function all(): array
     {
-        $statement = $this->db->query('SELECT * FROM cauhoi ORDER BY ma_cauhoi');
+        if (!$this->hasConnection()) {
+            return [];
+        }
+
+        $statement = $this->requireConnection()->query('SELECT * FROM cauhoi ORDER BY ma_cauhoi');
         return $statement->fetchAll();
     }
 }
