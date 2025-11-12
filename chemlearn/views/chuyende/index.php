@@ -6,7 +6,7 @@ use function htmlspecialchars as h;
         <h1 class="h3 mb-1">Chuyên đề Hóa học</h1>
         <p class="text-muted mb-0">Khám phá các bài giảng trọng tâm cho môn Hóa học.</p>
     </div>
-    <a href="index.php" class="btn btn-outline-primary">← Về trang chủ</a>
+    <a href="<?= app_url(); ?>" class="btn btn-outline-primary">← Về trang chủ</a>
 </div>
 
 <?php if (empty($lessons)): ?>
@@ -18,12 +18,12 @@ use function htmlspecialchars as h;
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-body">
                         <h5 class="card-title mb-3">
-                            <a href="chuyende_chitiet.php?id=<?= (int)$lesson['ma_baigiang']; ?>" class="text-decoration-none">
+                            <a href="<?= app_url('chuyende_chitiet.php?id=' . (int)$lesson['ma_baigiang']); ?>" class="text-decoration-none">
                                 <?= h($lesson['ten_baigiang']); ?>
                             </a>
                         </h5>
                         <p class="card-text text-muted"><?= h(mb_strimwidth(strip_tags($lesson['noidung'] ?? ''), 0, 160, '...')); ?></p>
-                        <a href="chuyende_chitiet.php?id=<?= (int)$lesson['ma_baigiang']; ?>" class="btn btn-primary btn-sm">Đọc chi tiết</a>
+                        <a href="<?= app_url('chuyende_chitiet.php?id=' . (int)$lesson['ma_baigiang']); ?>" class="btn btn-primary btn-sm">Đọc chi tiết</a>
                     </div>
                 </div>
             </div>

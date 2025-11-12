@@ -33,7 +33,7 @@ use function htmlspecialchars as h;
                     </div>
                 </form>
 
-                <p class="mt-3 mb-0">Chưa có tài khoản? <a href="dangky.php">Đăng ký ngay</a>.</p>
+                <p class="mt-3 mb-0">Chưa có tài khoản? <a href="<?= app_url('dangky.php'); ?>">Đăng ký ngay</a>.</p>
             </div>
         </div>
     </div>

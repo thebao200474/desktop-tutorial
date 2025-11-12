@@ -8,7 +8,7 @@ use function htmlspecialchars as h;
                 <h1 class="h4 mb-1">Ngân hàng đề thi</h1>
                 <p class="text-muted mb-0">Chọn đề thi trắc nghiệm, luyện tập và nhận đáp án ngay sau khi nộp bài.</p>
             </div>
-            <a href="index.php" class="btn btn-outline-secondary">← Trang chủ</a>
+            <a href="<?= app_url(); ?>" class="btn btn-outline-secondary">← Trang chủ</a>
         </div>
         <div class="row g-4">
             <?php if (empty($exams)): ?>
@@ -23,7 +23,7 @@ use function htmlspecialchars as h;
                                 <?php if (!empty($exam['mo_ta'])): ?>
                                     <p class="mb-3"><?= h($exam['mo_ta']); ?></p>
                                 <?php endif; ?>
-                                <a href="de_thi.php?id=<?= (int)$exam['id']; ?>" class="btn btn-primary btn-sm">Bắt đầu làm đề</a>
+                                <a href="<?= app_url('de_thi.php?id=' . (int)$exam['id']); ?>" class="btn btn-primary btn-sm">Bắt đầu làm đề</a>
                             </div>
                         </div>
                     </div>

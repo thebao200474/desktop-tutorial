@@ -1,7 +1,7 @@
 <?php
 use function htmlspecialchars as h;
 ?>
-<a href="chuyende.php" class="btn btn-link ps-0">← Quay lại danh sách chuyên đề</a>
+<a href="<?= app_url('chuyende.php'); ?>" class="btn btn-link ps-0">← Quay lại danh sách chuyên đề</a>
 <div class="card border-0 shadow-sm">
     <div class="card-body p-4">
         <h1 class="h3 mb-3"><?= h($lesson['ten_baigiang']); ?></h1>

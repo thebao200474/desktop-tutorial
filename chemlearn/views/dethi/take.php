@@ -8,7 +8,7 @@ use function htmlspecialchars as h;
                 <h1 class="h4 mb-1"><?= h($exam['ten_de'] ?? 'Đề thi'); ?></h1>
                 <p class="text-muted mb-0">Mã đề <?= h($exam['ma_de'] ?? 'N/A'); ?> · Năm <?= h($exam['nam'] ?? ''); ?></p>
             </div>
-            <a href="de_thi.php" class="btn btn-outline-secondary">← Chọn đề khác</a>
+            <a href="<?= app_url('de_thi.php'); ?>" class="btn btn-outline-secondary">← Chọn đề khác</a>
         </div>
 
         <?php if (!empty($message)): ?>

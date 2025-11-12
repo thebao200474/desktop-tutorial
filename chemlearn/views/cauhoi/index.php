@@ -8,7 +8,7 @@ use function htmlspecialchars as h;
                 <h1 class="h4 mb-1">Bài luyện tập trắc nghiệm</h1>
                 <p class="text-muted mb-0">Chọn đáp án đúng cho mỗi câu. Kết quả sẽ được lưu vào tiến độ khi bạn đăng nhập.</p>
             </div>
-            <a href="index.php" class="btn btn-outline-secondary">← Trang chủ</a>
+            <a href="<?= app_url(); ?>" class="btn btn-outline-secondary">← Trang chủ</a>
         </div>
 
         <?php if (!empty($message)): ?>

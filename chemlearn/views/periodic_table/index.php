@@ -115,4 +115,4 @@ $categories = [
         <li><span class="dot cat-chua_xd"></span> Đặc tính chưa xác định</li>
     </ul>
 </div>
-<script src="public/js/periodic-table.js"></script>
+<script src="<?= asset_url('js/periodic-table.js'); ?>"></script>

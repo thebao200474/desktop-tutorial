@@ -8,13 +8,13 @@ use function htmlspecialchars as h;
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= isset($title) ? h($title) : 'ChemLearn'; ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="public/css/style.css">
-    <link rel="stylesheet" href="public/css/periodic-table.css">
+    <link rel="stylesheet" href="<?= asset_url('css/style.css'); ?>">
+    <link rel="stylesheet" href="<?= asset_url('css/periodic-table.css'); ?>">
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
     <div class="container">
-        <a class="navbar-brand" href="index.php">
+        <a class="navbar-brand" href="<?= app_url(); ?>">
             <span>⚗️ ChemLearn</span>
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -22,13 +22,13 @@ use function htmlspecialchars as h;
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item"><a class="nav-link" href="index.php">Trang chủ</a></li>
-                <li class="nav-item"><a class="nav-link" href="chuyende.php">Chuyên đề</a></li>
-                <li class="nav-item"><a class="nav-link" href="canbang.php">Cân bằng PTHH</a></li>
-                <li class="nav-item"><a class="nav-link" href="cauhoi.php">Câu hỏi</a></li>
-                <li class="nav-item"><a class="nav-link" href="periodic-table">Bảng tuần hoàn</a></li>
-                <li class="nav-item"><a class="nav-link" href="de_thi.php">Đề thi</a></li>
-                <li class="nav-item"><a class="nav-link" href="hoi_dap.php">Hỏi đáp AI</a></li>
+                <li class="nav-item"><a class="nav-link" href="<?= app_url(); ?>">Trang chủ</a></li>
+                <li class="nav-item"><a class="nav-link" href="<?= app_url('chuyende.php'); ?>">Chuyên đề</a></li>
+                <li class="nav-item"><a class="nav-link" href="<?= app_url('canbang.php'); ?>">Cân bằng PTHH</a></li>
+                <li class="nav-item"><a class="nav-link" href="<?= app_url('cauhoi.php'); ?>">Câu hỏi</a></li>
+                <li class="nav-item"><a class="nav-link" href="<?= app_url('periodic-table'); ?>">Bảng tuần hoàn</a></li>
+                <li class="nav-item"><a class="nav-link" href="<?= app_url('de_thi.php'); ?>">Đề thi</a></li>
+                <li class="nav-item"><a class="nav-link" href="<?= app_url('hoi_dap.php'); ?>">Hỏi đáp AI</a></li>
             </ul>
             <ul class="navbar-nav ms-auto">
                 <?php if (!empty($currentUser)): ?>
@@ -38,14 +38,14 @@ use function htmlspecialchars as h;
                             <span class="badge text-bg-warning ms-2">Rank <?= (int)($currentUser['diem_rank'] ?? 0); ?></span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountMenu">
-                            <li><a class="dropdown-item" href="tien_do.php">Tiến độ học</a></li>
+                            <li><a class="dropdown-item" href="<?= app_url('tien_do.php'); ?>">Tiến độ học</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="dangxuat.php">Đăng xuất</a></li>
+                            <li><a class="dropdown-item" href="<?= app_url('dangxuat.php'); ?>">Đăng xuất</a></li>
                         </ul>
                     </li>
                 <?php else: ?>
-                    <li class="nav-item"><a class="nav-link" href="dangnhap.php">Đăng nhập</a></li>
-                    <li class="nav-item"><a class="nav-link" href="dangky.php">Đăng ký</a></li>
+                    <li class="nav-item"><a class="nav-link" href="<?= app_url('dangnhap.php'); ?>">Đăng nhập</a></li>
+                    <li class="nav-item"><a class="nav-link" href="<?= app_url('dangky.php'); ?>">Đăng ký</a></li>
                 <?php endif; ?>
             </ul>
         </div>
