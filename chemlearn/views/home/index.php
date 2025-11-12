@@ -110,29 +110,4 @@ use function htmlspecialchars as h;
     </div>
 </div>
 
-<div class="chat-bubble" data-chat data-chat-token="<?= h($csrfToken); ?>">
-    <button class="chat-bubble__button shadow" type="button" data-chat-toggle aria-expanded="false" aria-controls="chatWindow">
-        <span aria-hidden="true">💬</span>
-        <span class="visually-hidden">Mở trò chuyện với ChemTutor</span>
-    </button>
-    <div class="chat-bubble__panel shadow d-none" id="chatWindow" data-chat-panel>
-        <div class="chat-bubble__header">ChemTutor</div>
-        <div class="chat-window" data-chat-window>
-            <div class="chat-message chat-message--assistant">
-                <div class="chat-message__avatar">🤖</div>
-                <div class="chat-message__content">
-                    <p class="mb-1">Chào bạn! Mình là gia sư Hóa học ChemTutor. Bạn muốn ôn chủ đề nào hôm nay?</p>
-                </div>
-            </div>
-        </div>
-        <form class="chat-form" data-chat-form>
-            <div class="input-group input-group-sm">
-                <input type="text" class="form-control" placeholder="Nhập câu hỏi của bạn..." autocomplete="off" data-chat-input>
-                <button class="btn btn-success" type="submit">Gửi</button>
-            </div>
-            <div class="chat-error text-danger small mt-2 d-none" data-chat-error></div>
-        </form>
-    </div>
-</div>
-
 <div class="decor-layer" data-decor-layer aria-hidden="true"></div>
