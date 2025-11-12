@@ -1,0 +1,180 @@
+:root {
+    --kiem: #64b5f6;
+    --kiem-tho: #ef9a9a;
+    --chuyen: #b39ddb;
+    --hau: #a5d6a7;
+    --a-kim: #ffd54f;
+    --phi-kim: #90caf9;
+    --halogen: #f48fb1;
+    --khi-hiem: #80deea;
+    --lantan: #ffe082;
+    --actin: #ffcc80;
+    --unk: #cfd8dc;
+}
+
+.periodic-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.periodic-title {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.periodic-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+}
+
+.periodic-toolbar input[type="search"],
+.periodic-toolbar select {
+    padding: 0.6rem 0.85rem;
+    border-radius: 0.85rem;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    min-width: 240px;
+}
+
+.ptable-grid {
+    display: grid;
+    grid-template-columns: repeat(18, minmax(0, 1fr));
+    grid-auto-rows: minmax(80px, auto);
+    gap: 8px;
+    margin-bottom: 2rem;
+}
+
+.series-grid {
+    display: grid;
+    grid-template-columns: repeat(15, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.periodic-cell {
+    position: relative;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    padding: 0.6rem;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.periodic-cell:hover,
+.periodic-cell:focus-within {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 18px rgba(33, 150, 243, 0.18);
+}
+
+.periodic-cell .z {
+    font-size: 0.75rem;
+    opacity: 0.7;
+}
+
+.periodic-cell .sym {
+    font-size: 1.55rem;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.periodic-cell .name {
+    font-size: 0.82rem;
+    opacity: 0.9;
+}
+
+.periodic-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.1rem;
+    list-style: none;
+    padding: 0;
+    margin: 2rem 0 0;
+}
+
+.periodic-legend li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.92rem;
+}
+
+.periodic-legend .dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+}
+
+.periodic-cell.cat-kiem,
+.periodic-legend .cat-kiem { background: color-mix(in srgb, var(--kiem) 28%, white); }
+.periodic-cell.cat-kiem_tho,
+.periodic-legend .cat-kiem_tho { background: color-mix(in srgb, var(--kiem-tho) 30%, white); }
+.periodic-cell.cat-chuyen_tiep,
+.periodic-legend .cat-chuyen_tiep { background: color-mix(in srgb, var(--chuyen) 32%, white); }
+.periodic-cell.cat-hau_chuyen_tiep,
+.periodic-legend .cat-hau_chuyen_tiep { background: color-mix(in srgb, var(--hau) 32%, white); }
+.periodic-cell.cat-a_kim,
+.periodic-legend .cat-a_kim { background: color-mix(in srgb, var(--a-kim) 36%, white); }
+.periodic-cell.cat-phi_kim,
+.periodic-legend .cat-phi_kim { background: color-mix(in srgb, var(--phi-kim) 32%, white); }
+.periodic-cell.cat-halogen,
+.periodic-legend .cat-halogen { background: color-mix(in srgb, var(--halogen) 32%, white); }
+.periodic-cell.cat-khi_hiem,
+.periodic-legend .cat-khi_hiem { background: color-mix(in srgb, var(--khi-hiem) 32%, white); }
+.periodic-cell.cat-lantanide,
+.periodic-legend .cat-lantanide { background: color-mix(in srgb, var(--lantan) 36%, white); }
+.periodic-cell.cat-actinide,
+.periodic-legend .cat-actinide { background: color-mix(in srgb, var(--actin) 36%, white); }
+.periodic-cell.cat-chua_xd,
+.periodic-legend .cat-chua_xd { background: color-mix(in srgb, var(--unk) 36%, white); }
+
+.periodic-series-heading {
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+@media (max-width: 992px) {
+    .ptable-grid {
+        grid-template-columns: repeat(9, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .periodic-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .ptable-grid {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+
+    .series-grid {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 540px) {
+    .ptable-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .periodic-cell {
+        padding: 0.5rem;
+    }
+
+    .periodic-cell .sym {
+        font-size: 1.3rem;
+    }
+
+    .periodic-cell .name {
+        font-size: 0.78rem;
+    }
+}
+
+.periodic-cell.is-hidden {
+    display: none !important;
+}

@@ -4,24 +4,23 @@ declare(strict_types=1);
 
 namespace ChemLearn\Controllers;
 
-use ChemLearn\Models\NguyenTo;
-
 class PeriodicTableController extends BaseController
 {
-    private NguyenTo $nguyenToModel;
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->nguyenToModel = new NguyenTo();
-    }
-
     public function index(): void
     {
-        $elements = $this->nguyenToModel->all();
-        $this->render('periodic/index', [
-            'title' => 'Bảng tuần hoàn hóa học',
-            'elements' => $elements,
+        $path = BASE_PATH . '/data/elements.json';
+        $json = is_file($path) ? file_get_contents($path) : '[]';
+        $elements = json_decode($json, true);
+
+        if (!is_array($elements)) {
+            $elements = [];
+        }
+
+        usort($elements, static fn(array $a, array $b): int => ($a['Z'] ?? 0) <=> ($b['Z'] ?? 0));
+
+        $this->render('periodic_table/index', [
+            'title' => 'Bảng tuần hoàn – ChemLearn',
+            'elementsVar' => $elements,
         ]);
     }
 }
