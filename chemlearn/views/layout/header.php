@@ -26,6 +26,7 @@ use function htmlspecialchars as h;
                 <li class="nav-item"><a class="nav-link" href="<?= app_url('chuyende.php'); ?>">Chuyên đề</a></li>
                 <li class="nav-item"><a class="nav-link" href="<?= app_url('canbang.php'); ?>">Cân bằng PTHH</a></li>
                 <li class="nav-item"><a class="nav-link" href="<?= app_url('cauhoi.php'); ?>">Câu hỏi</a></li>
+                <li class="nav-item"><a class="nav-link" href="<?= app_url('phuongtrinh'); ?>">Phương trình</a></li>
                 <li class="nav-item"><a class="nav-link" href="<?= app_url('periodic-table'); ?>">Bảng tuần hoàn</a></li>
                 <li class="nav-item"><a class="nav-link" href="<?= app_url('de_thi.php'); ?>">Đề thi</a></li>
                 <li class="nav-item"><a class="nav-link" href="<?= app_url('hoi_dap.php'); ?>">Hỏi đáp AI</a></li>

@@ -7,6 +7,7 @@ use Bramus\Router\Router;
 use ChemLearn\Controllers\ChatController;
 use ChemLearn\Controllers\HomeController;
 use ChemLearn\Controllers\PeriodicTableController;
+use ChemLearn\Controllers\PhuongTrinhController;
 
 $router = new Router();
 
@@ -20,6 +21,10 @@ $router->get('/index.php', static function (): void {
 
 $router->get('/periodic-table', static function (): void {
     (new PeriodicTableController())->index();
+});
+
+$router->get('/phuongtrinh', static function (): void {
+    (new PhuongTrinhController())->index();
 });
 
 $router->post('/ai/ask', static function (): void {
