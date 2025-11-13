@@ -26,7 +26,32 @@ class Router
 
     public function get(string $pattern, $handler): self
     {
-        return $this->map(['GET'], $pattern, $handler);
+        return $this->map(['GET', 'HEAD'], $pattern, $handler);
+    }
+
+    public function post(string $pattern, $handler): self
+    {
+        return $this->map(['POST'], $pattern, $handler);
+    }
+
+    public function put(string $pattern, $handler): self
+    {
+        return $this->map(['PUT'], $pattern, $handler);
+    }
+
+    public function delete(string $pattern, $handler): self
+    {
+        return $this->map(['DELETE'], $pattern, $handler);
+    }
+
+    public function patch(string $pattern, $handler): self
+    {
+        return $this->map(['PATCH'], $pattern, $handler);
+    }
+
+    public function options(string $pattern, $handler): self
+    {
+        return $this->map(['OPTIONS'], $pattern, $handler);
     }
 
     /**
