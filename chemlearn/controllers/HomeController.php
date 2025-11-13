@@ -5,7 +5,7 @@ namespace ChemLearn\Controllers;
 /**
  * HomeController chịu trách nhiệm xử lý yêu cầu đến trang chủ ChemLearn.
  */
-class HomeController
+class HomeController extends BaseController
 {
     /**
      * Phương thức index() chuẩn bị dữ liệu và render giao diện trang chủ.
@@ -58,18 +58,11 @@ class HomeController
             ],
         ];
 
-        // Xác định đường dẫn tuyệt đối đến file view để nạp giao diện trang chủ.
-        $viewPath = __DIR__ . '/../views/home/index.php';
-
-        // Bắt đầu bộ đệm đầu ra để lấy nội dung HTML của view.
-        ob_start();
-        require $viewPath;
-        $content = ob_get_clean();
-
-        // Xác định đường dẫn đến layout để bọc nội dung trang chủ trong khung giao diện chung.
-        $layoutPath = __DIR__ . '/../views/layouts/default.php';
-
-        // Nạp layout và hiển thị toàn bộ trang cho người dùng.
-        require $layoutPath;
+        // Sử dụng tiện ích view() của BaseController để render view và layout.
+        $this->view('home/index', [
+            'pageTitle' => $pageTitle,
+            'intro' => $intro,
+            'featureCards' => $featureCards,
+        ]);
     }
 }

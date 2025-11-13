@@ -1,6 +1,6 @@
 {
     "name": "chemlearn/homepage",
-    "description": "ChemLearn MVC skeleton with home page",
+    "description": "ChemLearn MVC skeleton with home and topic pages",
     "type": "project",
     "require": {
         "php": "^8.0",
@@ -8,7 +8,8 @@
     },
     "autoload": {
         "psr-4": {
-            "ChemLearn\\": "controllers/"
+            "ChemLearn\\Controllers\\": "controllers/",
+            "ChemLearn\\Models\\": "models/"
         }
     }
 }

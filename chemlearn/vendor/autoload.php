@@ -3,7 +3,8 @@
 
 spl_autoload_register(function (string $class): void {
     $prefixes = [
-        'ChemLearn\\' => __DIR__ . '/../controllers/',
+        'ChemLearn\\Controllers\\' => __DIR__ . '/../controllers/',
+        'ChemLearn\\Models\\' => __DIR__ . '/../models/',
         'Bramus\\Router\\' => __DIR__ . '/Bramus/Router/',
     ];
 
