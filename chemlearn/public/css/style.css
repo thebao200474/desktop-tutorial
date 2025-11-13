@@ -258,3 +258,29 @@ footer a {
         bottom: 11.5rem;
     }
 }
+
+/* Gợi ý tìm kiếm phương trình hóa học */
+.equation-search-wrapper {
+    position: relative;
+}
+
+.equation-suggestions {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 0;
+    right: 0;
+    max-height: 260px;
+    overflow-y: auto;
+    border-radius: 0.75rem;
+    z-index: 1040;
+}
+
+.equation-suggestions .list-group-item {
+    cursor: pointer;
+}
+
+@media (max-width: 576px) {
+    .equation-suggestions {
+        max-height: 220px;
+    }
+}

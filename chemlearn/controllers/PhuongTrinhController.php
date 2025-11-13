@@ -15,17 +15,20 @@ class PhuongTrinhController extends BaseController
         $keyword = isset($_GET['q']) ? trim((string) $_GET['q']) : '';
 
         try {
+            $allEquations = $model->getAll();
             $equations = $keyword === ''
-                ? $model->getAll()
+                ? $allEquations
                 : $model->search($keyword);
         } catch (Throwable $exception) {
-            $equations = [];
+            $allEquations = $model->getAll();
+            $equations = $keyword === '' ? $allEquations : [];
         }
 
         $this->render('phuongtrinh/index', [
             'title' => '🔬 Phương trình Hóa học Phổ Biến',
             'equations' => $equations,
             'keyword' => $keyword,
+            'allEquations' => $allEquations ?? [],
         ]);
     }
 }

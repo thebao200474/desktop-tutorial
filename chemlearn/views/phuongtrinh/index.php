@@ -6,13 +6,23 @@ use function htmlspecialchars as h;
         <h1 class="display-5 fw-bold">🔬 Phương trình Hóa học Phổ Biến</h1>
         <p class="text-muted lead">Khám phá các phản ứng tiêu biểu và tra cứu nhanh chóng theo chất hoặc ký hiệu.</p>
         <form class="d-flex justify-content-center mt-4" method="get" action="<?= app_url('phuongtrinh'); ?>">
-            <div class="input-group input-group-lg w-100" style="max-width: 540px;">
+            <div class="input-group input-group-lg w-100 equation-search-wrapper" style="max-width: 540px;">
                 <span class="input-group-text bg-success text-white">🔍</span>
-                <input type="search" name="q" class="form-control" placeholder="Nhập chất hoặc ký hiệu (ví dụ: H₂, O₂, CO₂)"
-                       value="<?= h($keyword ?? ''); ?>" aria-label="Tìm kiếm phương trình">
+                <input
+                    type="search"
+                    name="q"
+                    class="form-control"
+                    placeholder="Nhập chất hoặc ký hiệu (ví dụ: H₂, O₂, CO₂)"
+                    value="<?= h($keyword ?? ''); ?>"
+                    aria-label="Tìm kiếm phương trình"
+                    data-equation-search
+                >
                 <button class="btn btn-success" type="submit">Tìm kiếm</button>
             </div>
         </form>
+        <div class="position-relative d-flex justify-content-center">
+            <div class="list-group equation-suggestions d-none shadow" data-equation-suggestions></div>
+        </div>
     </div>
 
     <?php if (!empty($equations)): ?>
@@ -38,3 +48,12 @@ use function htmlspecialchars as h;
         </div>
     <?php endif; ?>
 </section>
+<?php
+$suggestionData = json_encode($allEquations ?? [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+$currentKeyword = json_encode($keyword ?? '', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+?>
+<script>
+    window.ChemLearnEquationData = <?= $suggestionData ?: '[]'; ?>;
+    window.ChemLearnEquationKeyword = <?= $currentKeyword ?: "''"; ?>;
+</script>
+<script src="<?= asset_url('js/phuongtrinh.js'); ?>" defer></script>
