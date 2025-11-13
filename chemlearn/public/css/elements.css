@@ -1,0 +1,158 @@
+/* CSS dành riêng cho trang Bảng tuần hoàn ChemLearn. */
+
+.periodic-wrapper {
+    background: #ffffff;
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px rgba(13, 110, 253, 0.15);
+    padding: 2rem;
+}
+
+.periodic-toolbar .form-control,
+.periodic-toolbar .form-select {
+    border-radius: 0.75rem;
+}
+
+.periodic-toolbar .btn {
+    border-radius: 0.75rem;
+}
+
+.periodic-grid {
+    display: grid;
+    grid-template-columns: repeat(18, minmax(60px, 1fr));
+    gap: 0.5rem;
+    justify-items: stretch;
+}
+
+.element-tile {
+    position: relative;
+    border-radius: 0.75rem;
+    padding: 0.65rem 0.35rem;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 10px rgba(13, 110, 253, 0.08);
+    background-color: #f5f9ff;
+    border: 1px solid rgba(13, 110, 253, 0.15);
+}
+
+.element-tile:hover,
+.element-tile:focus {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 18px rgba(13, 110, 253, 0.25);
+    outline: none;
+}
+
+.element-tile.is-selected {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.7), 0 10px 22px rgba(13, 110, 253, 0.35);
+}
+
+.element-tile .atomic-number {
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.element-tile .symbol {
+    font-weight: 700;
+    font-size: 1.4rem;
+    letter-spacing: 0.03em;
+}
+
+.element-tile .name {
+    font-size: 0.7rem;
+    color: rgba(33, 37, 41, 0.8);
+    margin-top: 0.3rem;
+}
+
+.element-tile .mass {
+    font-size: 0.68rem;
+    color: rgba(33, 37, 41, 0.65);
+}
+
+.element-tile.is-hidden {
+    display: none;
+}
+
+.periodic-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    font-size: 0.85rem;
+}
+
+.periodic-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.periodic-legend .legend-sample {
+    width: 1.2rem;
+    height: 1.2rem;
+    border-radius: 0.35rem;
+    border: 1px solid rgba(33, 37, 41, 0.15);
+}
+
+.periodic-detail {
+    background: #0d6efd;
+    border-radius: 1rem;
+    color: #ffffff;
+    padding: 1.25rem;
+    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.3);
+}
+
+.periodic-detail h3 {
+    font-weight: 700;
+    font-size: 1.75rem;
+}
+
+.periodic-detail p {
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.periodic-detail .detail-placeholder {
+    opacity: 0.8;
+}
+
+/* Màu sắc cho từng nhóm nguyên tố (đã được slug hóa trong JS). */
+.group-phi-kim { background: linear-gradient(135deg, #a5d8ff, #d0ebff); }
+.group-khi-hiem { background: linear-gradient(135deg, #f8a5c2, #fbc9d4); }
+.group-kim-loai-kiem { background: linear-gradient(135deg, #ffd8a8, #ffe8cc); }
+.group-kim-loai-kiem-tho { background: linear-gradient(135deg, #ffe066, #fff3bf); }
+.group-a-kim { background: linear-gradient(135deg, #e5b0ff, #f3d9fa); }
+.group-kim-loai-chuyen-tiep { background: linear-gradient(135deg, #c7d2fe, #dee2ff); }
+.group-kim-loai-hau-chuyen-tiep { background: linear-gradient(135deg, #ffe9a1, #fff4d6); }
+.group-lantan { background: linear-gradient(135deg, #b8f2a1, #d3f9d8); }
+.group-actini { background: linear-gradient(135deg, #ffc9a9, #ffe0cc); }
+.group-halogen { background: linear-gradient(135deg, #d3bfff, #e5d5ff); }
+.group-dac-tinh-khong-xac-dinh { background: linear-gradient(135deg, #ced4da, #e9ecef); }
+
+/* Responsive tinh chỉnh cho thiết bị nhỏ. */
+@media (max-width: 992px) {
+    .periodic-grid {
+        grid-template-columns: repeat(12, minmax(60px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .periodic-wrapper {
+        padding: 1.5rem;
+    }
+
+    .periodic-grid {
+        grid-template-columns: repeat(6, minmax(60px, 1fr));
+    }
+}
+
+@media (max-width: 576px) {
+    .periodic-grid {
+        grid-template-columns: repeat(4, minmax(55px, 1fr));
+    }
+
+    .element-tile {
+        padding: 0.5rem 0.25rem;
+    }
+}

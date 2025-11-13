@@ -6,6 +6,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 use Bramus\Router\Router;
 use ChemLearn\Controllers\HomeController;
+use ChemLearn\Controllers\ElementsController;
 use ChemLearn\Controllers\TopicController;
 use ChemLearn\Models\LessonModel;
 use ChemLearn\Models\TopicModel;
@@ -33,6 +34,7 @@ $router = new Router();
 
 // Khởi tạo các controller và model cần thiết cho ứng dụng.
 $homeController = new HomeController();
+$elementsController = new ElementsController();
 $topicModel = new TopicModel($pdo);
 $lessonModel = new LessonModel($pdo);
 $topicController = new TopicController($topicModel, $lessonModel);
@@ -50,6 +52,14 @@ $router->get('/home', function () use ($homeController) {
 // Route hiển thị danh sách tất cả chủ đề: /topics.
 $router->get('/topics', function () use ($topicController) {
     $topicController->index();
+});
+
+// Route hiển thị bảng tuần hoàn, phục vụ cả /periodic và /elements.
+$router->get('/periodic', function () use ($elementsController) {
+    $elementsController->index();
+});
+$router->get('/elements', function () use ($elementsController) {
+    $elementsController->index();
 });
 
 // Route hiển thị chi tiết từng chủ đề: /topics/{id}.
