@@ -17,6 +17,26 @@ class TopicController extends BaseController
     }
 
     /**
+     * Hiển thị danh sách toàn bộ chủ đề cùng bộ đếm bài giảng và ô tìm kiếm.
+     */
+    public function index(): void
+    {
+        $q = trim($_GET['q'] ?? '');
+
+        if ($q !== '') {
+            $topics = $this->topicModel->searchByName($q);
+        } else {
+            $topics = $this->topicModel->getAllWithCounts();
+        }
+
+        $this->view('topics/index', [
+            'pageTitle' => 'Chuyên đề Hóa học',
+            'topics' => $topics,
+            'q' => $q,
+        ]);
+    }
+
+    /**
      * Hiển thị thông tin chủ đề và các bài giảng liên quan.
      */
     public function show(int $id): void

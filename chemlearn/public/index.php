@@ -47,6 +47,11 @@ $router->get('/home', function () use ($homeController) {
     $homeController->index();
 });
 
+// Route hiển thị danh sách tất cả chủ đề: /topics.
+$router->get('/topics', function () use ($topicController) {
+    $topicController->index();
+});
+
 // Route hiển thị chi tiết từng chủ đề: /topics/{id}.
 $router->get('/topics/(\d+)', function (int $id) use ($topicController) {
     $topicController->show($id);
