@@ -2,6 +2,18 @@
 
 declare(strict_types=1);
 
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
+if (empty($_SESSION['csrf'])) {
+    $_SESSION['csrf'] = $_SESSION['csrf_token'];
+}
+
 if (!defined('BASE_PATH')) {
     define('BASE_PATH', __DIR__);
 }

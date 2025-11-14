@@ -47,9 +47,9 @@ use function htmlspecialchars as h;
         <div class="card h-100 border-0 shadow-sm card-hover">
             <div class="card-body text-center">
                 <div class="display-6 mb-3">🤖</div>
-                <h5 class="card-title">Hỏi đáp AI</h5>
-                <p class="card-text">Đặt câu hỏi và nhận phản hồi mô phỏng từ AI ChemLearn.</p>
-                <a href="<?= app_url('hoi_dap.php'); ?>" class="btn btn-primary">Đặt câu hỏi</a>
+                <h5 class="card-title">Chatbot Hóa học</h5>
+                <p class="card-text">Trò chuyện với trợ lý ChemLearn ngay trên mọi trang.</p>
+                <button type="button" class="btn btn-primary" data-open-chat>Mở chat ngay</button>
             </div>
         </div>
     </div>

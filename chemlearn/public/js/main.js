@@ -15,14 +15,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     initializeFloatingActions();
-    initializeChatBot();
     initializeDecoration();
     initializePeriodicFilter();
 });
 
 function initializeFloatingActions() {
     setupFloatingContainer(document.querySelector('[data-settings]'), '[data-settings-toggle]', '[data-settings-panel]');
-    setupFloatingContainer(document.querySelector('[data-chat]'), '[data-chat-toggle]', '[data-chat-panel]');
 }
 
 function setupFloatingContainer(container, toggleSelector, panelSelector) {
@@ -53,109 +51,6 @@ function setupFloatingContainer(container, toggleSelector, panelSelector) {
             toggle.setAttribute('aria-expanded', 'false');
         }
     });
-}
-
-function initializeChatBot() {
-    const chatContainer = document.querySelector('[data-chat]');
-    if (!chatContainer) {
-        return;
-    }
-
-    const form = chatContainer.querySelector('[data-chat-form]');
-    const input = chatContainer.querySelector('[data-chat-input]');
-    const chatWindow = chatContainer.querySelector('[data-chat-window]');
-    const errorEl = chatContainer.querySelector('[data-chat-error]');
-    const token = chatContainer.getAttribute('data-chat-token');
-    const panel = chatContainer.querySelector('[data-chat-panel]');
-    const toggle = chatContainer.querySelector('[data-chat-toggle]');
-    const submitBtn = form ? form.querySelector('button[type="submit"]') : null;
-
-    if (!form || !input || !chatWindow || !token || !panel || !toggle) {
-        return;
-    }
-
-    let isSending = false;
-
-    form.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        const message = input.value.trim();
-        if (message === '' || isSending) {
-            return;
-        }
-
-        appendChatMessage(chatWindow, 'user', message);
-        input.value = '';
-        if (errorEl) {
-            errorEl.classList.add('d-none');
-            errorEl.textContent = '';
-        }
-
-        isSending = true;
-        if (submitBtn) {
-            submitBtn.disabled = true;
-        }
-
-        try {
-            const response = await fetch('chat_api.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    message,
-                    csrf_token: token,
-                }),
-            });
-
-            const payload = await response.json();
-            if (!response.ok || !payload || typeof payload.reply !== 'string') {
-                throw new Error(payload && payload.error ? payload.error : 'Không thể phản hồi, vui lòng thử lại.');
-            }
-
-            appendChatMessage(chatWindow, 'assistant', payload.reply);
-        } catch (error) {
-            if (errorEl) {
-                errorEl.textContent = error instanceof Error ? error.message : 'Không thể gửi tin nhắn.';
-                errorEl.classList.remove('d-none');
-            }
-        } finally {
-            chatWindow.scrollTop = chatWindow.scrollHeight;
-            isSending = false;
-            if (submitBtn) {
-                submitBtn.disabled = false;
-            }
-        }
-    });
-
-    toggle.addEventListener('click', () => {
-        if (!panel.classList.contains('d-none')) {
-            chatWindow.scrollTop = chatWindow.scrollHeight;
-        }
-    });
-}
-
-function appendChatMessage(chatWindow, role, message) {
-    const wrapper = document.createElement('div');
-    wrapper.className = 'chat-message' + (role === 'user' ? ' chat-message--user' : ' chat-message--assistant');
-
-    const avatar = document.createElement('div');
-    avatar.className = 'chat-message__avatar';
-    avatar.textContent = role === 'user' ? '🙂' : '🤖';
-
-    const content = document.createElement('div');
-    content.className = 'chat-message__content';
-    const lines = String(message).split('\n');
-    lines.forEach((line, index) => {
-        if (index > 0) {
-            content.appendChild(document.createElement('br'));
-        }
-        content.appendChild(document.createTextNode(line));
-    });
-
-    wrapper.appendChild(avatar);
-    wrapper.appendChild(content);
-    chatWindow.appendChild(wrapper);
-    chatWindow.scrollTop = chatWindow.scrollHeight;
 }
 
 function initializeDecoration() {

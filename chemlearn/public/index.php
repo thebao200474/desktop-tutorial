@@ -4,7 +4,7 @@ declare(strict_types=1);
 require __DIR__ . '/../bootstrap.php';
 
 use Bramus\Router\Router;
-use ChemLearn\Controllers\ChatController;
+use ChemLearn\Controllers\ChatbotController;
 use ChemLearn\Controllers\HomeController;
 use ChemLearn\Controllers\PeriodicTableController;
 use ChemLearn\Controllers\PhuongTrinhController;
@@ -27,8 +27,8 @@ $router->get('/phuongtrinh', static function (): void {
     (new PhuongTrinhController())->index();
 });
 
-$router->post('/ai/ask', static function (): void {
-    (new ChatController())->respond();
+$router->post('/chatbot/ask', static function (): void {
+    (new ChatbotController())->ask();
 });
 
 $router->set404(static function (): void {

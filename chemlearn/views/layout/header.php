@@ -7,6 +7,8 @@ use function htmlspecialchars as h;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= isset($title) ? h($title) : 'ChemLearn'; ?></title>
+    <?php $csrfToken = h($_SESSION['csrf_token'] ?? $_SESSION['csrf'] ?? ''); ?>
+    <meta name="csrf-token" content="<?= $csrfToken; ?>">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="<?= asset_url('css/style.css'); ?>">
     <link rel="stylesheet" href="<?= asset_url('css/periodic-table.css'); ?>">
@@ -28,8 +30,8 @@ use function htmlspecialchars as h;
                 <li class="nav-item"><a class="nav-link" href="<?= app_url('cauhoi.php'); ?>">Câu hỏi</a></li>
                 <li class="nav-item"><a class="nav-link" href="<?= app_url('phuongtrinh'); ?>">Phương trình</a></li>
                 <li class="nav-item"><a class="nav-link" href="<?= app_url('periodic-table'); ?>">Bảng tuần hoàn</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" data-open-chat>Chatbot Hóa học</a></li>
                 <li class="nav-item"><a class="nav-link" href="<?= app_url('de_thi.php'); ?>">Đề thi</a></li>
-                <li class="nav-item"><a class="nav-link" href="<?= app_url('hoi_dap.php'); ?>">Hỏi đáp AI</a></li>
             </ul>
             <ul class="navbar-nav ms-auto">
                 <?php if (!empty($currentUser)): ?>
