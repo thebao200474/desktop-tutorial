@@ -45,8 +45,9 @@ use function htmlspecialchars as h;
     </div>
 </section>
 
-<script src="https://cdn.ckeditor.com/4.22.1/standard-all/ckeditor.js"></script>
+<script src="https://cdn.ckeditor.com/4.25.0-lts/standard-all/ckeditor.js"></script>
 <script>
+    CKEDITOR.config.versionCheck = false;
     CKEDITOR.replace('questionContent', {
         language: 'vi',
         height: 360,
