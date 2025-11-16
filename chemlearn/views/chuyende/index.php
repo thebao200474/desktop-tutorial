@@ -2,7 +2,8 @@
 use function htmlspecialchars as h;
 
 $lessons = $lessons ?? [];
-$coreTopics = $coreTopics ?? [];
+$topicGrid = $topicGrid ?? [];
+$topicDetails = $topicDetails ?? [];
 $laws = $laws ?? [];
 $formulas = $formulas ?? [];
 $decorImages = $decorImages ?? [];
@@ -12,11 +13,10 @@ $decorImages = $decorImages ?? [];
     <div class="card-body d-lg-flex align-items-center gap-4">
         <div class="flex-grow-1">
             <p class="text-uppercase text-primary fw-semibold mb-2">ChemLearn Modules</p>
-            <h1 class="display-6 fs-2 fw-bold mb-3">🔬 Phân hệ Chuyên đề Hóa học</h1>
+            <h1 class="display-6 fs-2 fw-bold mb-3">🔬 8 chuyên đề Hóa học cốt lõi</h1>
             <p class="text-muted mb-0">
-                10 chuyên đề cốt lõi + mục Định luật + mục Công thức được trình bày theo dạng mục lục số hóa
-                (1, 1.1, …) giúp dễ dàng đưa vào AI offline và bài giảng ChemLearn. Tất cả nội dung bám sát chương
-                trình phổ thông – đại cương và đi kèm ví dụ minh họa.
+                Bộ nội dung rút gọn gồm 8 chuyên đề trọng tâm, mỗi chuyên đề có phần lý thuyết, ví dụ và 5 câu trắc nghiệm
+                kèm đáp án để dùng cho AI offline và giáo án ChemLearn.
             </p>
         </div>
         <div class="module-hero__illustration text-center mt-4 mt-lg-0">
@@ -28,11 +28,11 @@ $decorImages = $decorImages ?? [];
 <?php if (!empty($decorImages)): ?>
     <div class="decor-gallery card border-0 shadow-sm mb-5">
         <div class="card-body">
-            <div class="decor-grid">
+            <div class="decor-scroll" role="list">
                 <?php foreach ($decorImages as $decor): ?>
-                    <figure class="decor-item">
+                    <figure class="decor-item" role="listitem">
                         <img src="<?= asset_url('images/topics/' . h($decor['file'])); ?>" alt="<?= h($decor['alt']); ?>" width="120" height="120">
-                        <figcaption class="small text-muted"><?= h($decor['alt']); ?></figcaption>
+                        <figcaption class="small text-muted text-center mt-2"><?= h($decor['alt']); ?></figcaption>
                     </figure>
                 <?php endforeach; ?>
             </div>
@@ -43,34 +43,75 @@ $decorImages = $decorImages ?? [];
 <section class="mb-5">
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
         <div>
-            <h2 class="h4 mb-1">10 Chuyên đề Hóa học cốt lõi</h2>
-            <p class="text-muted mb-0">Bám sát chương trình phổ thông – đại cương, đầy đủ ví dụ minh họa.</p>
+            <h2 class="h4 mb-1">Danh mục 8 chuyên đề (grid 3×)</h2>
+            <p class="text-muted mb-0">Chỉ hiển thị mã và tên chuyên đề để dễ quan sát tổng quan.</p>
         </div>
         <a href="<?= app_url(); ?>" class="btn btn-outline-primary">← Về trang chủ</a>
     </div>
 
-    <div class="topic-grid">
-        <?php foreach ($coreTopics as $topic): ?>
-            <article class="topic-card card border-0 shadow-sm">
+    <div class="topic-grid-simple">
+        <?php foreach ($topicGrid as $topic): ?>
+            <div class="topic-pill card border-0 shadow-sm text-center">
+                <div class="card-body py-4">
+                    <span class="badge rounded-pill bg-primary-subtle text-primary fw-semibold mb-2">Chuyên đề <?= h($topic['code']); ?></span>
+                    <p class="fw-semibold mb-0"><?= h($topic['title']); ?></p>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+</section>
+
+<section class="mb-5">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div>
+            <h2 class="h4 mb-1">Nội dung chi tiết + ví dụ + trắc nghiệm</h2>
+            <p class="text-muted mb-0">Mỗi chuyên đề gồm phần lý thuyết, ví dụ minh họa và 5 câu hỏi trắc nghiệm.</p>
+        </div>
+    </div>
+
+    <div class="topic-detail-stack">
+        <?php foreach ($topicDetails as $topic): ?>
+            <article class="topic-detail card border-0 shadow-sm mb-4">
                 <div class="card-body">
-                    <div class="d-flex align-items-start gap-3 mb-3">
-                        <div class="topic-icon rounded-circle flex-shrink-0 text-center">
-                            <span class="badge rounded-pill bg-primary-subtle text-primary fw-semibold"><?= h($topic['code']); ?></span>
-                            <img src="<?= asset_url('images/topics/' . h($topic['icon'])); ?>" alt="<?= h($topic['title']); ?>" width="56" height="56">
-                        </div>
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
                         <div>
-                            <h3 class="h6 mb-1"><?= h($topic['title']); ?></h3>
-                            <p class="text-muted small mb-0">Module nền tảng</p>
+                            <p class="text-uppercase small text-muted mb-1">Chuyên đề <?= h($topic['code']); ?></p>
+                            <h3 class="h5 mb-1"><?= h($topic['title']); ?></h3>
+                            <p class="text-muted small mb-0"><?= h($topic['summary']); ?></p>
+                        </div>
+                        <span class="badge bg-success-subtle text-success fw-semibold">🧪 Có ví dụ & trắc nghiệm</span>
+                    </div>
+
+                    <div class="row g-4">
+                        <div class="col-lg-4">
+                            <h4 class="h6 text-primary">📘 Nội dung chính</h4>
+                            <ul class="list-unstyled small mb-0 topic-detail__list">
+                                <?php foreach ($topic['content'] as $line): ?>
+                                    <li>✔ <?= h($line); ?></li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
+                        <div class="col-lg-4">
+                            <h4 class="h6 text-warning">🧪 Ví dụ</h4>
+                            <p class="small text-muted mb-0"><?= h($topic['example']); ?></p>
+                        </div>
+                        <div class="col-lg-4">
+                            <h4 class="h6 text-success">📝 Trắc nghiệm (5 câu)</h4>
+                            <ol class="quiz-list small mb-0">
+                                <?php foreach ($topic['quiz'] as $index => $quiz): ?>
+                                    <li>
+                                        <p class="mb-1 fw-semibold"><?= h($quiz['question']); ?></p>
+                                        <ul class="list-unstyled mb-1">
+                                            <?php foreach ($quiz['options'] as $option): ?>
+                                                <li><?= h($option); ?></li>
+                                            <?php endforeach; ?>
+                                        </ul>
+                                        <span class="badge bg-primary-subtle text-primary">Đáp án: <?= h($quiz['answer']); ?></span>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ol>
                         </div>
                     </div>
-                    <ul class="list-unstyled small mb-0">
-                        <?php foreach ($topic['bullets'] as $point): ?>
-                            <li class="d-flex gap-2 mb-1">
-                                <span class="text-success">✔</span>
-                                <span><?= h($point); ?></span>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
                 </div>
             </article>
         <?php endforeach; ?>

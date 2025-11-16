@@ -371,6 +371,69 @@ footer a {
     background: rgba(25, 135, 84, 0.05);
 }
 
+.decor-scroll {
+    display: flex;
+    gap: 1.5rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+    scroll-snap-type: x mandatory;
+}
+
+.decor-item {
+    min-width: 140px;
+    scroll-snap-align: start;
+    text-align: center;
+}
+
+.topic-grid-simple {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+@media (min-width: 768px) {
+    .topic-grid-simple {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 992px) {
+    .topic-grid-simple {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+.topic-pill {
+    border-radius: 1.5rem;
+}
+
+.topic-detail {
+    border-radius: 1.5rem;
+}
+
+.topic-detail__list li {
+    margin-bottom: 0.35rem;
+}
+
+.quiz-list {
+    counter-reset: quiz;
+}
+
+.quiz-list > li {
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px dashed rgba(0, 0, 0, 0.08);
+}
+
+.quiz-list > li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.quiz-list ul li {
+    margin-left: 0.5rem;
+}
+
 @media (max-width: 576px) {
     .module-hero {
         text-align: center;
