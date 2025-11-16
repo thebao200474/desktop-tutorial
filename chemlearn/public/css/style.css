@@ -284,3 +284,62 @@ footer a {
         max-height: 220px;
     }
 }
+
+/* Trang chuyên đề */
+.module-hero {
+    background: radial-gradient(circle at top left, rgba(93, 135, 255, 0.18), transparent 65%), #fff;
+}
+
+.module-hero__illustration img {
+    filter: drop-shadow(0 10px 25px rgba(13, 110, 253, 0.25));
+}
+
+.module-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+}
+
+.module-card {
+    border-radius: 1.25rem;
+    min-height: 100%;
+}
+
+.topic-icon {
+    width: 56px;
+    height: 56px;
+    background: #e9f2ff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.4rem;
+    box-shadow: inset 0 0 0 1px rgba(13, 110, 253, 0.15);
+}
+
+.topic-icon img {
+    max-width: 100%;
+}
+
+.module-panel {
+    border-radius: 1.25rem;
+}
+
+.module-list .list-group-item {
+    background: transparent;
+    border: none;
+    padding-bottom: 0.75rem;
+}
+
+.formula-card {
+    background: rgba(25, 135, 84, 0.05);
+}
+
+@media (max-width: 576px) {
+    .module-hero {
+        text-align: center;
+    }
+
+    .module-grid {
+        gap: 1rem;
+    }
+}
