@@ -5,6 +5,7 @@ require __DIR__ . '/../bootstrap.php';
 
 use Bramus\Router\Router;
 use ChemLearn\Controllers\ChatbotController;
+use ChemLearn\Controllers\HoiDapController;
 use ChemLearn\Controllers\HomeController;
 use ChemLearn\Controllers\PeriodicTableController;
 use ChemLearn\Controllers\PhuongTrinhController;
@@ -25,6 +26,26 @@ $router->get('/periodic-table', static function (): void {
 
 $router->get('/phuongtrinh', static function (): void {
     (new PhuongTrinhController())->index();
+});
+
+$router->get('/hoi-dap', static function (): void {
+    (new HoiDapController())->index();
+});
+
+$router->get('/hoi-dap/hoi', static function (): void {
+    (new HoiDapController())->create();
+});
+
+$router->post('/hoi-dap/hoi', static function (): void {
+    (new HoiDapController())->store();
+});
+
+$router->get('/hoi-dap/(\d+)', static function (int $id): void {
+    (new HoiDapController())->show($id);
+});
+
+$router->post('/hoi-dap/(\d+)', static function (int $id): void {
+    (new HoiDapController())->answer($id);
 });
 
 $router->post('/chatbot/ask', static function (): void {

@@ -8,6 +8,7 @@ Trường Đại học Cần Thơ
 - Bảng tuần hoàn trực quan, tìm kiếm theo tên/ký hiệu
 - Làm trắc nghiệm luyện tập và thi thử THPT, hiển thị đáp án
 - Ghi tiến độ học, hệ thống điểm rank tăng khi luyện tập/thi đề
+- Module Hỏi – Đáp Hóa học với tìm kiếm, sắp xếp, đặt câu hỏi và trả lời có đính kèm file
 - Chatbot Hóa học offline dạng bong bóng trên mọi trang, lưu lịch sử tại trình duyệt
 - Trang trí giao diện với icon Hóa học kéo thả
 
@@ -23,6 +24,9 @@ PHP 8, MySQL, Bootstrap 5, PDO, Composer Autoload (PSR-4)
    - `GET /chemlearn/` → Trang chủ ChemLearn
    - `GET /chemlearn/index.php` → Trang chủ (bổ sung cho XAMPP truy cập trực tiếp)
    - `GET /chemlearn/periodic-table` → Bảng tuần hoàn offline 118 nguyên tố
+   - `GET /chemlearn/hoi-dap` → Danh sách câu hỏi, có tìm kiếm/sắp xếp
+   - `GET /chemlearn/hoi-dap/hoi` → Form đặt câu hỏi mới
+   - `POST /chemlearn/hoi-dap/{id}` → Gửi câu trả lời, cộng số lượng trả lời
    - `POST /chemlearn/chatbot/ask` → API chatbot bong bóng (gửi FormData `message`, `csrf`)
 6. Cập nhật thông tin kết nối cơ sở dữ liệu trong `config/config.php` hoặc thiết lập biến môi trường `CHEMLEARN_DB_*`.
 7. Tạo database `chemlearn` và chạy file `chemlearn.sql` để khởi tạo bảng.
@@ -33,6 +37,7 @@ PHP 8, MySQL, Bootstrap 5, PDO, Composer Autoload (PSR-4)
 - Lưu ý cột `mota` của bảng `phanung` nên chứa phương trình đã cân bằng (ví dụ: `2H2 + O2 -> 2H2O`).
 - Bổ sung dữ liệu bảng `nguyento` nếu muốn hoàn thiện bảng tuần hoàn.
 - Import file `database/chatbot.sql` để thêm bảng `faq_hoa` và dữ liệu trả lời mẫu cho chatbot.
+- Import `database/hoi_dap_module.sql` để tạo bảng `cau_hoi`, `cau_tra_loi`, `file_dinh_kem` và dữ liệu minh họa.
 - Thêm đề thi mới vào `de_thi` và `cau_hoi_de_thi` để mở rộng ngân hàng đề.
 
 Chúc bạn học tốt cùng ChemLearn! 💙

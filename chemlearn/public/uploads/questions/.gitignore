@@ -1,0 +1,3 @@
+# Keep uploads directory tracked while ignoring actual files
+*
+!.gitignore

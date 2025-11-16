@@ -559,3 +559,44 @@ footer a {
         gap: 1rem;
     }
 }
+
+/* ====== Hỏi đáp ChemLearn ====== */
+.question-card .question-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #0d6efd;
+    text-decoration: none;
+}
+
+.question-card .question-title:hover {
+    text-decoration: underline;
+}
+
+.rich-text p {
+    margin-bottom: 0.8rem;
+    line-height: 1.6;
+}
+
+.rich-text ul,
+.rich-text ol {
+    padding-left: 1.25rem;
+    margin-bottom: 0.8rem;
+}
+
+.attachment-tile {
+    min-width: 150px;
+    border: 1px solid rgba(13, 110, 253, 0.15);
+    border-radius: 12px;
+    padding: 0.75rem;
+    background: #f8fafc;
+}
+
+.attachment-tile .icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.35rem;
+}
+
+.attachment-tile img {
+    max-height: 120px;
+    object-fit: cover;
+}
