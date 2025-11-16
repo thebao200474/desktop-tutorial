@@ -45,15 +45,21 @@ use function htmlspecialchars as h;
     </div>
 </section>
 
-<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
+<script src="https://cdn.ckeditor.com/4.22.1/standard-all/ckeditor.js"></script>
 <script>
-    tinymce.init({
-        selector: '#questionContent',
-        height: 380,
-        menubar: false,
-        plugins: 'link image lists table code',
-        toolbar: 'undo redo | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image table code',
-        branding: false,
-        language: 'vi'
+    CKEDITOR.replace('questionContent', {
+        language: 'vi',
+        height: 360,
+        removePlugins: 'elementspath',
+        extraPlugins: 'autogrow',
+        autoGrow_onStartup: true,
+        toolbar: [
+            { name: 'clipboard', items: ['Undo', 'Redo'] },
+            { name: 'styles', items: ['Format'] },
+            { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'RemoveFormat'] },
+            { name: 'paragraph', items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight'] },
+            { name: 'insert', items: ['Link', 'Unlink', 'Image', 'Table'] },
+            { name: 'tools', items: ['Maximize', 'Source'] }
+        ],
     });
 </script>
