@@ -300,6 +300,43 @@ footer a {
     gap: 1.5rem;
 }
 
+.topic-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+}
+
+.topic-card .topic-icon {
+    width: 72px;
+    height: 72px;
+    background: var(--bs-primary-bg-subtle, #eef5ff);
+    border: 1px solid rgba(13, 110, 253, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.decor-gallery .decor-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+}
+
+.decor-gallery .decor-item {
+    text-align: center;
+    padding: 0.5rem;
+    border-radius: 1rem;
+    background: var(--bs-light-bg-subtle, #f8f9fa);
+    border: 1px dashed rgba(13, 110, 253, 0.2);
+}
+
+.decor-gallery .decor-item img {
+    max-width: 100%;
+    height: auto;
+}
+
 .module-card {
     border-radius: 1.25rem;
     min-height: 100%;

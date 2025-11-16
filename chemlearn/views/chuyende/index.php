@@ -2,9 +2,10 @@
 use function htmlspecialchars as h;
 
 $lessons = $lessons ?? [];
-$featuredModules = $featuredModules ?? [];
+$coreTopics = $coreTopics ?? [];
 $laws = $laws ?? [];
 $formulas = $formulas ?? [];
+$decorImages = $decorImages ?? [];
 ?>
 
 <div class="module-hero card border-0 shadow-sm mb-5">
@@ -13,16 +14,31 @@ $formulas = $formulas ?? [];
             <p class="text-uppercase text-primary fw-semibold mb-2">ChemLearn Modules</p>
             <h1 class="display-6 fs-2 fw-bold mb-3">🔬 Phân hệ Chuyên đề Hóa học</h1>
             <p class="text-muted mb-0">
-                Bộ chuyên đề này được bóc tách từ giáo trình CT275 – Công nghệ Web, giúp bạn nhanh chóng ôn lại
-                cấu trúc nguyên tử, phản ứng, định luật và công thức trọng tâm. Nội dung được tối ưu cho AI offline
-                cũng như giao diện bài giảng ChemLearn.
+                10 chuyên đề cốt lõi + mục Định luật + mục Công thức được trình bày theo dạng mục lục số hóa
+                (1, 1.1, …) giúp dễ dàng đưa vào AI offline và bài giảng ChemLearn. Tất cả nội dung bám sát chương
+                trình phổ thông – đại cương và đi kèm ví dụ minh họa.
             </p>
         </div>
         <div class="module-hero__illustration text-center mt-4 mt-lg-0">
-            <img src="<?= asset_url('images/topics/atom.svg'); ?>" alt="Atom" class="img-fluid" width="180" height="180">
+            <img src="<?= asset_url('images/topics/core-atom.svg'); ?>" alt="Atom" class="img-fluid" width="180" height="180">
         </div>
     </div>
 </div>
+
+<?php if (!empty($decorImages)): ?>
+    <div class="decor-gallery card border-0 shadow-sm mb-5">
+        <div class="card-body">
+            <div class="decor-grid">
+                <?php foreach ($decorImages as $decor): ?>
+                    <figure class="decor-item">
+                        <img src="<?= asset_url('images/topics/' . h($decor['file'])); ?>" alt="<?= h($decor['alt']); ?>" width="120" height="120">
+                        <figcaption class="small text-muted"><?= h($decor['alt']); ?></figcaption>
+                    </figure>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
 
 <section class="mb-5">
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
@@ -33,21 +49,22 @@ $formulas = $formulas ?? [];
         <a href="<?= app_url(); ?>" class="btn btn-outline-primary">← Về trang chủ</a>
     </div>
 
-    <div class="module-grid">
-        <?php foreach ($featuredModules as $module): ?>
-            <article class="module-card card border-0 shadow-sm">
+    <div class="topic-grid">
+        <?php foreach ($coreTopics as $topic): ?>
+            <article class="topic-card card border-0 shadow-sm">
                 <div class="card-body">
                     <div class="d-flex align-items-start gap-3 mb-3">
-                        <div class="topic-icon rounded-circle flex-shrink-0">
-                            <img src="<?= asset_url('images/topics/' . h($module['icon'])); ?>" alt="<?= h($module['title']); ?>" width="56" height="56">
+                        <div class="topic-icon rounded-circle flex-shrink-0 text-center">
+                            <span class="badge rounded-pill bg-primary-subtle text-primary fw-semibold"><?= h($topic['code']); ?></span>
+                            <img src="<?= asset_url('images/topics/' . h($topic['icon'])); ?>" alt="<?= h($topic['title']); ?>" width="56" height="56">
                         </div>
                         <div>
-                            <h3 class="h6 mb-1"><?= h($module['title']); ?></h3>
+                            <h3 class="h6 mb-1"><?= h($topic['title']); ?></h3>
                             <p class="text-muted small mb-0">Module nền tảng</p>
                         </div>
                     </div>
                     <ul class="list-unstyled small mb-0">
-                        <?php foreach ($module['points'] as $point): ?>
+                        <?php foreach ($topic['bullets'] as $point): ?>
                             <li class="d-flex gap-2 mb-1">
                                 <span class="text-success">✔</span>
                                 <span><?= h($point); ?></span>
