@@ -26,14 +26,14 @@ $decorImages = $decorImages ?? [];
 </div>
 
 <?php if (!empty($decorImages)): ?>
-    <div class="decor-gallery card border-0 shadow-sm mb-5">
+    <div class="decor-ribbon card border-0 shadow-sm mb-5">
         <div class="card-body">
-            <div class="decor-scroll" role="list">
+            <div class="decor-ribbon__track" role="list">
                 <?php foreach ($decorImages as $decor): ?>
-                    <figure class="decor-item" role="listitem">
-                        <img src="<?= asset_url('images/topics/' . h($decor['file'])); ?>" alt="<?= h($decor['alt']); ?>" width="120" height="120">
-                        <figcaption class="small text-muted text-center mt-2"><?= h($decor['alt']); ?></figcaption>
-                    </figure>
+                    <div class="decor-chip" role="listitem">
+                        <img src="<?= asset_url('images/topics/' . h($decor['file'])); ?>" alt="<?= h($decor['alt']); ?>" width="56" height="56">
+                        <span class="fw-semibold small text-secondary"><?= h($decor['alt']); ?></span>
+                    </div>
                 <?php endforeach; ?>
             </div>
         </div>
@@ -49,14 +49,18 @@ $decorImages = $decorImages ?? [];
         <a href="<?= app_url(); ?>" class="btn btn-outline-primary">← Về trang chủ</a>
     </div>
 
-    <div class="topic-grid-simple">
+    <div class="topic-grid-simple" role="list">
         <?php foreach ($topicGrid as $topic): ?>
-            <div class="topic-pill card border-0 shadow-sm text-center">
+            <button type="button"
+                    class="topic-pill card border-0 shadow-sm text-center"
+                    data-topic-code="<?= h($topic['code']); ?>"
+                    aria-controls="topic-detail-<?= h($topic['code']); ?>"
+                    role="listitem">
                 <div class="card-body py-4">
                     <span class="badge rounded-pill bg-primary-subtle text-primary fw-semibold mb-2">Chuyên đề <?= h($topic['code']); ?></span>
                     <p class="fw-semibold mb-0"><?= h($topic['title']); ?></p>
                 </div>
-            </div>
+            </button>
         <?php endforeach; ?>
     </div>
 </section>
@@ -69,9 +73,11 @@ $decorImages = $decorImages ?? [];
         </div>
     </div>
 
+    <div id="topic-detail-placeholder" class="alert alert-info shadow-sm rounded-4">Chọn một chuyên đề ở lưới phía trên để xem nội dung, ví dụ và bộ trắc nghiệm.</div>
+
     <div class="topic-detail-stack">
         <?php foreach ($topicDetails as $topic): ?>
-            <article class="topic-detail card border-0 shadow-sm mb-4">
+            <article class="topic-detail card border-0 shadow-sm mb-4 d-none" id="topic-detail-<?= h($topic['code']); ?>" data-topic-detail="<?= h($topic['code']); ?>">
                 <div class="card-body">
                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
                         <div>
@@ -173,6 +179,31 @@ $decorImages = $decorImages ?? [];
         </div>
     </div>
 </section>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const topicButtons = document.querySelectorAll('[data-topic-code]');
+    const detailBlocks = document.querySelectorAll('[data-topic-detail]');
+    const placeholder = document.getElementById('topic-detail-placeholder');
+
+    topicButtons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const targetCode = btn.getAttribute('data-topic-code');
+            const targetBlock = document.getElementById(`topic-detail-${targetCode}`);
+
+            detailBlocks.forEach((block) => block.classList.add('d-none'));
+            topicButtons.forEach((button) => button.classList.remove('active'));
+
+            if (targetBlock) {
+                targetBlock.classList.remove('d-none');
+                btn.classList.add('active');
+                placeholder?.classList.add('d-none');
+                targetBlock.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+            }
+        });
+    });
+});
+</script>
 
 <section class="mb-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
