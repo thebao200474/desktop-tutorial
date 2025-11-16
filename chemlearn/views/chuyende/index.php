@@ -102,7 +102,7 @@ $decorImages = $decorImages ?? [];
                                         <?php $questionIndex = (string) $index; ?>
                                         <fieldset class="quiz-question" data-question-index="<?= h($questionIndex); ?>">
                                             <legend class="fw-semibold small mb-2"><?= h($quiz['question']); ?></legend>
-                                            <div class="quiz-option-list">
+                                            <div class="quiz-answer-list">
                                                 <?php foreach ($quiz['options'] as $optionIndex => $optionText): ?>
                                                     <?php
                                                     $optionCode = null;
@@ -111,11 +111,14 @@ $decorImages = $decorImages ?? [];
                                                     } else {
                                                         $optionCode = chr(65 + $optionIndex);
                                                     }
+                                                    $inputId = sprintf('quiz-%s-%s-%s', $topic['code'], $questionIndex, $optionCode);
                                                     ?>
-                                                    <label class="quiz-option">
-                                                        <input type="radio" class="visually-hidden" name="answers[<?= h($questionIndex); ?>]" value="<?= h($optionCode); ?>" aria-label="<?= h($optionText); ?>">
-                                                        <span><?= h($optionText); ?></span>
-                                                    </label>
+                                                    <div class="form-check quiz-answer">
+                                                        <input class="form-check-input" type="radio" name="answers[<?= h($questionIndex); ?>]" id="<?= h($inputId); ?>" value="<?= h($optionCode); ?>">
+                                                        <label class="form-check-label" for="<?= h($inputId); ?>">
+                                                            <strong><?= h($optionCode); ?>.</strong> <?= h($optionText); ?>
+                                                        </label>
+                                                    </div>
                                                 <?php endforeach; ?>
                                             </div>
                                         </fieldset>
@@ -214,47 +217,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const topicButtons = document.querySelectorAll('.topic-nav-btn');
     const detailBlocks = document.querySelectorAll('[data-topic-detail]');
     const placeholder = document.getElementById('topic-detail-placeholder');
-    const setFieldsetSelectionState = (fieldset) => {
-        const options = fieldset.querySelectorAll('.quiz-option');
-        options.forEach((option) => {
-            const input = option.querySelector('input[type="radio"]');
-            option.classList.toggle('is-selected', Boolean(input && input.checked));
-        });
-    };
 
-    const selectQuizOption = (option) => {
-        const input = option.querySelector('input[type="radio"]');
-        if (!input) {
-            return;
-        }
-        input.checked = true;
-        input.dispatchEvent(new Event('change', { bubbles: true }));
-    };
-
-    const initQuizOptionInteractions = (form) => {
-        const optionNodes = form.querySelectorAll('.quiz-option');
-        optionNodes.forEach((option) => {
-            option.setAttribute('tabindex', '0');
-            option.addEventListener('click', (event) => {
-                if (event.target && event.target.tagName === 'INPUT') {
-                    return;
-                }
-                selectQuizOption(option);
-            });
-            option.addEventListener('keydown', (event) => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault();
-                    selectQuizOption(option);
-                }
-            });
-        });
-
-        const fieldsets = form.querySelectorAll('.quiz-question');
-        fieldsets.forEach((fieldset) => {
-            fieldset.querySelectorAll('input[type="radio"]').forEach((radio) => {
-                radio.addEventListener('change', () => setFieldsetSelectionState(fieldset));
-            });
-            setFieldsetSelectionState(fieldset);
+    const clearQuizState = (form) => {
+        form.querySelectorAll('.quiz-answer').forEach((answer) => {
+            answer.classList.remove('is-correct', 'is-incorrect');
         });
     };
 
@@ -279,7 +245,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const quizForms = document.querySelectorAll('.topic-quiz-form');
     quizForms.forEach((form) => {
-        initQuizOptionInteractions(form);
         form.addEventListener('submit', async (event) => {
             event.preventDefault();
 
@@ -294,6 +259,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!endpoint || !topicCode) {
                 return;
             }
+
+            clearQuizState(form);
 
             const payload = new FormData();
             payload.append('topic', topicCode);
@@ -333,16 +300,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 fieldsets.forEach((fieldset) => {
                     const idx = fieldset.getAttribute('data-question-index');
                     const detail = detailMap.get(idx);
-                    fieldset.querySelectorAll('.quiz-option').forEach((option) => {
-                        option.classList.remove('is-correct', 'is-incorrect', 'is-selected');
-                        const input = option.querySelector('input[type="radio"]');
+                    fieldset.querySelectorAll('.quiz-answer').forEach((answer) => {
+                        const input = answer.querySelector('input[type="radio"]');
                         if (!detail || !input) {
                             return;
                         }
                         if (input.value === detail.correctAnswer) {
-                            option.classList.add('is-correct');
+                            answer.classList.add('is-correct');
                         } else if (detail.userAnswer && input.value === detail.userAnswer) {
-                            option.classList.add('is-incorrect');
+                            answer.classList.add('is-incorrect');
                         }
                     });
                 });
