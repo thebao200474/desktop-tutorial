@@ -5,20 +5,171 @@ declare(strict_types=1);
 namespace ChemLearn\Controllers;
 
 use ChemLearn\Models\BaiGiang;
+use ChemLearn\Models\NguoiDung;
 
 class ChuyenDeController extends BaseController
 {
     private BaiGiang $baiGiangModel;
+    private NguoiDung $nguoiDungModel;
 
     public function __construct()
     {
         parent::__construct();
         $this->baiGiangModel = new BaiGiang();
+        $this->nguoiDungModel = new NguoiDung();
     }
 
     public function index(): void
     {
-        $topicDetails = [
+        $topicDetails = $this->getTopicDetails();
+        $topicGrid = array_map(
+            fn(array $topic): array => ['code' => $topic['code'], 'title' => $topic['title']],
+            $topicDetails
+        );
+
+        $decorImages = [
+            ['file' => 'decor-1.svg', 'alt' => 'Bộ thí nghiệm mini'],
+            ['file' => 'decor-2.svg', 'alt' => 'Sổ tay Hóa học'],
+            ['file' => 'decor-3.svg', 'alt' => 'Dụng cụ đun hóa học'],
+            ['file' => 'decor-4.svg', 'alt' => 'Phòng thí nghiệm'],
+            ['file' => 'decor-5.svg', 'alt' => 'Câu lạc bộ Hóa học'],
+            ['file' => 'decor-6.svg', 'alt' => 'Phân tử H₂SO₄'],
+            ['file' => 'decor-7.svg', 'alt' => 'Sổ tay màu sắc'],
+            ['file' => 'decor-8.svg', 'alt' => 'Mô hình hạt nhân'],
+            ['file' => 'decor-9.svg', 'alt' => 'Bình tam giác'],
+        ];
+
+        $laws = [
+            ['name' => 'Bảo toàn khối lượng', 'desc' => 'Tổng khối lượng chất tham gia bằng tổng khối lượng sản phẩm.'],
+            ['name' => 'Bảo toàn nguyên tố', 'desc' => 'Số nguyên tử mỗi nguyên tố không thay đổi sau phản ứng.'],
+            ['name' => 'Bảo toàn điện tích', 'desc' => 'Trong dung dịch, tổng điện tích dương = tổng điện tích âm.'],
+            ['name' => 'Bảo toàn electron', 'desc' => 'Số mol electron cho = số mol electron nhận.'],
+            ['name' => 'Định luật tuần hoàn', 'desc' => 'Tính chất các nguyên tố biến đổi tuần hoàn theo Z.'],
+            ['name' => 'Phương trình khí lí tưởng', 'desc' => 'pV = nRT – áp dụng cho các bài toán khí cơ bản.'],
+            ['name' => 'Định luật Henry', 'desc' => 'Độ tan khí trong dung dịch tỉ lệ với áp suất riêng phần của khí.'],
+            ['name' => 'Định luật Beer–Lambert', 'desc' => 'A = εlc, độ hấp thụ tỉ lệ với nồng độ và bề dày cuvet.'],
+            ['name' => 'Định luật Avogadro', 'desc' => 'Cùng nhiệt độ và áp suất, V khí bằng nhau ⇒ số phân tử bằng nhau.'],
+            ['name' => 'Định luật Hess', 'desc' => 'ΔH phản ứng bằng tổng entanpi các bước trung gian.'],
+        ];
+
+        $formulas = [
+            ['title' => 'Công thức cơ bản', 'lines' => ['n = m/M', 'n = V/22,4 (đktc)', 'C% = (mct/mdd) × 100%', 'CM = n/V', 'C₁V₁ = C₂V₂']],
+            ['title' => 'pH – pOH', 'lines' => ['pH = –log[H⁺]', 'pOH = –log[OH⁻]', 'pH + pOH = 14']],
+            ['title' => 'Số oxi hóa – electron', 'lines' => ['Tổng số oxi hóa = 0 với phân tử trung hòa', 'Số e cho = số e nhận']],
+            ['title' => 'Công thức hydrocarbon', 'lines' => ['Ankan: CnH2n+2', 'Anken: CnH2n', 'Ankin: CnH2n–2', 'Aren: CnH2n–6']],
+            ['title' => 'Phản ứng đặc trưng', 'lines' => ['Tráng bạc: R–CHO + 2Ag⁺ → R–COO⁻ + 2Ag', 'Este hóa: Axit + Ancol ⇄ Este + H₂O', 'Xà phòng hóa: Este + NaOH → Muối + Ancol']],
+            ['title' => 'Điện hóa & nhiệt hóa', 'lines' => ['m = (A·I·t)/(nF)', 'ΔG = –nFE', 'ΔH = ΣH(sp) – ΣH(tham gia)']],
+        ];
+
+        $this->render('chuyende/index', [
+            'title' => 'Chuyên đề Hóa học',
+            'lessons' => $this->baiGiangModel->all(),
+            'topicGrid' => $topicGrid,
+            'topicDetails' => $topicDetails,
+            'laws' => $laws,
+            'formulas' => $formulas,
+            'decorImages' => $decorImages,
+        ]);
+    }
+
+    public function submitQuiz(): void
+    {
+        header('Content-Type: application/json; charset=utf-8');
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode(['ok' => false, 'message' => 'Phương thức không được hỗ trợ.']);
+            return;
+        }
+
+        $token = $_POST['csrf_token'] ?? $_POST['csrf'] ?? null;
+        if (!$this->validateCsrfToken(is_string($token) ? $token : null)) {
+            http_response_code(403);
+            echo json_encode(['ok' => false, 'message' => 'CSRF token không hợp lệ.']);
+            return;
+        }
+
+        $topicCode = trim((string)($_POST['topic'] ?? ''));
+        $answers = $_POST['answers'] ?? [];
+        if ($topicCode === '' || !is_array($answers)) {
+            http_response_code(422);
+            echo json_encode(['ok' => false, 'message' => 'Dữ liệu gửi lên chưa đầy đủ.']);
+            return;
+        }
+
+        $topic = $this->findTopicByCode($topicCode);
+        if ($topic === null) {
+            http_response_code(404);
+            echo json_encode(['ok' => false, 'message' => 'Không tìm thấy chuyên đề cần chấm.']);
+            return;
+        }
+
+        $correctCount = 0;
+        $details = [];
+
+        foreach ($topic['quiz'] as $index => $quiz) {
+            $userAnswer = strtoupper(trim((string)($answers[$index] ?? '')));
+            $correctAnswer = strtoupper($quiz['answer']);
+            $isCorrect = $userAnswer !== '' && $userAnswer === $correctAnswer;
+            if ($isCorrect) {
+                $correctCount++;
+            }
+            $details[] = [
+                'index' => $index,
+                'question' => $quiz['question'],
+                'userAnswer' => $userAnswer,
+                'correctAnswer' => $correctAnswer,
+                'isCorrect' => $isCorrect,
+            ];
+        }
+
+        $total = count($topic['quiz']);
+        $rankAwarded = $correctCount > 0 ? $correctCount : 0;
+        $newRank = null;
+        $currentUser = $this->getCurrentUser();
+        if ($currentUser !== null && $rankAwarded > 0) {
+            $newRank = $this->nguoiDungModel->incrementRank((int)$currentUser['ma_user'], $rankAwarded);
+            $this->refreshUserRankInSession((int)$currentUser['ma_user'], $newRank);
+        }
+
+        $message = sprintf('Bạn trả lời đúng %d/%d.', $correctCount, $total);
+        if ($currentUser !== null && $rankAwarded > 0) {
+            $message .= sprintf(' Đã cộng %d điểm rank%s.', $rankAwarded, $newRank !== null ? ' (Rank hiện tại: ' . $newRank . ')' : '');
+        } elseif ($currentUser === null) {
+            $message .= ' Đăng nhập để được cộng điểm rank.';
+        }
+
+        echo json_encode(
+            [
+                'ok' => true,
+                'scoreLabel' => sprintf('%d/%d', $correctCount, $total),
+                'correct' => $correctCount,
+                'total' => $total,
+                'rankAwarded' => $rankAwarded,
+                'newRank' => $newRank,
+                'message' => $message,
+                'details' => $details,
+            ],
+            JSON_UNESCAPED_UNICODE
+        );
+    }
+
+    public function show(int $id): void
+    {
+        $lesson = $this->baiGiangModel->find($id);
+        if ($lesson === null) {
+            $this->redirect('chuyende.php');
+        }
+
+        $this->render('chuyende/detail', [
+            'title' => $lesson['ten_baigiang'],
+            'lesson' => $lesson,
+        ]);
+    }
+
+    private function getTopicDetails(): array
+    {
+        return [
             [
                 'code' => '1',
                 'title' => 'Cấu tạo nguyên tử',
@@ -173,66 +324,25 @@ class ChuyenDeController extends BaseController
             ],
         ];
 
-        $topicGrid = array_map(
-            fn(array $topic): array => ['code' => $topic['code'], 'title' => $topic['title']],
-            $topicDetails
-        );
-
-        $decorImages = [
-            ['file' => 'decor-1.svg', 'alt' => 'Bộ thí nghiệm mini'],
-            ['file' => 'decor-2.svg', 'alt' => 'Sổ tay Hóa học'],
-            ['file' => 'decor-3.svg', 'alt' => 'Dụng cụ đun hóa học'],
-            ['file' => 'decor-4.svg', 'alt' => 'Phòng thí nghiệm'],
-            ['file' => 'decor-5.svg', 'alt' => 'Câu lạc bộ Hóa học'],
-            ['file' => 'decor-6.svg', 'alt' => 'Phân tử H₂SO₄'],
-            ['file' => 'decor-7.svg', 'alt' => 'Sổ tay màu sắc'],
-            ['file' => 'decor-8.svg', 'alt' => 'Mô hình hạt nhân'],
-            ['file' => 'decor-9.svg', 'alt' => 'Bình tam giác'],
-        ];
-
-        $laws = [
-            ['name' => 'Bảo toàn khối lượng', 'desc' => 'Tổng khối lượng chất tham gia bằng tổng khối lượng sản phẩm.'],
-            ['name' => 'Bảo toàn nguyên tố', 'desc' => 'Số nguyên tử mỗi nguyên tố không thay đổi sau phản ứng.'],
-            ['name' => 'Bảo toàn điện tích', 'desc' => 'Trong dung dịch, tổng điện tích dương = tổng điện tích âm.'],
-            ['name' => 'Bảo toàn electron', 'desc' => 'Số mol electron cho = số mol electron nhận.'],
-            ['name' => 'Định luật tuần hoàn', 'desc' => 'Tính chất các nguyên tố biến đổi tuần hoàn theo Z.'],
-            ['name' => 'Phương trình khí lí tưởng', 'desc' => 'pV = nRT – áp dụng cho các bài toán khí cơ bản.'],
-            ['name' => 'Định luật Henry', 'desc' => 'Độ tan khí trong dung dịch tỉ lệ với áp suất riêng phần của khí.'],
-            ['name' => 'Định luật Beer–Lambert', 'desc' => 'A = εlc, độ hấp thụ tỉ lệ với nồng độ và bề dày cuvet.'],
-            ['name' => 'Định luật Avogadro', 'desc' => 'Cùng nhiệt độ và áp suất, V khí bằng nhau ⇒ số phân tử bằng nhau.'],
-            ['name' => 'Định luật Hess', 'desc' => 'ΔH phản ứng bằng tổng entanpi các bước trung gian.'],
-        ];
-
-        $formulas = [
-            ['title' => 'Công thức cơ bản', 'lines' => ['n = m/M', 'n = V/22,4 (đktc)', 'C% = (mct/mdd) × 100%', 'CM = n/V', 'C₁V₁ = C₂V₂']],
-            ['title' => 'pH – pOH', 'lines' => ['pH = –log[H⁺]', 'pOH = –log[OH⁻]', 'pH + pOH = 14']],
-            ['title' => 'Số oxi hóa – electron', 'lines' => ['Tổng số oxi hóa = 0 với phân tử trung hòa', 'Số e cho = số e nhận']],
-            ['title' => 'Công thức hydrocarbon', 'lines' => ['Ankan: CnH2n+2', 'Anken: CnH2n', 'Ankin: CnH2n–2', 'Aren: CnH2n–6']],
-            ['title' => 'Phản ứng đặc trưng', 'lines' => ['Tráng bạc: R–CHO + 2Ag⁺ → R–COO⁻ + 2Ag', 'Este hóa: Axit + Ancol ⇄ Este + H₂O', 'Xà phòng hóa: Este + NaOH → Muối + Ancol']],
-            ['title' => 'Điện hóa & nhiệt hóa', 'lines' => ['m = (A·I·t)/(nF)', 'ΔG = –nFE', 'ΔH = ΣH(sp) – ΣH(tham gia)']],
-        ];
-
-        $this->render('chuyende/index', [
-            'title' => 'Chuyên đề Hóa học',
-            'lessons' => $this->baiGiangModel->all(),
-            'topicGrid' => $topicGrid,
-            'topicDetails' => $topicDetails,
-            'laws' => $laws,
-            'formulas' => $formulas,
-            'decorImages' => $decorImages,
-        ]);
     }
 
-    public function show(int $id): void
+    private function findTopicByCode(string $code): ?array
     {
-        $lesson = $this->baiGiangModel->find($id);
-        if ($lesson === null) {
-            $this->redirect('chuyende.php');
+        foreach ($this->getTopicDetails() as $topic) {
+            if ($topic['code'] === $code) {
+                return $topic;
+            }
         }
 
-        $this->render('chuyende/detail', [
-            'title' => $lesson['ten_baigiang'],
-            'lesson' => $lesson,
-        ]);
+        return null;
+    }
+
+    private function refreshUserRankInSession(int $userId, int $newRank): void
+    {
+        if (empty($_SESSION['user']) || (int)($_SESSION['user']['ma_user'] ?? 0) !== $userId) {
+            return;
+        }
+
+        $_SESSION['user']['diem_rank'] = $newRank;
     }
 }
