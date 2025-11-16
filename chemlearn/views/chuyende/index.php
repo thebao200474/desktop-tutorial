@@ -6,7 +6,6 @@ $topicGrid = $topicGrid ?? [];
 $topicDetails = $topicDetails ?? [];
 $laws = $laws ?? [];
 $formulas = $formulas ?? [];
-$decorImages = $decorImages ?? [];
 ?>
 
 <div class="module-hero card border-0 shadow-sm mb-5">
@@ -137,24 +136,6 @@ $decorImages = $decorImages ?? [];
         </div>
     </div>
 </section>
-
-<?php if (!empty($decorImages)): ?>
-    <section class="mb-5">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body">
-                <p class="text-muted small mb-3">Bộ ảnh trang trí ChemLearn</p>
-                <div class="decor-ribbon__track decor-ribbon__track--compact" role="list">
-                    <?php foreach ($decorImages as $decor): ?>
-                        <div class="decor-chip" role="listitem">
-                            <img src="<?= asset_url('images/topics/' . h($decor['file'])); ?>" alt="<?= h($decor['alt']); ?>" width="56" height="56">
-                            <span class="fw-semibold small text-secondary"><?= h($decor['alt']); ?></span>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-        </div>
-    </section>
-<?php endif; ?>
 
 <section class="mb-5">
     <div class="row g-4">

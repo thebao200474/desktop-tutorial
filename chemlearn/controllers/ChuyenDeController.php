@@ -27,18 +27,6 @@ class ChuyenDeController extends BaseController
             $topicDetails
         );
 
-        $decorImages = [
-            ['file' => 'decor-1.svg', 'alt' => 'Bộ thí nghiệm mini'],
-            ['file' => 'decor-2.svg', 'alt' => 'Sổ tay Hóa học'],
-            ['file' => 'decor-3.svg', 'alt' => 'Dụng cụ đun hóa học'],
-            ['file' => 'decor-4.svg', 'alt' => 'Phòng thí nghiệm'],
-            ['file' => 'decor-5.svg', 'alt' => 'Câu lạc bộ Hóa học'],
-            ['file' => 'decor-6.svg', 'alt' => 'Phân tử H₂SO₄'],
-            ['file' => 'decor-7.svg', 'alt' => 'Sổ tay màu sắc'],
-            ['file' => 'decor-8.svg', 'alt' => 'Mô hình hạt nhân'],
-            ['file' => 'decor-9.svg', 'alt' => 'Bình tam giác'],
-        ];
-
         $laws = [
             ['name' => 'Bảo toàn khối lượng', 'desc' => 'Tổng khối lượng chất tham gia bằng tổng khối lượng sản phẩm.'],
             ['name' => 'Bảo toàn nguyên tố', 'desc' => 'Số nguyên tử mỗi nguyên tố không thay đổi sau phản ứng.'],
@@ -68,7 +56,6 @@ class ChuyenDeController extends BaseController
             'topicDetails' => $topicDetails,
             'laws' => $laws,
             'formulas' => $formulas,
-            'decorImages' => $decorImages,
         ]);
     }
 
