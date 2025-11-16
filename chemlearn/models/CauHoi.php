@@ -49,11 +49,60 @@ class CauHoi extends BaseModel
         ],
     ];
 
+    private static bool $schemaEnsured = false;
+
+    private function ensureSchema(): void
+    {
+        if (self::$schemaEnsured || !$this->hasConnection()) {
+            return;
+        }
+
+        $pdo = $this->requireConnection();
+
+        $queries = [
+            "CREATE TABLE IF NOT EXISTS cau_hoi (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT,
+                tieu_de VARCHAR(255) NOT NULL,
+                noi_dung_html TEXT NOT NULL,
+                trang_thai ENUM('open','solved') DEFAULT 'open',
+                luot_xem INT DEFAULT 0,
+                so_cau_tra_loi INT DEFAULT 0,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            )",
+            "CREATE TABLE IF NOT EXISTS cau_tra_loi (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                cau_hoi_id INT NOT NULL,
+                user_id INT,
+                noi_dung_html TEXT NOT NULL,
+                is_best TINYINT(1) DEFAULT 0,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (cau_hoi_id) REFERENCES cau_hoi(id) ON DELETE CASCADE
+            )",
+            "CREATE TABLE IF NOT EXISTS file_dinh_kem (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                cau_hoi_id INT,
+                duong_dan VARCHAR(255),
+                ten_goc VARCHAR(255),
+                FOREIGN KEY (cau_hoi_id) REFERENCES cau_hoi(id) ON DELETE CASCADE
+            )",
+        ];
+
+        foreach ($queries as $sql) {
+            $pdo->exec($sql);
+        }
+
+        self::$schemaEnsured = true;
+    }
+
     public function all(string $search, string $sort, int $limit, int $offset): array
     {
         if (!$this->hasConnection()) {
             return $this->filterFallback($search, $sort, $limit, $offset);
         }
+
+        $this->ensureSchema();
 
         $orderBy = self::SORT_MAPPING[$sort] ?? self::SORT_MAPPING['newest'];
         $params = [];
@@ -98,6 +147,8 @@ class CauHoi extends BaseModel
             return $this->countFallback($search);
         }
 
+        $this->ensureSchema();
+
         $sql = 'SELECT COUNT(*) FROM cau_hoi';
         $params = [];
 
@@ -131,6 +182,7 @@ class CauHoi extends BaseModel
         $sql = 'INSERT INTO cau_hoi (user_id, tieu_de, noi_dung_html, trang_thai) VALUES (:user_id, :tieu_de, :noi_dung_html, :trang_thai)';
 
         $pdo = $this->requireConnection();
+        $this->ensureSchema();
         $stmt = $pdo->prepare($sql);
         $stmt->bindValue(':user_id', $data['user_id'], $data['user_id'] === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
         $stmt->bindValue(':tieu_de', $data['tieu_de']);
@@ -155,6 +207,7 @@ class CauHoi extends BaseModel
 
         try {
             $pdo = $this->requireConnection();
+            $this->ensureSchema();
             $stmt = $pdo->prepare('SELECT ch.*, nd.hoten AS nguoi_hoi FROM cau_hoi ch LEFT JOIN nguoidung nd ON nd.ma_user = ch.user_id WHERE ch.id = :id');
             $stmt->bindValue(':id', $id, PDO::PARAM_INT);
             $stmt->execute();
@@ -175,6 +228,7 @@ class CauHoi extends BaseModel
 
         try {
             $pdo = $this->requireConnection();
+            $this->ensureSchema();
             $stmt = $pdo->prepare('UPDATE cau_hoi SET luot_xem = luot_xem + 1 WHERE id = :id');
             $stmt->bindValue(':id', $id, PDO::PARAM_INT);
             $stmt->execute();
@@ -191,6 +245,7 @@ class CauHoi extends BaseModel
 
         try {
             $pdo = $this->requireConnection();
+            $this->ensureSchema();
             $stmt = $pdo->prepare('UPDATE cau_hoi SET so_cau_tra_loi = so_cau_tra_loi + 1 WHERE id = :id');
             $stmt->bindValue(':id', $id, PDO::PARAM_INT);
             $stmt->execute();
