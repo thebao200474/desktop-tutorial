@@ -214,6 +214,49 @@ document.addEventListener('DOMContentLoaded', () => {
     const topicButtons = document.querySelectorAll('.topic-nav-btn');
     const detailBlocks = document.querySelectorAll('[data-topic-detail]');
     const placeholder = document.getElementById('topic-detail-placeholder');
+    const setFieldsetSelectionState = (fieldset) => {
+        const options = fieldset.querySelectorAll('.quiz-option');
+        options.forEach((option) => {
+            const input = option.querySelector('input[type="radio"]');
+            option.classList.toggle('is-selected', Boolean(input && input.checked));
+        });
+    };
+
+    const selectQuizOption = (option) => {
+        const input = option.querySelector('input[type="radio"]');
+        if (!input) {
+            return;
+        }
+        input.checked = true;
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+    };
+
+    const initQuizOptionInteractions = (form) => {
+        const optionNodes = form.querySelectorAll('.quiz-option');
+        optionNodes.forEach((option) => {
+            option.setAttribute('tabindex', '0');
+            option.addEventListener('click', (event) => {
+                if (event.target && event.target.tagName === 'INPUT') {
+                    return;
+                }
+                selectQuizOption(option);
+            });
+            option.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    selectQuizOption(option);
+                }
+            });
+        });
+
+        const fieldsets = form.querySelectorAll('.quiz-question');
+        fieldsets.forEach((fieldset) => {
+            fieldset.querySelectorAll('input[type="radio"]').forEach((radio) => {
+                radio.addEventListener('change', () => setFieldsetSelectionState(fieldset));
+            });
+            setFieldsetSelectionState(fieldset);
+        });
+    };
 
     topicButtons.forEach((btn) => {
         btn.addEventListener('click', () => {
@@ -236,6 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const quizForms = document.querySelectorAll('.topic-quiz-form');
     quizForms.forEach((form) => {
+        initQuizOptionInteractions(form);
         form.addEventListener('submit', async (event) => {
             event.preventDefault();
 
@@ -290,7 +334,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const idx = fieldset.getAttribute('data-question-index');
                     const detail = detailMap.get(idx);
                     fieldset.querySelectorAll('.quiz-option').forEach((option) => {
-                        option.classList.remove('is-correct', 'is-incorrect');
+                        option.classList.remove('is-correct', 'is-incorrect', 'is-selected');
                         const input = option.querySelector('input[type="radio"]');
                         if (!detail || !input) {
                             return;
