@@ -127,7 +127,8 @@ $toggleMineUrl = function (bool $isMine) use ($search, $sort) {
         <article class="card border-0 shadow-sm mb-3 question-card">
             <div class="card-body d-flex flex-column flex-md-row align-items-start gap-3">
                 <div class="flex-grow-1">
-                    <a class="question-title" href="<?= app_url('hoi-dap/' . $question['id']); ?>">
+                    <?php $detailUrl = app_url('hoi-dap/' . $question['id'] . ($mine ? '?from=mine' : '')); ?>
+                    <a class="question-title" href="<?= h($detailUrl); ?>">
                         <?= h($question['tieu_de']); ?>
                     </a>
                     <p class="mb-2 text-muted small">
@@ -139,6 +140,7 @@ $toggleMineUrl = function (bool $isMine) use ($search, $sort) {
                     <?php if ($mine && $ownedByUser): ?>
                         <form method="post" action="<?= app_url('hoi-dap/' . $question['id'] . '/xoa'); ?>" class="d-inline" onsubmit="return confirm('Bạn chắc chắn muốn xóa câu hỏi này?');">
                             <input type="hidden" name="csrf_token" value="<?= h($csrfToken); ?>">
+                            <input type="hidden" name="redirect" value="<?= h($mine ? app_url('hoi-dap?mine=1') : app_url('hoi-dap')); ?>">
                             <button type="submit" class="btn btn-sm btn-outline-danger">Xóa câu hỏi</button>
                         </form>
                     <?php endif; ?>

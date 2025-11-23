@@ -15,9 +15,10 @@ $status = ($question['trang_thai'] ?? 'open') === 'solved' ? 'Đã giải' : 'Ch
 $statusClass = ($question['trang_thai'] ?? 'open') === 'solved' ? 'success' : 'warning';
 $createdAt = !empty($question['created_at']) ? date('d/m/Y H:i', strtotime((string) $question['created_at'])) : '';
 $canMarkBest = !empty($currentUser['ma_user']) && !empty($question['user_id']) && (int) $currentUser['ma_user'] === (int) $question['user_id'];
+$returnUrl = !empty($_GET['from']) && $_GET['from'] === 'mine' ? app_url('hoi-dap?mine=1') : app_url('hoi-dap');
 ?>
 <section class="mb-4">
-    <a class="btn btn-link px-0" href="<?= app_url('hoi-dap'); ?>">&larr; Quay lại danh sách</a>
+    <a class="btn btn-link px-0" href="<?= h($returnUrl); ?>">&larr; Quay lại danh sách</a>
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3">
         <div>
             <h1 class="fw-bold mb-2"><?= h($question['tieu_de'] ?? ''); ?></h1>
@@ -33,6 +34,7 @@ $canMarkBest = !empty($currentUser['ma_user']) && !empty($question['user_id']) &
             <?php if (!empty($canDelete)): ?>
                 <form class="d-inline" action="<?= app_url('hoi-dap/' . $question['id'] . '/xoa'); ?>" method="post" onsubmit="return confirm('Bạn chắc chắn muốn xóa câu hỏi này?');">
                     <input type="hidden" name="csrf_token" value="<?= h($csrfToken); ?>">
+                    <input type="hidden" name="redirect" value="<?= h($returnUrl); ?>">
                     <button type="submit" class="btn btn-outline-danger">Xóa câu hỏi</button>
                 </form>
             <?php endif; ?>
