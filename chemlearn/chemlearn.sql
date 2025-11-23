@@ -173,14 +173,14 @@ INSERT INTO cau_hoi_de_thi (de_thi_id, noi_dung, dapan_a, dapan_b, dapan_c, dapa
 (2, 'Hòa tan 11,7 gam NaCl vào nước được 500 ml dung dịch. Nồng độ mol là bao nhiêu?', '0,1 M', '0,2 M', '0,4 M', '0,5 M', 'C'),
 -- Đề số 2 (id=3)
 (3, 'Hòa tan 6,2 gam Na2O vào nước thu được 200 ml dung dịch. Nồng độ mol của NaOH là bao nhiêu?', '0,5 M', '1,0 M', '1,5 M', '2,0 M', 'B'),
-(3, 'Cho 4,8 gam Mg tác dụng với dung dịch H2SO4 loãng dư. Khối lượng muối MgSO4 thu được là bao nhiêu?', '12,0 gam', '16,8 gam', '24,0 gam', '28,8 gam', 'C'),
+(3, 'Cho 4,8 gam Mg tác dụng với dung dịch H2SO4 loãng dư. Khối lượng muối MgSO4 thu được là bao nhiêu?', '12,0 gam', '24,0 gam', '28,8 gam', '16,8 gam', 'B'),
 (3, 'Cho 0,2 mol Ba(OH)2 tác dụng với 0,3 mol CO2. Khối lượng kết tủa thu được là bao nhiêu?', '9,85 gam', '19,7 gam', '29,55 gam', '39,4 gam', 'B'),
 (3, 'Cần lấy bao nhiêu ml dung dịch NaOH 1M để trung hòa 100 ml dung dịch H2SO4 0,5M?', '50 ml', '100 ml', '200 ml', '250 ml', 'B'),
-(3, 'Đốt cháy hoàn toàn 4,4 gam C3H8. Thể tích khí CO2 (đktc) thu được là bao nhiêu?', '2,24 lít', '3,36 lít', '4,48 lít', '6,72 lít', 'D'),
+(3, 'Đốt cháy hoàn toàn 4,4 gam C3H8. Thể tích khí CO2 (đktc) thu được là bao nhiêu?', '2,24 lít', '3,36 lít', '6,72 lít', '4,48 lít', 'C'),
 (3, 'Trộn 100 ml dung dịch HCl 0,1M với 100 ml dung dịch NaOH 0,1M. pH của dung dịch sau phản ứng là:', 'pH = 1', 'pH = 7', 'pH = 13', 'pH không xác định', 'B'),
-(3, 'Hòa tan 27 gam Al trong dung dịch H2SO4 đặc, nóng, dư thu được 33,6 lít khí SO2 (đktc). Hiệu suất phản ứng là bao nhiêu?', '66,67%', '75,00%', '80,00%', '100%', 'D'),
+(3, 'Hòa tan 27 gam Al trong dung dịch H2SO4 đặc, nóng, dư thu được 33,6 lít khí SO2 (đktc). Hiệu suất phản ứng là bao nhiêu?', '66,67%', '75,00%', '100%', '80,00%', 'C'),
 (3, 'Cho m gam Cu tác dụng với HNO3 dư thu được 4,48 lít khí NO (đktc). Giá trị của m là:', '6,4 gam', '12,8 gam', '19,2 gam', '25,6 gam', 'C'),
-(3, 'Nhiệt phân hoàn toàn 10 gam CaCO3, sau phản ứng thu được 4,48 gam chất rắn. Hiệu suất phản ứng là bao nhiêu?', '44,8%', '50%', '60%', '80%', 'C'),
+(3, 'Nhiệt phân hoàn toàn 10 gam CaCO3, sau phản ứng thu được 4,48 gam chất rắn. Hiệu suất phản ứng là bao nhiêu?', '44,8%', '50%', '80%', '60%', 'C'),
 (3, 'Dung dịch X chứa 0,1 mol Na+; 0,05 mol Mg2+; 0,15 mol Cl- và y mol SO4 2-. Giá trị của y là:', '0,025', '0,05', '0,1', '0,15', 'B'),
 -- Đề số 3 (id=4)
 (4, 'Nguyên tử của nguyên tố S (Z=16) có cấu hình electron là:', '1s2 2s2 2p6 3s2 3p2', '1s2 2s2 2p6 3s2 3p4', '1s2 2s2 2p6 3s2 3p6', '1s2 2s2 2p6 3s2 3p5', 'B'),

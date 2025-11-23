@@ -231,7 +231,7 @@ class HoiDapController extends BaseController
         try {
             $this->questions->delete($id, (int) $userId);
             $_SESSION['flash_message'] = 'Đã xóa câu hỏi của bạn.';
-            $this->redirect(app_url('hoi-dap?mine=1'));
+            $this->redirect(app_url('hoi-dap'));
         } catch (RuntimeException $exception) {
             $_SESSION['flash_message'] = $exception->getMessage();
             $this->redirect(app_url('hoi-dap/' . $id));
