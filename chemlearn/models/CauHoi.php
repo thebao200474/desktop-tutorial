@@ -113,7 +113,7 @@ class CauHoi extends BaseModel
             $params[':search'] = '%' . $search . '%';
         }
 
-        $sql = 'SELECT ch.id, ch.tieu_de, ch.trang_thai, ch.luot_xem, ch.so_cau_tra_loi, ch.created_at, nd.hoten AS nguoi_hoi'
+        $sql = 'SELECT ch.id, ch.user_id, ch.tieu_de, ch.trang_thai, ch.luot_xem, ch.so_cau_tra_loi, ch.created_at, nd.hoten AS nguoi_hoi'
             . ' FROM cau_hoi ch'
             . ' LEFT JOIN nguoidung nd ON nd.ma_user = ch.user_id';
         if ($conditions !== []) {
@@ -138,6 +138,50 @@ class CauHoi extends BaseModel
             return $rows !== [] ? $rows : $this->filterFallback($search, $sort, $limit, $offset);
         } catch (PDOException $exception) {
             return $this->filterFallback($search, $sort, $limit, $offset);
+        }
+    }
+
+    public function allByUser(int $userId, string $search, string $sort, int $limit, int $offset): array
+    {
+        if (!$this->hasConnection()) {
+            return [];
+        }
+
+        $this->ensureSchema();
+
+        $orderBy = self::SORT_MAPPING[$sort] ?? self::SORT_MAPPING['newest'];
+        $params = [
+            ':user_id' => $userId,
+        ];
+        $conditions = ['ch.user_id = :user_id'];
+
+        if ($search !== '') {
+            $conditions[] = 'ch.tieu_de LIKE :search';
+            $params[':search'] = '%' . $search . '%';
+        }
+
+        $sql = 'SELECT ch.id, ch.user_id, ch.tieu_de, ch.trang_thai, ch.luot_xem, ch.so_cau_tra_loi, ch.created_at, nd.hoten AS nguoi_hoi'
+            . ' FROM cau_hoi ch'
+            . ' LEFT JOIN nguoidung nd ON nd.ma_user = ch.user_id'
+            . ' WHERE ' . implode(' AND ', $conditions)
+            . ' ORDER BY ' . $orderBy . ' LIMIT :limit OFFSET :offset';
+
+        try {
+            $pdo = $this->requireConnection();
+            $stmt = $pdo->prepare($sql);
+
+            foreach ($params as $placeholder => $value) {
+                $stmt->bindValue($placeholder, $value, $placeholder === ':user_id' ? PDO::PARAM_INT : PDO::PARAM_STR);
+            }
+
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        } catch (PDOException $exception) {
+            return [];
         }
     }
 
@@ -170,6 +214,38 @@ class CauHoi extends BaseModel
             return (int) $stmt->fetchColumn();
         } catch (PDOException $exception) {
             return $this->countFallback($search);
+        }
+    }
+
+    public function countByUser(int $userId, string $search): int
+    {
+        if (!$this->hasConnection()) {
+            return 0;
+        }
+
+        $this->ensureSchema();
+
+        $sql = 'SELECT COUNT(*) FROM cau_hoi WHERE user_id = :user_id';
+        $params = [':user_id' => $userId];
+
+        if ($search !== '') {
+            $sql .= ' AND tieu_de LIKE :search';
+            $params[':search'] = '%' . $search . '%';
+        }
+
+        try {
+            $pdo = $this->requireConnection();
+            $stmt = $pdo->prepare($sql);
+
+            foreach ($params as $placeholder => $value) {
+                $stmt->bindValue($placeholder, $value, $placeholder === ':user_id' ? PDO::PARAM_INT : PDO::PARAM_STR);
+            }
+
+            $stmt->execute();
+
+            return (int) $stmt->fetchColumn();
+        } catch (PDOException $exception) {
+            return 0;
         }
     }
 
@@ -251,6 +327,29 @@ class CauHoi extends BaseModel
             $stmt->execute();
         } catch (PDOException $exception) {
             // Không làm gì thêm
+        }
+    }
+
+    public function delete(int $id, int $userId): void
+    {
+        if (!$this->hasConnection()) {
+            throw new RuntimeException('Không thể xóa câu hỏi vì mất kết nối cơ sở dữ liệu.');
+        }
+
+        $this->ensureSchema();
+
+        try {
+            $pdo = $this->requireConnection();
+            $stmt = $pdo->prepare('DELETE FROM cau_hoi WHERE id = :id AND user_id = :user_id');
+            $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+            $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+            $stmt->execute();
+
+            if ($stmt->rowCount() === 0) {
+                throw new RuntimeException('Không thể xóa câu hỏi này.');
+            }
+        } catch (PDOException $exception) {
+            throw new RuntimeException('Không thể xóa câu hỏi: ' . $exception->getMessage());
         }
     }
 

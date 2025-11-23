@@ -30,10 +30,19 @@ class HoiDapController extends BaseController
         $sort = $_GET['sort'] ?? 'newest';
         $page = max(1, (int) ($_GET['page'] ?? 1));
         $perPage = 6;
+        $mine = (bool) ($_GET['mine'] ?? false);
+
+        $currentUser = $this->getCurrentUser();
+        $userId = $currentUser['ma_user'] ?? null;
 
         try {
-            $total = $this->questions->countAll($search);
-            $questions = $this->questions->all($search, $sort, $perPage, ($page - 1) * $perPage);
+            if ($mine && $userId !== null) {
+                $total = $this->questions->countByUser($userId, $search);
+                $questions = $this->questions->allByUser($userId, $search, $sort, $perPage, ($page - 1) * $perPage);
+            } else {
+                $total = $this->questions->countAll($search);
+                $questions = $this->questions->all($search, $sort, $perPage, ($page - 1) * $perPage);
+            }
         } catch (Throwable $exception) {
             $total = 0;
             $questions = [];
@@ -42,7 +51,9 @@ class HoiDapController extends BaseController
         $totalPages = max(1, (int) ceil($total / $perPage));
         if ($page > $totalPages) {
             $page = $totalPages;
-            $questions = $this->questions->all($search, $sort, $perPage, ($page - 1) * $perPage);
+            $questions = $mine && $userId !== null
+                ? $this->questions->allByUser($userId, $search, $sort, $perPage, ($page - 1) * $perPage)
+                : $this->questions->all($search, $sort, $perPage, ($page - 1) * $perPage);
         }
 
         $this->render('hoidap/index', [
@@ -52,6 +63,7 @@ class HoiDapController extends BaseController
             'sort' => $sort,
             'page' => $page,
             'totalPages' => $totalPages,
+            'mine' => $mine,
         ]);
     }
 
@@ -122,11 +134,15 @@ class HoiDapController extends BaseController
         $answers = $this->answers->findByQuestion($id);
         $files = $this->attachments->findByQuestion($id);
 
+        $currentUser = $this->getCurrentUser();
+        $canDelete = !empty($currentUser['ma_user']) && (int) $currentUser['ma_user'] === (int) ($question['user_id'] ?? 0);
+
         $this->render('hoidap/show', [
             'title' => $question['tieu_de'],
             'question' => $question,
             'answers' => $answers,
             'files' => $files,
+            'canDelete' => $canDelete,
         ]);
     }
 
@@ -178,6 +194,44 @@ class HoiDapController extends BaseController
             $this->questions->increaseAnswerCount($id);
             $_SESSION['flash_message'] = 'Đã gửi câu trả lời!';
             $this->redirect(app_url('hoi-dap/' . $id) . '#answers');
+        } catch (RuntimeException $exception) {
+            $_SESSION['flash_message'] = $exception->getMessage();
+            $this->redirect(app_url('hoi-dap/' . $id));
+        }
+    }
+
+    public function delete(int $id): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect(app_url('hoi-dap/' . $id));
+        }
+
+        if (!$this->validateCsrfToken($_POST['csrf_token'] ?? null)) {
+            http_response_code(403);
+            $_SESSION['flash_message'] = 'CSRF token không hợp lệ.';
+            $this->redirect(app_url('hoi-dap/' . $id));
+        }
+
+        $question = $this->questions->find($id);
+        if (!$question) {
+            http_response_code(404);
+            $_SESSION['flash_message'] = 'Câu hỏi không tồn tại hoặc đã bị xóa.';
+            $this->redirect(app_url('hoi-dap'));
+        }
+
+        $currentUser = $this->getCurrentUser();
+        $userId = $currentUser['ma_user'] ?? null;
+
+        if ($userId === null || (int) $question['user_id'] !== (int) $userId) {
+            http_response_code(403);
+            $_SESSION['flash_message'] = 'Bạn không thể xóa câu hỏi của người khác.';
+            $this->redirect(app_url('hoi-dap/' . $id));
+        }
+
+        try {
+            $this->questions->delete($id, (int) $userId);
+            $_SESSION['flash_message'] = 'Đã xóa câu hỏi của bạn.';
+            $this->redirect(app_url('hoi-dap?mine=1'));
         } catch (RuntimeException $exception) {
             $_SESSION['flash_message'] = $exception->getMessage();
             $this->redirect(app_url('hoi-dap/' . $id));

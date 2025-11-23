@@ -48,6 +48,10 @@ $router->post('/hoi-dap/(\d+)', static function (int $id): void {
     (new HoiDapController())->answer($id);
 });
 
+$router->post('/hoi-dap/(\d+)/xoa', static function (int $id): void {
+    (new HoiDapController())->delete($id);
+});
+
 $router->post('/chatbot/ask', static function (): void {
     (new ChatbotController())->ask();
 });

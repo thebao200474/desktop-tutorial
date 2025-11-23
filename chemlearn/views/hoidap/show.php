@@ -30,6 +30,12 @@ $canMarkBest = !empty($currentUser['ma_user']) && !empty($question['user_id']) &
         </div>
         <div class="text-end">
             <a href="<?= app_url('hoi-dap/hoi'); ?>" class="btn btn-outline-primary">Hỏi câu khác</a>
+            <?php if (!empty($canDelete)): ?>
+                <form class="d-inline" action="<?= app_url('hoi-dap/' . $question['id'] . '/xoa'); ?>" method="post" onsubmit="return confirm('Bạn chắc chắn muốn xóa câu hỏi này?');">
+                    <input type="hidden" name="csrf_token" value="<?= h($csrfToken); ?>">
+                    <button type="submit" class="btn btn-outline-danger">Xóa câu hỏi</button>
+                </form>
+            <?php endif; ?>
         </div>
     </div>
 </section>

@@ -8,17 +8,20 @@ $sortOptions = [
 ];
 $sortLabel = $sortOptions[$sort] ?? $sortOptions['newest'];
 
-$buildSortUrl = function (string $key) use ($search) {
+$buildSortUrl = function (string $key) use ($search, $mine) {
     $params = [];
     if ($search !== '') {
         $params['q'] = $search;
+    }
+    if ($mine) {
+        $params['mine'] = 1;
     }
     $params['sort'] = $key;
 
     return app_url('hoi-dap') . '?' . http_build_query($params);
 };
 
-$buildPageUrl = function (int $pageNumber) use ($search, $sort) {
+$buildPageUrl = function (int $pageNumber) use ($search, $sort, $mine) {
     $params = [];
     if ($search !== '') {
         $params['q'] = $search;
@@ -26,9 +29,29 @@ $buildPageUrl = function (int $pageNumber) use ($search, $sort) {
     if ($sort !== '') {
         $params['sort'] = $sort;
     }
+    if ($mine) {
+        $params['mine'] = 1;
+    }
     $params['page'] = $pageNumber;
 
     return app_url('hoi-dap') . '?' . http_build_query($params);
+};
+
+$toggleMineUrl = function (bool $isMine) use ($search, $sort) {
+    $params = [];
+    if ($search !== '') {
+        $params['q'] = $search;
+    }
+    if ($sort !== '') {
+        $params['sort'] = $sort;
+    }
+    if ($isMine) {
+        $params['mine'] = 1;
+    }
+
+    $query = http_build_query($params);
+
+    return app_url('hoi-dap' . ($query !== '' ? ('?' . $query) : ''));
 };
 ?>
 <section class="mb-4">
@@ -42,13 +65,27 @@ $buildPageUrl = function (int $pageNumber) use ($search, $sort) {
             <a href="<?= app_url('hoi-dap/hoi'); ?>" class="btn btn-primary btn-lg shadow-sm">
                 💡 Hỏi tại đây
             </a>
+            <?php if (!empty($currentUser['ma_user'])): ?>
+                <a href="<?= h($toggleMineUrl(true)); ?>" class="btn btn-outline-secondary btn-lg ms-2 <?= $mine ? 'active' : ''; ?>">
+                    📁 Câu hỏi của tôi
+                </a>
+                <?php if ($mine): ?>
+                    <a href="<?= h($toggleMineUrl(false)); ?>" class="btn btn-link ms-1">Xem tất cả</a>
+                <?php endif; ?>
+            <?php endif; ?>
         </div>
     </div>
 </section>
 
 <section class="card border-0 shadow-sm mb-4">
     <div class="card-body">
+        <?php if ($mine && empty($currentUser['ma_user'])): ?>
+            <div class="alert alert-warning">Bạn cần đăng nhập để xem lại câu hỏi đã đăng.</div>
+        <?php endif; ?>
         <form class="row gy-3 gx-2 align-items-center" method="get" action="<?= app_url('hoi-dap'); ?>">
+            <?php if ($mine): ?>
+                <input type="hidden" name="mine" value="1">
+            <?php endif; ?>
             <div class="col-12 col-lg-6">
                 <label class="form-label text-muted small mb-1" for="searchQuestion">Tìm trong hỏi đáp…</label>
                 <input id="searchQuestion" type="text" name="q" class="form-control form-control-lg"
@@ -85,6 +122,7 @@ $buildPageUrl = function (int $pageNumber) use ($search, $sort) {
         $statusClass = ($question['trang_thai'] ?? 'open') === 'solved' ? 'text-success' : 'text-warning';
         $createdAt = !empty($question['created_at']) ? date('d/m/Y H:i', strtotime((string) $question['created_at'])) : '';
         $author = $question['nguoi_hoi'] ?? 'Ẩn danh';
+        $ownedByUser = !empty($currentUser['ma_user']) && isset($question['user_id']) && (int) $currentUser['ma_user'] === (int) $question['user_id'];
         ?>
         <article class="card border-0 shadow-sm mb-3 question-card">
             <div class="card-body d-flex flex-column flex-md-row align-items-start gap-3">
@@ -98,6 +136,12 @@ $buildPageUrl = function (int $pageNumber) use ($search, $sort) {
                         • <?= h($author); ?>
                         <?= $createdAt !== '' ? '• ' . h($createdAt) : ''; ?>
                     </p>
+                    <?php if ($mine && $ownedByUser): ?>
+                        <form method="post" action="<?= app_url('hoi-dap/' . $question['id'] . '/xoa'); ?>" class="d-inline" onsubmit="return confirm('Bạn chắc chắn muốn xóa câu hỏi này?');">
+                            <input type="hidden" name="csrf_token" value="<?= h($csrfToken); ?>">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Xóa câu hỏi</button>
+                        </form>
+                    <?php endif; ?>
                 </div>
                 <div class="text-center border rounded-3 px-3 py-2 bg-light-subtle shadow-sm">
                     <div class="fs-4 fw-bold text-primary"><?= (int) ($question['so_cau_tra_loi'] ?? 0); ?></div>
