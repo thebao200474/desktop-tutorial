@@ -112,7 +112,7 @@ class HoiDapController extends BaseController
             }
 
             $_SESSION['flash_message'] = 'Đã đăng câu hỏi thành công!';
-            $this->redirect(app_url('hoi-dap/' . $questionId));
+            $this->redirect(app_url('hoi-dap'));
         } catch (RuntimeException $exception) {
             $_SESSION['flash_message'] = $exception->getMessage();
             $this->redirect(app_url('hoi-dap/hoi'));

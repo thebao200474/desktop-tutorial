@@ -7,13 +7,13 @@ use function htmlspecialchars as h;
         <p class="lead mt-3">Nền tảng học và ôn tập Hóa học dành cho sinh viên CT275 - Công nghệ Web (Đại học Cần Thơ).</p>
         <div class="d-flex justify-content-center gap-3 mt-4">
             <a href="<?= app_url('chuyende.php'); ?>" class="btn btn-light btn-lg">Khám phá chuyên đề</a>
-            <a href="<?= app_url('cauhoi.php'); ?>" class="btn btn-outline-light btn-lg">Làm bài trắc nghiệm</a>
+            <a href="<?= app_url('de_thi.php'); ?>" class="btn btn-outline-light btn-lg">Luyện đề trắc nghiệm</a>
         </div>
     </div>
 </section>
 
 <div class="row g-4 mb-5">
-    <div class="col-md-3">
+    <div class="col-md-4">
         <div class="card h-100 border-0 shadow-sm card-hover">
             <div class="card-body text-center">
                 <div class="display-6 mb-3">📚</div>
@@ -23,33 +23,23 @@ use function htmlspecialchars as h;
             </div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card h-100 border-0 shadow-sm card-hover">
-            <div class="card-body text-center">
-                <div class="display-6 mb-3">⚖️</div>
-                <h5 class="card-title">Cân bằng PTHH</h5>
-                <p class="card-text">Công cụ gợi ý nhanh kết quả cân bằng phương trình hóa học.</p>
-                <a href="<?= app_url('canbang.php'); ?>" class="btn btn-primary">Thử ngay</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card h-100 border-0 shadow-sm card-hover">
-            <div class="card-body text-center">
-                <div class="display-6 mb-3">🧪</div>
-                <h5 class="card-title">Làm câu hỏi</h5>
-                <p class="card-text">Bộ câu hỏi trắc nghiệm giúp bạn tự kiểm tra kiến thức.</p>
-                <a href="<?= app_url('cauhoi.php'); ?>" class="btn btn-primary">Làm bài</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
+    <div class="col-md-4">
         <div class="card h-100 border-0 shadow-sm card-hover">
             <div class="card-body text-center">
                 <div class="display-6 mb-3">🤖</div>
                 <h5 class="card-title">Chatbot Hóa học</h5>
                 <p class="card-text">Trò chuyện với trợ lý ChemLearn ngay trên mọi trang.</p>
                 <button type="button" class="btn btn-primary" data-open-chat>Mở chat ngay</button>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm card-hover">
+            <div class="card-body text-center">
+                <div class="display-6 mb-3">📝</div>
+                <h5 class="card-title">Thi trắc nghiệm</h5>
+                <p class="card-text">Chọn đề luyện tập, nộp bài và nhận điểm rank ngay.</p>
+                <a href="<?= app_url('de_thi.php'); ?>" class="btn btn-primary">Vào ngân hàng đề</a>
             </div>
         </div>
     </div>
@@ -61,11 +51,11 @@ use function htmlspecialchars as h;
         <div class="row g-4">
             <?php foreach ($lessons as $lesson): ?>
                 <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body">
-                            <h5 class="card-title"><?= h($lesson['ten_baigiang']); ?></h5>
-                            <p class="card-text text-muted"><?= h(mb_strimwidth(strip_tags($lesson['noidung'] ?? ''), 0, 120, '...')); ?></p>
-                            <a href="<?= app_url('chuyende_chitiet.php?id=' . (int)$lesson['ma_baigiang']); ?>" class="btn btn-outline-primary btn-sm">Đọc chi tiết</a>
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title"><?= h($lesson['ten_baigiang']); ?></h5>
+                <p class="card-text text-muted"><?= h(mb_strimwidth(strip_tags($lesson['noidung'] ?? ''), 0, 120, '...')); ?></p>
+                <a href="<?= app_url('chuyende_chitiet.php?id=' . (int)$lesson['ma_baigiang']); ?>" class="btn btn-outline-primary btn-sm">Đọc chi tiết</a>
                         </div>
                     </div>
                 </div>
@@ -88,26 +78,6 @@ use function htmlspecialchars as h;
                 Chế độ tối <span class="text-muted">(đang phát triển)</span>
             </button>
             <a class="btn btn-primary btn-sm w-100 mb-2" href="<?= app_url('tien_do.php'); ?>">Xem tiến độ học tập</a>
-            <button class="btn btn-outline-primary btn-sm w-100" type="button" data-decor-toggle>
-                🎨 Trang trí màn hình
-            </button>
         </div>
     </div>
 </div>
-
-<div class="decor-panel card shadow d-none" data-decor-panel>
-    <div class="card-body p-3">
-        <h6 class="card-title h6 mb-3">Kéo thả icon Hóa học</h6>
-        <div class="decor-icons" role="list">
-            <?php $decorIcons = ['⚗️', '🧪', '🧬', '🔬', '⚛️', '🧊']; ?>
-            <?php foreach ($decorIcons as $icon): ?>
-                <button type="button" class="btn btn-outline-secondary btn-sm decor-icons__item" data-decor-icon="<?= h($icon); ?>" aria-label="Thả biểu tượng <?= h($icon); ?>">
-                    <?= h($icon); ?>
-                </button>
-            <?php endforeach; ?>
-        </div>
-        <p class="small text-muted mb-0">Nhấn vào biểu tượng để thêm, sau đó kéo thả đến vị trí bạn thích.</p>
-    </div>
-</div>
-
-<div class="decor-layer" data-decor-layer aria-hidden="true"></div>

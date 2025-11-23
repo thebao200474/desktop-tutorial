@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 require __DIR__ . '/bootstrap.php';
 
-use ChemLearn\Controllers\CanBangController;
-
-$controller = new CanBangController();
-$controller->index();
+$_SESSION['flash_message'] = 'Trang cân bằng phương trình đã được gỡ. Bạn có thể ôn luyện bằng các đề thi mới.';
+header('Location: ' . app_url());
+exit;

@@ -148,47 +148,6 @@ footer a {
     color: #fff;
 }
 
-.decor-panel {
-    position: fixed;
-    bottom: 8rem;
-    right: 6.25rem;
-    width: 16rem;
-    border: none;
-    border-radius: 1rem;
-    z-index: 1040;
-}
-
-.decor-icons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-}
-
-.decor-icons__item {
-    width: 2.5rem;
-    height: 2.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 0.75rem;
-}
-
-.decor-layer {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 1030;
-}
-
-.decor-icon {
-    position: absolute;
-    font-size: 2.5rem;
-    cursor: move;
-    user-select: none;
-    pointer-events: auto;
-    z-index: 1;
-}
-
 .periodic-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -248,14 +207,8 @@ footer a {
     }
 
     .chat-bubble__panel,
-    .floating-settings .settings-panel,
-    .decor-panel {
+    .floating-settings .settings-panel {
         width: 15rem;
-    }
-
-    .decor-panel {
-        right: 1rem;
-        bottom: 11.5rem;
     }
 }
 
@@ -318,25 +271,6 @@ footer a {
     gap: 0.15rem;
 }
 
-.decor-gallery .decor-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 1rem;
-}
-
-.decor-gallery .decor-item {
-    text-align: center;
-    padding: 0.5rem;
-    border-radius: 1rem;
-    background: var(--bs-light-bg-subtle, #f8f9fa);
-    border: 1px dashed rgba(13, 110, 253, 0.2);
-}
-
-.decor-gallery .decor-item img {
-    max-width: 100%;
-    height: auto;
-}
-
 .module-card {
     border-radius: 1.25rem;
     min-height: 100%;
@@ -369,34 +303,6 @@ footer a {
 
 .formula-card {
     background: rgba(25, 135, 84, 0.05);
-}
-
-.decor-ribbon__track {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    justify-content: center;
-}
-
-.decor-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.65rem 1.25rem;
-    border-radius: 999px;
-    background: #f8f9fa;
-    border: 1px solid rgba(13, 110, 253, 0.12);
-    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
-}
-
-.decor-chip img {
-    flex-shrink: 0;
-}
-
-.decor-ribbon__track--compact {
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    padding-bottom: 0.25rem;
 }
 
 .topic-nav-vertical {
