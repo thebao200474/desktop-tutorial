@@ -229,9 +229,12 @@ class HoiDapController extends BaseController
         }
 
         $redirectTarget = app_url('hoi-dap');
+
         $candidate = (string) ($_POST['redirect'] ?? '');
         if ($candidate !== '' && !preg_match('#^https?://#i', $candidate) && str_starts_with($candidate, '/')) {
             $redirectTarget = $candidate;
+        } elseif (!empty($_SERVER['HTTP_REFERER']) && str_contains($_SERVER['HTTP_REFERER'], 'mine=1')) {
+            $redirectTarget = app_url('hoi-dap?mine=1');
         }
 
         try {
