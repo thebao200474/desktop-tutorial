@@ -1,0 +1,19 @@
+{
+    "name": "chemlearn/chemlearn",
+    "description": "ChemLearn - Nen tang hoc Hoa hoc truc tuyen",
+    "type": "project",
+    "require": {
+        "bramus/router": "^1.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "ChemLearn\\Controllers\\": "controllers/",
+            "ChemLearn\\Models\\": "models/",
+            "ChemLearn\\Config\\": "config/",
+            "ChemLearn\\Services\\": "Services/"
+        },
+        "classmap": [
+            "vendor/bramus/Router"
+        ]
+    }
+}

@@ -1,0 +1,9 @@
+<svg width="160" height="160" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+  <rect width="160" height="160" rx="32" fill="#f2fffb"/>
+  <rect x="30" y="40" width="100" height="80" rx="14" fill="#fff" stroke="#20c997" stroke-width="4"/>
+  <path d="M52 68h24" stroke="#20c997" stroke-width="6" stroke-linecap="round"/>
+  <path d="M52 90h16" stroke="#20c997" stroke-width="6" stroke-linecap="round"/>
+  <path d="M96 68h24" stroke="#20c997" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="90" cy="90" r="14" fill="#c3fae8" stroke="#12b886" stroke-width="4"/>
+  <text x="90" y="95" font-size="12" text-anchor="middle" fill="#0c7c59" font-family="'Segoe UI', sans-serif">ΔH</text>
+</svg>
