@@ -42,6 +42,7 @@ npm start
 Mở:
 
 - Trang người dùng: `http://localhost:3000/`
+- Trang khám phá sách: `http://localhost:3000/explore.html`
 - Trang đăng nhập: `http://localhost:3000/login.html`
 - Trang đăng ký: `http://localhost:3000/register.html`
 - Trang chi tiết sách: `http://localhost:3000/book-detail.html?id=S001`

@@ -230,6 +230,92 @@ app.get('/api/search-books', (req, res) => {
   res.json({ books });
 });
 
+
+app.get('/api/books', (req, res) => {
+  const {
+    search = '',
+    genre = 'all',
+    author = 'all',
+    minRating = 0,
+    yearFrom = 0,
+    sort = 'newest',
+    page = 1,
+    pageSize = 10
+  } = req.query;
+
+  const filters = ['1=1'];
+  const params = [];
+
+  if (search) {
+    filters.push('(s.TenSach LIKE ? OR s.NguonGoc LIKE ? OR s.TheLoai LIKE ?)');
+    params.push(`%${search}%`, `%${search}%`, `%${search}%`);
+  }
+
+  if (genre !== 'all') {
+    filters.push('s.TheLoai = ?');
+    params.push(genre);
+  }
+
+  if (author !== 'all') {
+    filters.push('s.NguonGoc = ?');
+    params.push(author);
+  }
+
+  if (Number(yearFrom) > 0) {
+    filters.push('s.NamXuatBan >= ?');
+    params.push(Number(yearFrom));
+  }
+
+  if (Number(minRating) > 0) {
+    filters.push('COALESCE(avgRating, 0) >= ?');
+    params.push(Number(minRating));
+  }
+
+  const sortMap = {
+    newest: 's.NamXuatBan DESC',
+    featured: 's.SoQuyen DESC',
+    rating: 'avgRating DESC',
+    priceAsc: 's.DonGia ASC',
+    priceDesc: 's.DonGia DESC'
+  };
+
+  const orderBy = sortMap[sort] || sortMap.newest;
+  const limit = Math.max(1, Number(pageSize) || 10);
+  const offset = (Math.max(1, Number(page) || 1) - 1) * limit;
+
+  const baseQuery = `
+    FROM (
+      SELECT s.*,
+             COALESCE(AVG(r.Diem), 0) AS avgRating,
+             COUNT(r.id) AS ratingCount
+      FROM Sach s
+      LEFT JOIN DanhGiaSach r ON r.MaSach = s.MaSach
+      GROUP BY s.MaSach
+    ) s
+    WHERE ${filters.join(' AND ')}
+  `;
+
+  const countRow = db.prepare(`SELECT COUNT(*) AS total ${baseQuery}`).get(...params);
+  const books = db
+    .prepare(`
+      SELECT s.*
+      ${baseQuery}
+      ORDER BY ${orderBy}
+      LIMIT ? OFFSET ?
+    `)
+    .all(...params, limit, offset);
+
+  res.json({
+    books,
+    pagination: {
+      total: countRow.total,
+      page: Math.max(1, Number(page) || 1),
+      pageSize: limit,
+      totalPages: Math.ceil(countRow.total / limit)
+    }
+  });
+});
+
 app.get('/api/books/:id', (req, res) => {
   const book = db
     .prepare(
