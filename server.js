@@ -29,7 +29,9 @@ function ensureSchemaCompatibility() {
   const otpCols = db.prepare("PRAGMA table_info(OTPToken)").all();
   if (!otpCols.some((x) => x.name === 'purpose')) db.exec("ALTER TABLE OTPToken ADD COLUMN purpose TEXT DEFAULT 'login'");
   if (!otpCols.some((x) => x.name === 'isUsed')) db.exec('ALTER TABLE OTPToken ADD COLUMN isUsed INTEGER DEFAULT 0');
-  if (!otpCols.some((x) => x.name === 'createdAt')) db.exec("ALTER TABLE OTPToken ADD COLUMN createdAt INTEGER DEFAULT (strftime('%s','now'))");
+  if (!otpCols.some((x) => x.name === 'createdAt')) db.exec('ALTER TABLE OTPToken ADD COLUMN createdAt INTEGER');
+
+  db.exec("UPDATE OTPToken SET createdAt = strftime('%s','now') WHERE createdAt IS NULL");
 }
 
 ensureSchemaCompatibility();
