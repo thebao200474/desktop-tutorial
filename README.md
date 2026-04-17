@@ -102,3 +102,11 @@ Nếu thiếu `BREVO_API_KEY` hoặc `BREVO_SENDER_EMAIL`, API gửi OTP sẽ tr
 
 
 - `POST /api/admin/login`: đăng nhập quản trị viên bằng email + mật khẩu.
+
+
+## Thông tin đăng nhập admin (bạn tự điền)
+
+- Email admin mặc định: <span style="color:red"><b>__TU_DIEN_EMAIL_ADMIN__</b></span>
+- Mật khẩu admin mặc định: <span style="color:red"><b>__TU_DIEN_MAT_KHAU_ADMIN__</b></span>
+
+> Bạn tự thay 2 giá trị này theo tài khoản admin bạn đặt.
