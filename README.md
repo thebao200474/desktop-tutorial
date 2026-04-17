@@ -106,7 +106,10 @@ Nếu thiếu `BREVO_API_KEY` hoặc `BREVO_SENDER_EMAIL`, API gửi OTP sẽ tr
 
 ## Thông tin đăng nhập admin (bạn tự điền)
 
-- Email admin mặc định: <span style="color:red"><b>__TU_DIEN_EMAIL_ADMIN__</b></span>
-- Mật khẩu admin mặc định: <span style="color:red"><b>__TU_DIEN_MAT_KHAU_ADMIN__</b></span>
+- Email admin mặc định: <span style="color:red"><b>admin@gmail.com</b></span>
+- Mật khẩu admin mặc định: <span style="color:red"><b>admin</b></span>
 
 > Bạn tự thay 2 giá trị này theo tài khoản admin bạn đặt.
+
+
+- Có thể đổi mặc định bằng `.env`: `ADMIN_DEFAULT_EMAIL`, `ADMIN_DEFAULT_PASSWORD` (server sẽ đồng bộ tài khoản admin mặc định khi khởi động).

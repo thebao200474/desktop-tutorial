@@ -19,8 +19,8 @@
           <p class="admin-form-subtitle">Vui lòng đăng nhập để tiếp tục</p>
 
           <div class="admin-manual-note">
-            <div>Tài khoản admin mặc định: <span class="manual-fill">__TU_DIEN_EMAIL_ADMIN__</span></div>
-            <div>Mật khẩu mặc định: <span class="manual-fill">__TU_DIEN_MAT_KHAU_ADMIN__</span></div>
+            <div>Tài khoản admin mặc định: <span class="manual-fill">admin@gmail.com</span></div>
+            <div>Mật khẩu mặc định: <span class="manual-fill">admin</span></div>
           </div>
 
           <div id="admin-login-alert" class="alert alert-danger py-2 d-none" role="alert"></div>
@@ -28,14 +28,14 @@
           <form id="admin-login-form" novalidate>
             <div class="mb-3">
               <label for="admin-email" class="form-label">Email</label>
-              <input type="email" class="form-control" id="admin-email" placeholder="__TU_DIEN_EMAIL_ADMIN__" required />
+              <input type="email" class="form-control" id="admin-email" placeholder="admin@gmail.com" required />
               <div class="invalid-feedback">Vui lòng nhập email admin hợp lệ.</div>
             </div>
 
             <div class="mb-2">
               <label for="admin-password" class="form-label">Mật khẩu</label>
               <div class="password-wrap">
-                <input type="password" class="form-control" id="admin-password" placeholder="__TU_DIEN_MAT_KHAU_ADMIN__" required />
+                <input type="password" class="form-control" id="admin-password" placeholder="admin" required />
                 <button type="button" id="toggle-password" class="password-toggle" aria-label="Hiện/ẩn mật khẩu">👁</button>
               </div>
               <div class="invalid-feedback d-block" id="password-error"></div>

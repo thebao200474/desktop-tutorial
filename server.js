@@ -10,6 +10,8 @@ const bcrypt = require('bcryptjs');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-key';
+const ADMIN_DEFAULT_EMAIL = (process.env.ADMIN_DEFAULT_EMAIL || 'admin@gmail.com').toLowerCase();
+const ADMIN_DEFAULT_PASSWORD = process.env.ADMIN_DEFAULT_PASSWORD || 'admin';
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -40,7 +42,7 @@ function seedData() {
   const hasPublisher = db.prepare('SELECT COUNT(*) AS count FROM NhaXuatBan').get().count;
   if (hasPublisher > 0) return;
 
-  const adminPassword = bcrypt.hashSync('admin123', 10);
+  const adminPassword = bcrypt.hashSync(ADMIN_DEFAULT_PASSWORD, 10);
   const readerPassword = bcrypt.hashSync('reader123', 10);
 
   db.prepare('INSERT INTO NhaXuatBan(MaNXB, TenNXB, DiaChi) VALUES (?, ?, ?)').run('NXB01', 'NXB Tre', 'TP.HCM');
@@ -73,11 +75,34 @@ function seedData() {
 
   db.prepare(`
     INSERT INTO NhanVien(MSNV, HoTenNV, Password, ChucVu, DiaChi, SoDienThoai, Email)
-    VALUES ('NV001', 'Tran Thi Admin', ?, 'Quan tri', 'TP.HCM', '0900000099', 'admin@example.com')
-  `).run(adminPassword);
+    VALUES ('NV001', 'Tran Thi Admin', ?, 'Quan tri', 'TP.HCM', '0900000099', ?)
+  `).run(adminPassword, ADMIN_DEFAULT_EMAIL);
 }
 
 seedData();
+
+function ensureDefaultAdminCredentials() {
+  const admin = db.prepare('SELECT MSNV, Email, Password FROM NhanVien ORDER BY MSNV LIMIT 1').get();
+  const defaultHash = bcrypt.hashSync(ADMIN_DEFAULT_PASSWORD, 10);
+
+  if (!admin) {
+    db.prepare(`
+      INSERT INTO NhanVien(MSNV, HoTenNV, Password, ChucVu, DiaChi, SoDienThoai, Email)
+      VALUES ('NV001', 'Tran Thi Admin', ?, 'Quan tri', 'TP.HCM', '0900000099', ?)
+    `).run(defaultHash, ADMIN_DEFAULT_EMAIL);
+    return;
+  }
+
+  const matchedByEmail = db.prepare('SELECT MSNV FROM NhanVien WHERE lower(Email) = ?').get(ADMIN_DEFAULT_EMAIL);
+  if (matchedByEmail) {
+    db.prepare('UPDATE NhanVien SET Password = ? WHERE MSNV = ?').run(defaultHash, matchedByEmail.MSNV);
+    return;
+  }
+
+  db.prepare('UPDATE NhanVien SET Email = ?, Password = ? WHERE MSNV = ?').run(ADMIN_DEFAULT_EMAIL, defaultHash, admin.MSNV);
+}
+
+ensureDefaultAdminCredentials();
 
 function authMiddleware(req, res, next) {
   const header = req.headers.authorization;
