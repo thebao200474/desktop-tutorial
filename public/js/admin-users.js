@@ -17,6 +17,11 @@ const statusFilter = document.getElementById('user-status-filter');
 const chipsContainer = document.getElementById('user-filter-chips');
 const paginationEl = document.getElementById('users-pagination');
 const countEl = document.getElementById('users-count');
+const createUserForm = document.getElementById('user-create-form');
+const createUserModalEl = document.getElementById('user-create-modal');
+const viewUserModalEl = document.getElementById('user-view-modal');
+const createUserModal = new bootstrap.Modal(createUserModalEl);
+const viewUserModal = new bootstrap.Modal(viewUserModalEl);
 
 function normalizeText(value) {
   return String(value || '')
@@ -65,7 +70,7 @@ document.getElementById('admin-logout').addEventListener('click', () => {
 });
 
 document.getElementById('add-user-btn').addEventListener('click', () => {
-  openCreateUserFlow();
+  createUserForm.reset();
 });
 
 document.getElementById('user-advanced-filter').addEventListener('click', () => {
@@ -86,6 +91,12 @@ function statusBadge(status) {
   if (status === 'locked') return '<span class="badge badge-soft-danger">Bị khóa</span>';
   if (status === 'inactive') return '<span class="badge badge-soft-secondary">Không hoạt động</span>';
   return '<span class="badge badge-soft-success">Hoạt động</span>';
+}
+
+function statusText(status) {
+  if (status === 'locked') return 'Bị khóa';
+  if (status === 'inactive') return 'Không hoạt động';
+  return 'Hoạt động';
 }
 
 function roleLabel(role) {
@@ -205,38 +216,16 @@ function refreshUsersKeepPage() {
   return loadUsers(true);
 }
 
-async function openCreateUserFlow() {
-  const hoLot = prompt('Nhập họ lót:');
-  if (!hoLot) return;
-  const ten = prompt('Nhập tên:');
-  if (!ten) return;
-  const email = prompt('Nhập email:');
-  if (!email) return;
-  const dienThoai = prompt('Nhập số điện thoại:') || '';
-  const diaChi = prompt('Nhập địa chỉ:') || '';
-  const phai = prompt('Nhập phái (Nam/Nữ/Khác):', 'Nam') || 'Nam';
-  const ngaySinh = prompt('Nhập ngày sinh (YYYY-MM-DD):', '2000-01-01') || '2000-01-01';
-  const password = prompt('Nhập mật khẩu (>= 6 ký tự):', '123456') || '123456';
-
-  try {
-    await requestJson('/api/admin/users', {
-      method: 'POST',
-      body: JSON.stringify({
-        hoLot,
-        ten,
-        email,
-        dienThoai,
-        diaChi,
-        phai,
-        ngaySinh,
-        password
-      })
-    });
-    alert('Đã thêm người dùng mới.');
-    await refreshUsersKeepPage();
-  } catch (error) {
-    alert(error.message);
-  }
+function renderUserDetailModal(user) {
+  document.getElementById('view-ma-doc-gia').textContent = user.MaDocGia || '-';
+  document.getElementById('view-fullname').textContent = `${user.HoLot || ''} ${user.Ten || ''}`.trim() || '-';
+  document.getElementById('view-email').textContent = user.Email || '-';
+  document.getElementById('view-phone').textContent = user.DienThoai || '-';
+  document.getElementById('view-gender').textContent = user.Phai || '-';
+  document.getElementById('view-birthday').textContent = user.NgaySinh ? String(user.NgaySinh).slice(0, 10) : '-';
+  document.getElementById('view-address').textContent = user.DiaChi || '-';
+  document.getElementById('view-status').textContent = statusText(userStatus(user));
+  viewUserModal.show();
 }
 
 async function handleUserAction(action, id) {
@@ -244,16 +233,7 @@ async function handleUserAction(action, id) {
   if (!user) return;
 
   if (action === 'view') {
-    alert(
-      [
-        `Mã độc giả: ${user.MaDocGia}`,
-        `Họ tên: ${user.HoLot} ${user.Ten}`,
-        `Email: ${user.Email || '-'}`,
-        `SĐT: ${user.DienThoai || '-'}`,
-        `Địa chỉ: ${user.DiaChi || '-'}`,
-        `Trạng thái: ${user.TrangThai || 'Hoạt động'}`
-      ].join('\n')
-    );
+    renderUserDetailModal(user);
     return;
   }
 
@@ -286,7 +266,8 @@ async function handleUserAction(action, id) {
 
   if (action === 'toggle-lock') {
     try {
-      await requestJson(`/api/admin/users/${id}/toggle-lock`, { method: 'PUT' });
+      const response = await requestJson(`/api/admin/users/${id}/toggle-lock`, { method: 'PUT' });
+      if (response?.message) alert(response.message);
       await refreshUsersKeepPage();
     } catch (error) {
       alert(error.message);
@@ -369,6 +350,29 @@ function startUserVoiceSearch() {
 }
 
 document.getElementById('user-voice-search').addEventListener('click', startUserVoiceSearch);
+
+createUserForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const payload = {
+    hoLot: document.getElementById('create-ho-lot').value.trim(),
+    ten: document.getElementById('create-ten').value.trim(),
+    email: document.getElementById('create-email').value.trim(),
+    dienThoai: document.getElementById('create-phone').value.trim(),
+    diaChi: document.getElementById('create-address').value.trim(),
+    phai: document.getElementById('create-gender').value,
+    ngaySinh: document.getElementById('create-birthday').value || null,
+    password: document.getElementById('create-password').value
+  };
+  try {
+    await requestJson('/api/admin/users', { method: 'POST', body: JSON.stringify(payload) });
+    createUserModal.hide();
+    createUserForm.reset();
+    alert('Đã thêm người dùng mới.');
+    await refreshUsersKeepPage();
+  } catch (error) {
+    alert(error.message);
+  }
+});
 
 async function loadUsers(keepPage = false) {
   const prevPage = state.page;
