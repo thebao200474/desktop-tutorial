@@ -3,93 +3,113 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BookHub - Quản lý mượn sách</title>
+    <title>BookHub - Quản lý mượn sách thông minh</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="/styles.css" />
   </head>
-  <body>
-    <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
+  <body class="bg-light">
+    <nav class="navbar navbar-expand-lg bg-white border-bottom">
       <div class="container">
         <a class="navbar-brand fw-bold text-brown" href="/">📚 BookHub</a>
-        <div class="ms-auto d-flex gap-2">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 small">
+          <li class="nav-item"><a class="nav-link" href="#">Trang chủ</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Khám phá</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Cộng đồng</a></li>
+        </ul>
+        <div class="d-flex gap-2">
           <a class="btn btn-outline-secondary btn-sm" href="/login.html">Đăng nhập</a>
           <a class="btn btn-primary btn-sm" href="/register.html">Đăng ký</a>
-          <a class="btn btn-outline-dark btn-sm" href="/admin.html">Trang quản trị</a>
+          <a class="btn btn-outline-dark btn-sm" href="/admin.html">Admin</a>
         </div>
       </div>
     </nav>
 
-    <header class="container py-4">
-      <div class="hero p-4 p-lg-5 shadow-sm">
-        <div class="row align-items-center g-4">
-          <div class="col-lg-7">
-            <h1 class="display-6 fw-bold mb-3">Khám phá thế giới sách theo cách thông minh</h1>
-            <p class="mb-3 opacity-90">Tìm sách bằng văn bản/giọng nói, mượn sách nhanh bằng OTP Gmail và nhận hỗ trợ từ chatbot AI.</p>
-            <div class="input-group input-group-lg">
-              <input type="text" id="search-input" class="form-control" placeholder="Tìm sách, tác giả hoặc thể loại" />
-              <button class="btn btn-light" id="voice-btn">🎤 Giọng nói</button>
-              <button class="btn btn-warning" id="search-btn">Tìm kiếm</button>
-            </div>
-            <small class="d-block mt-2" id="voice-status">Nhấn nút micro để bắt đầu nhận diện giọng nói.</small>
-          </div>
-          <div class="col-lg-5">
-            <div class="otp-panel p-3 rounded-3 bg-white text-dark shadow-sm">
-              <h5 class="fw-bold">Đăng nhập / Đăng ký tách riêng</h5>
-              <p class="small text-muted mb-3">Giao diện xác thực đã được tách thành 2 trang riêng để dễ sử dụng hơn.</p>
-              <div class="d-grid gap-2">
-                <a class="btn btn-primary" href="/login.html">Đi đến trang đăng nhập</a>
-                <a class="btn btn-outline-success" href="/register.html">Đi đến trang đăng ký</a>
+    <main class="container py-4">
+      <h2 class="text-center section-title mb-3">BookHub - Quản lý mượn sách thông minh</h2>
+
+      <div class="row g-3 align-items-stretch">
+        <div class="col-lg-8">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <div class="row g-2 mb-3 align-items-center">
+                <div class="col-md-8">
+                  <input type="text" class="form-control" id="search-input" placeholder="Tìm sách, tác giả hoặc thể loại" />
+                </div>
+                <div class="col-md-2 d-grid">
+                  <button class="btn btn-primary" id="search-btn">Tìm kiếm</button>
+                </div>
+                <div class="col-md-2 d-grid">
+                  <button class="btn btn-info text-white" id="voice-btn">🎤 Giọng nói</button>
+                </div>
               </div>
-              <small class="text-muted d-block mt-2">Bạn vẫn có thể dùng OTP sau khi đăng nhập tại trang riêng.</small>
+              <small class="text-muted" id="voice-status">Nhấn nút giọng nói để tìm kiếm bằng micro.</small>
+
+              <div class="hero-lite p-3 p-lg-4 rounded-4 mt-3">
+                <div class="row align-items-center">
+                  <div class="col-md-7">
+                    <h3 class="fw-bold mb-2">Khám phá thế giới qua từng trang sách</h3>
+                    <p class="text-muted mb-3">Lưu trữ, đánh giá và chia sẻ những cuốn sách bạn yêu thích.</p>
+                    <div class="d-flex gap-2">
+                      <button class="btn btn-brown btn-sm">Khám phá ngay</button>
+                      <button class="btn btn-outline-secondary btn-sm">Tham gia cộng đồng</button>
+                    </div>
+                  </div>
+                  <div class="col-md-5 text-end mt-3 mt-md-0">
+                    <img src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=600" class="img-fluid rounded-3 home-hero-img" alt="kệ sách" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <h5 class="section-title">Đăng nhập OTP</h5>
+              <p class="small text-muted">Nhập email để nhận mã OTP qua Gmail.</p>
+              <input id="reader-email" class="form-control mb-2" placeholder="Email độc giả" />
+              <button class="btn btn-outline-primary w-100 mb-2" id="send-otp-reader">Gửi OTP</button>
+              <input id="reader-otp" class="form-control mb-2" placeholder="Nhập OTP" />
+              <button class="btn btn-primary w-100" id="verify-otp-reader">Xác thực</button>
+              <small class="text-muted d-block mt-2" id="auth-status"></small>
+
+              <hr>
+              <h6 class="section-title">Lịch sử mượn của tôi</h6>
+              <ul id="loan-list" class="list-group list-group-flush small"></ul>
             </div>
           </div>
         </div>
       </div>
-    </header>
 
-    <main class="container pb-4">
-      <section class="mb-4">
+      <section class="mt-4">
         <div class="d-flex justify-content-between align-items-center mb-2">
-          <h3 class="section-title mb-0">Sách gợi ý</h3>
-          <span class="badge text-bg-light">Responsive Bootstrap Cards</span>
+          <h4 class="section-title mb-0">Sách nổi bật</h4>
+          <a href="#" class="small text-decoration-none">Xem tất cả</a>
         </div>
         <div id="book-list" class="row g-3"></div>
       </section>
 
-      <section class="row g-3">
-        <div class="col-lg-7">
-          <div class="card border-0 shadow-sm h-100">
-            <div class="card-body">
-              <h5 class="section-title">Hướng dẫn nhanh</h5>
-              <ol class="small mb-0 ps-3">
-                <li>Tìm sách bằng văn bản hoặc giọng nói.</li>
-                <li>Nhấn <strong>Xem chi tiết</strong> để xem thông tin đầy đủ và đánh giá sách.</li>
-                <li>Xác thực OTP để mượn sách và theo dõi lịch sử mượn.</li>
-              </ol>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-lg-5">
-          <div class="card shadow-sm border-0">
-            <div class="card-body">
-              <h5 class="section-title">Chatbot AI hỗ trợ</h5>
-              <div class="chat-box mb-2" id="chat-box"></div>
-              <div class="input-group">
-                <input id="chat-input" class="form-control" placeholder="Ví dụ: Gợi ý sách kỹ năng sống" />
-                <button class="btn btn-dark" id="chat-send">Gửi</button>
-              </div>
-            </div>
+      <section class="card border-0 shadow-sm mt-3">
+        <div class="card-body">
+          <h5 class="section-title">Chatbot AI hỗ trợ người dùng</h5>
+          <div class="chat-box mb-2" id="chat-box"></div>
+          <div class="input-group">
+            <input id="chat-input" class="form-control" placeholder="Ví dụ: Gợi ý sách kỹ năng sống" />
+            <button class="btn btn-dark" id="chat-send">Gửi</button>
           </div>
         </div>
       </section>
 
-      <section class="mt-3">
-        <div class="card shadow-sm border-0">
-          <div class="card-body">
-            <h6 class="section-title">Lịch sử mượn của tôi</h6>
-            <ul id="loan-list" class="list-group list-group-flush small"></ul>
-          </div>
+      <section class="mt-4">
+        <h5 class="section-title">Thể loại phổ biến</h5>
+        <div class="row row-cols-3 row-cols-md-6 g-2 text-center small mt-1">
+          <div class="col"><div class="category-pill">Tiểu thuyết</div></div>
+          <div class="col"><div class="category-pill">Kinh tế</div></div>
+          <div class="col"><div class="category-pill">Kỹ năng sống</div></div>
+          <div class="col"><div class="category-pill">Lịch sử</div></div>
+          <div class="col"><div class="category-pill">Khoa học</div></div>
+          <div class="col"><div class="category-pill">Tâm lý</div></div>
         </div>
       </section>
     </main>

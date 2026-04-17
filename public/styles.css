@@ -12,10 +12,30 @@ body {
   color: var(--brown-900);
 }
 
+.btn-brown {
+  background: var(--brown-700);
+  color: #fff;
+}
+
+.btn-brown:hover {
+  background: var(--brown-900);
+  color: #fff;
+}
+
 .hero {
   background: linear-gradient(130deg, var(--brown-900), var(--brown-700));
   color: #fff;
   border-radius: 1rem;
+}
+
+.hero-lite {
+  background: #fbf5ee;
+  border: 1px solid #efdfcf;
+}
+
+.home-hero-img {
+  max-height: 220px;
+  object-fit: cover;
 }
 
 .otp-panel {
@@ -32,7 +52,7 @@ body {
 }
 
 .chat-box {
-  height: 270px;
+  height: 220px;
   overflow-y: auto;
   background: #fff;
   border: 1px solid #e9e1d9;
@@ -60,6 +80,13 @@ body {
 .section-title {
   font-weight: 700;
   color: var(--brown-900);
+}
+
+.category-pill {
+  background: #fff;
+  border: 1px solid #ead8c8;
+  border-radius: 999px;
+  padding: 0.4rem 0.5rem;
 }
 
 .table thead th {
