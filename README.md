@@ -66,3 +66,9 @@ GMAIL_APP_PASSWORD=your_gmail_app_password
 ```
 
 Nếu chưa cấu hình Gmail, hệ thống chạy ở chế độ demo mail nội bộ (không gửi ra ngoài).
+
+
+## API đăng ký OTP
+
+- `POST /api/auth/send-otp-register`: gửi OTP đăng ký qua Gmail.
+- `POST /api/auth/register`: đăng ký độc giả với OTP + thông tin bảng `Docgia`.

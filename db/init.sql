@@ -9,7 +9,8 @@ CREATE TABLE IF NOT EXISTS Docgia (
   DiaChi TEXT,
   DienThoai TEXT,
   Email TEXT UNIQUE,
-  Password TEXT
+  Password TEXT,
+  PasswordHash TEXT
 );
 
 CREATE TABLE IF NOT EXISTS NhaXuatBan (
@@ -59,7 +60,10 @@ CREATE TABLE IF NOT EXISTS OTPToken (
   email TEXT NOT NULL,
   otp TEXT NOT NULL,
   role TEXT NOT NULL,
-  expiresAt INTEGER NOT NULL
+  purpose TEXT DEFAULT "login",
+  expiresAt INTEGER NOT NULL,
+  isUsed INTEGER DEFAULT 0,
+  createdAt INTEGER DEFAULT (strftime("%s","now"))
 );
 
 CREATE TABLE IF NOT EXISTS DanhGiaSach (

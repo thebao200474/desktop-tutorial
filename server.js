@@ -20,15 +20,19 @@ const db = new Database(dbPath);
 db.pragma('journal_mode = WAL');
 db.exec(fs.readFileSync(path.join(__dirname, 'db', 'init.sql'), 'utf-8'));
 
-function ensureDocgiaPasswordColumn() {
-  const cols = db.prepare("PRAGMA table_info(Docgia)").all();
-  const hasPassword = cols.some((x) => x.name === 'Password');
-  if (!hasPassword) {
-    db.exec('ALTER TABLE Docgia ADD COLUMN Password TEXT');
-  }
+function ensureSchemaCompatibility() {
+  const docgiaCols = db.prepare("PRAGMA table_info(Docgia)").all();
+  if (!docgiaCols.some((x) => x.name === 'Password')) db.exec('ALTER TABLE Docgia ADD COLUMN Password TEXT');
+  if (!docgiaCols.some((x) => x.name === 'PasswordHash')) db.exec('ALTER TABLE Docgia ADD COLUMN PasswordHash TEXT');
+  if (!docgiaCols.some((x) => x.name === 'Email')) db.exec('ALTER TABLE Docgia ADD COLUMN Email TEXT');
+
+  const otpCols = db.prepare("PRAGMA table_info(OTPToken)").all();
+  if (!otpCols.some((x) => x.name === 'purpose')) db.exec("ALTER TABLE OTPToken ADD COLUMN purpose TEXT DEFAULT 'login'");
+  if (!otpCols.some((x) => x.name === 'isUsed')) db.exec('ALTER TABLE OTPToken ADD COLUMN isUsed INTEGER DEFAULT 0');
+  if (!otpCols.some((x) => x.name === 'createdAt')) db.exec("ALTER TABLE OTPToken ADD COLUMN createdAt INTEGER DEFAULT (strftime('%s','now'))");
 }
 
-ensureDocgiaPasswordColumn();
+ensureSchemaCompatibility();
 
 function seedData() {
   const hasPublisher = db.prepare('SELECT COUNT(*) AS count FROM NhaXuatBan').get().count;
@@ -61,9 +65,9 @@ function seedData() {
   books.forEach((book) => insertBook.run(...book));
 
   db.prepare(`
-    INSERT INTO Docgia(MaDocGia, HoLot, Ten, NgaySinh, Phai, DiaChi, DienThoai, Email, Password)
-    VALUES ('DG001', 'Nguyen Van', 'An', '2001-05-10', 'Nam', 'Can Tho', '0900000001', 'docgia1@example.com', ?)
-  `).run(readerPassword);
+    INSERT INTO Docgia(MaDocGia, HoLot, Ten, NgaySinh, Phai, DiaChi, DienThoai, Email, Password, PasswordHash)
+    VALUES ('DG001', 'Nguyen Van', 'An', '2001-05-10', 'Nam', 'Can Tho', '0900000001', 'docgia1@example.com', ?, ?)
+  `).run(readerPassword, readerPassword);
 
   db.prepare(`
     INSERT INTO NhanVien(MSNV, HoTenNV, Password, ChucVu, DiaChi, SoDienThoai, Email)
@@ -119,31 +123,109 @@ function generateDocGiaId() {
   return `DG${String(num).padStart(3, '0')}`;
 }
 
-app.post('/api/auth/register', (req, res) => {
-  const { HoLot = '', Ten = '', Email, Password, DienThoai = '', DiaChi = '', NgaySinh = null, Phai = null } = req.body;
-  if (!Email || !Password || !Ten) {
-    return res.status(400).json({ message: 'Tên, email và mật khẩu là bắt buộc.' });
+const otpCooldown = new Map();
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+app.post('/api/auth/send-otp-register', (req, res) => {
+  const email = String(req.body.email || '').trim().toLowerCase();
+  if (!EMAIL_REGEX.test(email)) {
+    return res.status(400).json({ success: false, message: 'Email không hợp lệ.' });
   }
 
-  const exists = db.prepare('SELECT 1 FROM Docgia WHERE Email = ?').get(Email);
+  const exists = db.prepare('SELECT 1 FROM Docgia WHERE lower(Email) = ?').get(email);
   if (exists) {
-    return res.status(409).json({ message: 'Email đã tồn tại.' });
+    return res.status(409).json({ success: false, message: 'Email đã tồn tại.' });
+  }
+
+  const cooldown = otpCooldown.get(email) || 0;
+  const now = Date.now();
+  if (cooldown > now) {
+    return res.status(429).json({ success: false, message: `Vui lòng thử lại sau ${Math.ceil((cooldown - now) / 1000)} giây.` });
+  }
+
+  const otp = `${Math.floor(100000 + Math.random() * 900000)}`;
+  const expiresAt = Date.now() + 5 * 60 * 1000;
+  db.prepare('UPDATE OTPToken SET isUsed = 1 WHERE email = ? AND purpose = ?').run(email, 'register');
+  db.prepare('INSERT INTO OTPToken(email, otp, role, purpose, expiresAt, isUsed, createdAt) VALUES (?, ?, ?, ?, ?, 0, ?)').run(email, otp, 'reader', 'register', expiresAt, Math.floor(Date.now() / 1000));
+
+  const transporter = buildMailer();
+  transporter.sendMail(
+    {
+      from: process.env.GMAIL_USER || 'no-reply@bookhub.local',
+      to: email,
+      subject: 'Mã OTP đăng ký tài khoản BookHub',
+      html: `<div style="font-family:Arial,sans-serif"><h2>BookHub</h2><p>Mã OTP của bạn là <b style="font-size:24px">${otp}</b></p><p>OTP có hiệu lực trong 5 phút.</p></div>`
+    },
+    (error) => {
+      if (error) return res.status(500).json({ success: false, message: 'Không gửi được OTP.' });
+      otpCooldown.set(email, now + 60 * 1000);
+      return res.json({ success: true, message: 'Đã gửi OTP về email' });
+    }
+  );
+});
+
+app.post('/api/auth/register', (req, res) => {
+  const {
+    hoLot = '',
+    ten = '',
+    ngaySinh = null,
+    phai = '',
+    diaChi = '',
+    dienThoai = '',
+    email = '',
+    password = '',
+    confirmPassword = '',
+    otp = ''
+  } = req.body;
+
+  const normalizedEmail = String(email).trim().toLowerCase();
+  if (!hoLot || !ten || !EMAIL_REGEX.test(normalizedEmail) || !dienThoai || !password || !confirmPassword || !otp) {
+    return res.status(400).json({ success: false, message: 'Thiếu trường bắt buộc hoặc email không hợp lệ.' });
+  }
+  if (!/^\d{9,11}$/.test(String(dienThoai))) {
+    return res.status(400).json({ success: false, message: 'Số điện thoại không hợp lệ.' });
+  }
+  if (!['Nam', 'Nữ', 'Khác'].includes(phai)) {
+    return res.status(400).json({ success: false, message: 'Phái không hợp lệ.' });
+  }
+  if (password.length < 6) {
+    return res.status(400).json({ success: false, message: 'Mật khẩu tối thiểu 6 ký tự.' });
+  }
+  if (password !== confirmPassword) {
+    return res.status(400).json({ success: false, message: 'Mật khẩu xác nhận không khớp.' });
+  }
+
+  const existed = db.prepare('SELECT 1 FROM Docgia WHERE lower(Email) = ?').get(normalizedEmail);
+  if (existed) {
+    return res.status(409).json({ success: false, message: 'Email đã tồn tại.' });
+  }
+
+  const otpRow = db
+    .prepare('SELECT * FROM OTPToken WHERE email = ? AND purpose = ? AND isUsed = 0 ORDER BY id DESC LIMIT 1')
+    .get(normalizedEmail, 'register');
+
+  if (!otpRow || otpRow.otp !== String(otp) || Number(otpRow.expiresAt) < Date.now()) {
+    return res.status(400).json({ success: false, message: 'OTP không đúng hoặc đã hết hạn.' });
   }
 
   const MaDocGia = generateDocGiaId();
-  const passwordHash = bcrypt.hashSync(Password, 10);
-  db.prepare(
-    `INSERT INTO Docgia(MaDocGia, HoLot, Ten, NgaySinh, Phai, DiaChi, DienThoai, Email, Password)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
-  ).run(MaDocGia, HoLot, Ten, NgaySinh, Phai, DiaChi, DienThoai, Email, passwordHash);
+  const hash = bcrypt.hashSync(password, 10);
 
-  return res.json({ message: 'Đăng ký thành công. Vui lòng đăng nhập.' });
+  db.prepare(
+    `INSERT INTO Docgia(MaDocGia, HoLot, Ten, NgaySinh, Phai, DiaChi, DienThoai, Email, Password, PasswordHash)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+  ).run(MaDocGia, hoLot, ten, ngaySinh, phai, diaChi, dienThoai, normalizedEmail, hash, hash);
+
+  db.prepare('UPDATE OTPToken SET isUsed = 1 WHERE id = ?').run(otpRow.id);
+
+  return res.json({ success: true, message: 'Đăng ký tài khoản thành công' });
 });
 
 app.post('/api/auth/login', (req, res) => {
   const { email, password } = req.body;
-  const user = db.prepare('SELECT MaDocGia, HoLot, Ten, Email, Password FROM Docgia WHERE Email = ?').get(email);
-  if (!user || !user.Password || !bcrypt.compareSync(password, user.Password)) {
+  const user = db.prepare('SELECT MaDocGia, HoLot, Ten, Email, Password, PasswordHash FROM Docgia WHERE lower(Email) = ?').get(String(email || '').toLowerCase());
+  const storedHash = user?.PasswordHash || user?.Password;
+  if (!user || !storedHash || !bcrypt.compareSync(password, storedHash)) {
     return res.status(401).json({ message: 'Email hoặc mật khẩu không đúng.' });
   }
 
@@ -173,8 +255,8 @@ app.post('/api/auth/send-otp', (req, res) => {
   const otp = `${Math.floor(100000 + Math.random() * 900000)}`;
   const expiresAt = Date.now() + 5 * 60 * 1000;
 
-  db.prepare('DELETE FROM OTPToken WHERE email = ? AND role = ?').run(email, role);
-  db.prepare('INSERT INTO OTPToken(email, otp, role, expiresAt) VALUES (?, ?, ?, ?)').run(email, otp, role, expiresAt);
+  db.prepare('UPDATE OTPToken SET isUsed = 1 WHERE email = ? AND role = ?').run(email, role);
+  db.prepare('INSERT INTO OTPToken(email, otp, role, purpose, expiresAt, isUsed, createdAt) VALUES (?, ?, ?, ?, ?, 0, ?)').run(email, otp, role, 'login', expiresAt, Math.floor(Date.now() / 1000));
 
   const transporter = buildMailer();
   transporter.sendMail(
@@ -201,8 +283,8 @@ app.post('/api/auth/send-otp', (req, res) => {
 app.post('/api/auth/verify-otp', (req, res) => {
   const { email, otp, role = 'reader' } = req.body;
   const tokenRow = db
-    .prepare('SELECT * FROM OTPToken WHERE email = ? AND role = ? ORDER BY id DESC LIMIT 1')
-    .get(email, role);
+    .prepare('SELECT * FROM OTPToken WHERE email = ? AND role = ? AND purpose = ? AND isUsed = 0 ORDER BY id DESC LIMIT 1')
+    .get(email, role, 'login');
 
   if (!tokenRow) {
     return res.status(400).json({ message: 'Không tìm thấy OTP, vui lòng yêu cầu lại.' });
@@ -217,7 +299,7 @@ app.post('/api/auth/verify-otp', (req, res) => {
       ? db.prepare('SELECT MSNV AS id, HoTenNV AS name, Email FROM NhanVien WHERE Email = ?').get(email)
       : db.prepare("SELECT MaDocGia AS id, HoLot || ' ' || Ten AS name, Email FROM Docgia WHERE Email = ?").get(email);
 
-  db.prepare('DELETE FROM OTPToken WHERE id = ?').run(tokenRow.id);
+  db.prepare('UPDATE OTPToken SET isUsed = 1 WHERE id = ?').run(tokenRow.id);
 
   const token = jwt.sign({ sub: profile.id, role, email }, JWT_SECRET, { expiresIn: '8h' });
   return res.json({ message: 'Xác thực thành công.', token, profile: { ...profile, role } });
