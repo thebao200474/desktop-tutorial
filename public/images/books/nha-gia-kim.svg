@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="480" viewBox="0 0 360 480">
+  <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#a14d2b"/><stop offset="100%" stop-color="#7b2f1d"/></linearGradient></defs>
+  <rect width="360" height="480" fill="url(#g)"/>
+  <rect x="24" y="24" width="312" height="432" rx="12" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2"/>
+  <text x="36" y="180" fill="white" font-size="28" font-weight="700" font-family="Arial">Nhà giả kim</text>
+  <text x="36" y="230" fill="rgba(255,255,255,0.9)" font-size="18" font-family="Arial">Paulo Coelho</text>
+</svg>

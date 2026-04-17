@@ -1,18 +1,38 @@
+const booksMockMeta = {
+  S001: { rating: 4.6, reviewCount: 2345, description: 'Cuốn sách nổi tiếng về nghệ thuật giao tiếp, ứng xử và xây dựng mối quan hệ hiệu quả.' },
+  S002: { rating: 4.7, reviewCount: 1780, description: 'Hành trình theo đuổi ước mơ và lắng nghe trái tim qua câu chuyện đầy tính biểu tượng.' },
+  S003: { rating: 4.8, reviewCount: 3507, description: 'Tác phẩm khái quát lịch sử phát triển của loài người từ thời nguyên thủy đến hiện đại.' },
+  S004: { rating: 4.5, reviewCount: 1234, description: 'Tuyển tập các câu chuyện truyền cảm hứng về nghị lực, niềm tin và lòng biết ơn.' },
+  S005: { rating: 4.6, reviewCount: 1887, description: 'Phương pháp học tập, phát triển tư duy và tạo động lực cho học sinh, sinh viên.' },
+  S006: { rating: 4.4, reviewCount: 1642, description: 'Tác phẩm kết hợp yếu tố chiêm nghiệm, tâm linh và góc nhìn về nhân quả trong cuộc sống.' },
+  S007: { rating: 4.5, reviewCount: 2104, description: 'Những chia sẻ gần gũi về học tập, trải nghiệm, trưởng thành và giá trị của tuổi trẻ.' },
+  S008: { rating: 4.7, reviewCount: 1420, description: 'Phân tích cách con người ra quyết định thông qua hai hệ thống tư duy nhanh và chậm.' },
+  S009: { rating: 4.3, reviewCount: 980, description: 'Cuốn sách khoa học phổ thông kinh điển giải thích vũ trụ, thời gian và các bí ẩn vật lý.' },
+  S010: { rating: 4.9, reviewCount: 2711, description: 'Tác phẩm nổi tiếng về ý nghĩa cuộc sống, nghị lực và sức mạnh tinh thần của con người.' }
+};
+
 const state = {
   search: '',
   genre: 'all',
   author: 'all',
   minRating: 0,
   yearFrom: 0,
+  yearBefore: null,
   sort: 'newest',
   page: 1,
   pageSize: 10
 };
 
 const genres = ['all', 'Tiểu thuyết', 'Kinh tế', 'Kỹ năng sống', 'Tâm lý', 'Khoa học', 'Lịch sử'];
-const authors = ['all', 'Nguyễn Nhật Ánh', 'Paulo Coelho', 'Dale Carnegie', 'Yuval Noah Harari', 'Nhiều tác giả'];
+const authors = ['all', 'Nguyễn Nhật Ánh', 'Paulo Coelho', 'Dale Carnegie', 'Yuval Noah Harari', 'Nhiều tác giả', 'Nguyên Phong', 'Rosie Nguyễn', 'Daniel Kahneman', 'Stephen Hawking', 'Viktor E. Frankl'];
 const ratings = [5, 4, 3, 2, 1];
-const years = [0, 2020, 2015, 2010];
+const years = [
+  { label: 'Tất cả', from: 0, before: null },
+  { label: '2022+', from: 2022, before: null },
+  { label: '2020+', from: 2020, before: null },
+  { label: '2018+', from: 2018, before: null },
+  { label: 'Trước 2018', from: 0, before: 2018 }
+];
 
 const genreFilters = document.getElementById('genre-filters');
 const authorFilters = document.getElementById('author-filters');
@@ -34,11 +54,11 @@ const chatBox = document.getElementById('chat-box');
 const chatInput = document.getElementById('chat-input');
 const chatSend = document.getElementById('chat-send');
 
-function renderFilter(container, items, current, onPick, formatter = (x) => x) {
+function renderFilter(container, items, current, onPick, formatter = (x) => x, keyFn = (x) => x) {
   container.innerHTML = '';
   items.forEach((item) => {
     const btn = document.createElement('button');
-    btn.className = `filter-item ${item === current ? 'active' : ''}`;
+    btn.className = `filter-item ${keyFn(item) === current ? 'active' : ''}`;
     btn.textContent = formatter(item);
     btn.addEventListener('click', () => onPick(item));
     container.appendChild(btn);
@@ -67,14 +87,15 @@ function renderFilters() {
     state.page = 1;
     renderFilters();
     fetchBooks();
-  }, (x) => `${'⭐'.repeat(x)} trở lên`);
+  }, (x) => `${'⭐'.repeat(x)}`, (x) => x);
 
-  renderFilter(yearFilters, years, state.yearFrom, (item) => {
-    state.yearFrom = item;
+  renderFilter(yearFilters, years, `${state.yearFrom}-${state.yearBefore}`, (item) => {
+    state.yearFrom = item.from;
+    state.yearBefore = item.before;
     state.page = 1;
     renderFilters();
     fetchBooks();
-  }, (x) => (x === 0 ? 'Tất cả' : `${x}+`));
+  }, (x) => x.label, (x) => `${x.from}-${x.before}`);
 }
 
 function formatCount(n) {
@@ -82,15 +103,22 @@ function formatCount(n) {
 }
 
 function bookRow(book) {
+  const meta = booksMockMeta[book.MaSach] || {};
+  const rating = meta.rating ?? Number(book.avgRating || 0);
+  const reviewCount = meta.reviewCount ?? Number(book.ratingCount || 0);
+  const description = meta.description || book.MoTa || '';
+  const cover = book.AnhBia || '/images/books/placeholder-book.svg';
+
   return `
     <a href="/book-detail.html?id=${encodeURIComponent(book.MaSach)}" class="book-row card border-0 shadow-sm text-decoration-none text-dark">
       <div class="card-body d-flex gap-3">
-        <img src="${book.AnhBia || 'https://placehold.co/120x170'}" class="book-row-cover" alt="${book.TenSach}" />
+        <img src="${cover}" class="book-row-cover" alt="${book.TenSach}" />
         <div class="flex-grow-1">
           <h5 class="mb-1">${book.TenSach}</h5>
           <div class="text-muted small mb-1">${book.NguonGoc || 'Nhiều tác giả'}</div>
-          <div class="small mb-1">⭐ ${Number(book.avgRating || 0).toFixed(1)} (${formatCount(book.ratingCount)} đánh giá)</div>
-          <div class="small text-muted">${book.TheLoai || 'Chưa rõ thể loại'}</div>
+          <div class="small mb-1">★ ${Number(rating).toFixed(1)} (${formatCount(reviewCount)} đánh giá)</div>
+          <div class="small text-muted mb-1">${book.TheLoai || 'Chưa rõ thể loại'}</div>
+          <div class="small text-secondary line-clamp-2">${description}</div>
         </div>
       </div>
     </a>
@@ -112,11 +140,16 @@ async function fetchBooks() {
   const res = await fetch(`/api/books?${q.toString()}`);
   const data = await res.json();
 
-  const total = data.pagination?.total || 0;
+  let books = data.books || [];
+  if (state.yearBefore) {
+    books = books.filter((b) => Number(b.NamXuatBan || 0) < state.yearBefore);
+  }
+
+  const total = state.yearBefore ? books.length : data.pagination?.total || books.length;
   resultTitle.textContent = `Tất cả sách (${formatCount(total)})`;
 
-  bookItems.innerHTML = (data.books || []).map(bookRow).join('');
-  if (!data.books?.length) {
+  bookItems.innerHTML = books.map(bookRow).join('');
+  if (!books.length) {
     bookItems.innerHTML = '<div class="alert alert-light border">Không có sách phù hợp bộ lọc.</div>';
   }
 

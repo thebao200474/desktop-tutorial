@@ -41,9 +41,16 @@ function seedData() {
   db.prepare('INSERT INTO NhaXuatBan(MaNXB, TenNXB, DiaChi) VALUES (?, ?, ?)').run('NXB02', 'Nha Nam', 'Ha Noi');
 
   const books = [
-    ['S001', 'Đắc nhân tâm', 90000, 8, 2019, 'NXB01', 'Dale Carnegie', 'Sách kỹ năng sống kinh điển.', 'Kỹ năng sống', 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400'],
-    ['S002', 'Nhà giả kim', 79000, 6, 2021, 'NXB02', 'Paulo Coelho', 'Tiểu thuyết truyền cảm hứng nổi tiếng.', 'Tiểu thuyết', 'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400'],
-    ['S003', 'Tư duy nhanh và chậm', 120000, 4, 2020, 'NXB01', 'Daniel Kahneman', 'Phân tích tâm lý học hành vi và ra quyết định.', 'Khoa học', 'https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=400']
+    ['S001', 'Đắc nhân tâm', 90000, 12, 2019, 'NXB01', 'Dale Carnegie', 'Cuốn sách nổi tiếng về nghệ thuật giao tiếp, ứng xử và xây dựng mối quan hệ hiệu quả.', 'Kỹ năng sống', '/images/books/dac-nhan-tam.svg'],
+    ['S002', 'Nhà giả kim', 79000, 8, 2020, 'NXB02', 'Paulo Coelho', 'Hành trình theo đuổi ước mơ và lắng nghe trái tim qua câu chuyện đầy tính biểu tượng.', 'Tiểu thuyết', '/images/books/nha-gia-kim.svg'],
+    ['S003', 'Sapiens - Lược sử loài người', 180000, 6, 2021, 'NXB02', 'Yuval Noah Harari', 'Tác phẩm khái quát lịch sử phát triển của loài người từ thời nguyên thủy đến hiện đại.', 'Khoa học', '/images/books/sapiens.svg'],
+    ['S004', 'Hạt giống tâm hồn', 88000, 15, 2018, 'NXB01', 'Nhiều tác giả', 'Tuyển tập các câu chuyện truyền cảm hứng về nghị lực, niềm tin và lòng biết ơn.', 'Kỹ năng sống', '/images/books/hat-giong-tam-hon.svg'],
+    ['S005', 'Tôi tài giỏi, bạn cũng thế!', 99000, 10, 2022, 'NXB01', 'Adam Khoo', 'Phương pháp học tập, phát triển tư duy và tạo động lực cho học sinh, sinh viên.', 'Kỹ năng sống', '/images/books/toi-tai-gioi-ban-cung-the.svg'],
+    ['S006', 'Muôn kiếp nhân sinh', 115000, 7, 2020, 'NXB01', 'Nguyên Phong', 'Tác phẩm kết hợp yếu tố chiêm nghiệm, tâm linh và góc nhìn về nhân quả trong cuộc sống.', 'Tâm lý', '/images/books/muon-kiep-nhan-sinh.svg'],
+    ['S007', 'Tuổi trẻ đáng giá bao nhiêu', 86000, 11, 2021, 'NXB02', 'Rosie Nguyễn', 'Những chia sẻ gần gũi về học tập, trải nghiệm, trưởng thành và giá trị của tuổi trẻ.', 'Kỹ năng sống', '/images/books/tuoi-tre-dang-gia-bao-nhieu.svg'],
+    ['S008', 'Thinking, Fast and Slow', 210000, 5, 2017, 'NXB02', 'Daniel Kahneman', 'Phân tích cách con người ra quyết định thông qua hai hệ thống tư duy nhanh và chậm.', 'Kinh tế', '/images/books/thinking-fast-and-slow.svg'],
+    ['S009', 'Lược sử thời gian', 165000, 4, 2016, 'NXB01', 'Stephen Hawking', 'Cuốn sách khoa học phổ thông kinh điển giải thích vũ trụ, thời gian và các bí ẩn vật lý.', 'Khoa học', '/images/books/luoc-su-thoi-gian.svg'],
+    ['S010', 'Đi tìm lẽ sống', 129000, 9, 2022, 'NXB01', 'Viktor E. Frankl', 'Tác phẩm nổi tiếng về ý nghĩa cuộc sống, nghị lực và sức mạnh tinh thần của con người.', 'Tâm lý', '/images/books/di-tim-le-song.svg']
   ];
 
   const insertBook = db.prepare(`
@@ -273,8 +280,9 @@ app.get('/api/books', (req, res) => {
 
   const sortMap = {
     newest: 's.NamXuatBan DESC',
-    featured: 's.SoQuyen DESC',
     rating: 'avgRating DESC',
+    titleAZ: 's.TenSach ASC',
+    quantityDesc: 's.SoQuyen DESC',
     priceAsc: 's.DonGia ASC',
     priceDesc: 's.DonGia DESC'
   };
