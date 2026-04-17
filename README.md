@@ -60,15 +60,24 @@ Tạo `.env`:
 
 ```bash
 PORT=3000
-JWT_SECRET=replace_me
-BREVO_API_KEY=your_brevo_api_key
-BREVO_SENDER_EMAIL=sender_verified_on_brevo@example.com
+JWT_SECRET=__BAT_BUOC_TU_DIEN__
+BREVO_API_KEY=__BAT_BUOC_TU_DIEN__
+BREVO_SENDER_EMAIL=__BAT_BUOC_TU_DIEN__
 BREVO_SENDER_NAME=BookHub  # optional, mặc định BookHub
 OTP_EXPIRE_MINUTES=5
 ```
 
 Nếu thiếu `BREVO_API_KEY` hoặc `BREVO_SENDER_EMAIL`, API gửi OTP sẽ trả lỗi rõ ràng để tránh báo thành công giả.
 
+
+
+## ⚠️ Chỗ bạn PHẢI điền thủ công (in đỏ)
+
+- <span style="color:red"><b>JWT_SECRET=... (bắt buộc)</b></span>
+- <span style="color:red"><b>BREVO_API_KEY=... (bắt buộc)</b></span>
+- <span style="color:red"><b>BREVO_SENDER_EMAIL=... (bắt buộc, email đã verify trên Brevo)</b></span>
+- <span style="color:#b45309"><b>BREVO_SENDER_NAME=... (tùy chọn, mặc định BookHub)</b></span>
+- <span style="color:#b45309"><b>TEST_RECEIVER_EMAIL=... (tùy chọn cho route test)</b></span>
 
 ## API đăng ký OTP
 

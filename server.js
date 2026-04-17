@@ -120,7 +120,7 @@ if (missingBrevoAtStartup.length > 0) {
 async function sendOTPEmail(email, otp, purpose = 'register') {
   const missingEnv = getMissingBrevoEnv();
   if (missingEnv.length > 0) {
-    throw new Error(`Thiếu cấu hình Brevo trong file .env: ${missingEnv.join(', ')}`);
+    throw new Error(`Thiếu cấu hình Brevo trong file .env (điền thủ công): ${missingEnv.join(', ')}. Mẫu: BREVO_API_KEY=<API_KEY_CUA_BAN>, BREVO_SENDER_EMAIL=<EMAIL_DA_VERIFY>`);
   }
 
   const subject = purpose === 'register' ? 'Mã OTP đăng ký BookHub' : 'Mã OTP đăng nhập BookHub';
