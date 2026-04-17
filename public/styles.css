@@ -1,20 +1,38 @@
+:root {
+  --brown-900: #3a2616;
+  --brown-700: #6f4e37;
+  --brown-100: #efe3d6;
+}
+
 body {
-  background: #f7f3ef;
+  background: #f6f3ef;
+}
+
+.text-brown {
+  color: var(--brown-900);
 }
 
 .hero {
-  background: linear-gradient(120deg, #432818, #6f4e37);
-  color: white;
+  background: linear-gradient(130deg, var(--brown-900), var(--brown-700));
+  color: #fff;
   border-radius: 1rem;
 }
 
+.otp-panel {
+  border: 1px solid #e8dccf;
+}
+
 .book-card img {
-  height: 220px;
+  height: 240px;
   object-fit: cover;
 }
 
+.book-card .card-title {
+  min-height: 3rem;
+}
+
 .chat-box {
-  height: 260px;
+  height: 270px;
   overflow-y: auto;
   background: #fff;
   border: 1px solid #e9e1d9;
@@ -31,15 +49,20 @@ body {
 
 .chat-user {
   margin-left: auto;
-  background: #6f4e37;
+  background: var(--brown-700);
   color: #fff;
 }
 
 .chat-bot {
-  background: #ece4db;
+  background: var(--brown-100);
 }
 
 .section-title {
   font-weight: 700;
-  color: #432818;
+  color: var(--brown-900);
+}
+
+.table thead th {
+  background-color: #fff7ef;
+  color: var(--brown-900);
 }

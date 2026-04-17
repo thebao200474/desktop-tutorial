@@ -177,6 +177,46 @@ app.get('/api/search-books', (req, res) => {
   res.json({ books });
 });
 
+app.get('/api/books/:id', (req, res) => {
+  const book = db
+    .prepare(
+      `SELECT s.*, n.TenNXB,
+              COALESCE(AVG(r.Diem), 0) AS avgRating,
+              COUNT(r.id) AS totalReviews
+       FROM Sach s
+       LEFT JOIN NhaXuatBan n ON n.MaNXB = s.MaNXB
+       LEFT JOIN DanhGiaSach r ON r.MaSach = s.MaSach
+       WHERE s.MaSach = ?`
+    )
+    .get(req.params.id);
+
+  if (!book) return res.status(404).json({ message: 'Không tìm thấy sách.' });
+  return res.json({ book });
+});
+
+app.get('/api/books/:id/reviews', (req, res) => {
+  const reviews = db
+    .prepare(
+      `SELECT r.*, d.HoLot || ' ' || d.Ten AS DocGia
+       FROM DanhGiaSach r
+       LEFT JOIN Docgia d ON d.MaDocGia = r.MaDocGia
+       WHERE r.MaSach = ?
+       ORDER BY r.id DESC`
+    )
+    .all(req.params.id);
+  res.json({ reviews });
+});
+
+app.post('/api/books/:id/reviews', authMiddleware, (req, res) => {
+  const { Diem, BinhLuan = '' } = req.body;
+  if (!Diem || Diem < 1 || Diem > 5) {
+    return res.status(400).json({ message: 'Điểm đánh giá phải từ 1-5.' });
+  }
+
+  db.prepare('INSERT INTO DanhGiaSach(MaDocGia, MaSach, Diem, BinhLuan) VALUES (?, ?, ?, ?)').run(req.user.sub, req.params.id, Diem, BinhLuan);
+  return res.json({ message: 'Đã gửi đánh giá.' });
+});
+
 app.post('/api/borrow-book', authMiddleware, (req, res) => {
   const { MaSach } = req.body;
   const MaDocGia = req.user.sub;
@@ -262,13 +302,36 @@ app.post('/api/admin/books', authMiddleware, adminOnly, (req, res) => {
   res.json({ message: 'Đã thêm sách.' });
 });
 
+app.put('/api/admin/books/:id', authMiddleware, adminOnly, (req, res) => {
+  const { TenSach, DonGia = 0, SoQuyen = 0, NamXuatBan, MaNXB, NguonGoc = '', MoTa = '', TheLoai = '', AnhBia = '' } = req.body;
+  db.prepare(
+    `UPDATE Sach
+     SET TenSach = ?, DonGia = ?, SoQuyen = ?, NamXuatBan = ?, MaNXB = ?, NguonGoc = ?, MoTa = ?, TheLoai = ?, AnhBia = ?
+     WHERE MaSach = ?`
+  ).run(TenSach, DonGia, SoQuyen, NamXuatBan, MaNXB, NguonGoc, MoTa, TheLoai, AnhBia, req.params.id);
+  res.json({ message: 'Đã cập nhật sách.' });
+});
+
 app.delete('/api/admin/books/:id', authMiddleware, adminOnly, (req, res) => {
   db.prepare('DELETE FROM Sach WHERE MaSach = ?').run(req.params.id);
   res.json({ message: 'Đã xóa sách.' });
 });
 
 app.get('/api/admin/users', authMiddleware, adminOnly, (req, res) => {
-  const users = db.prepare('SELECT MaDocGia, HoLot, Ten, Email, DienThoai, DiaChi FROM Docgia ORDER BY MaDocGia').all();
+  const users = db
+    .prepare(
+      `SELECT d.MaDocGia, d.HoLot, d.Ten, d.Email, d.DienThoai, d.DiaChi,
+              CASE
+                WHEN EXISTS (
+                  SELECT 1 FROM TheoDoiMuonSach l
+                  WHERE l.MaDocGia = d.MaDocGia AND l.TrangThai = 'dang_muon'
+                ) THEN 'Đang mượn'
+                ELSE 'Bình thường'
+              END AS TrangThai
+       FROM Docgia d
+       ORDER BY d.MaDocGia`
+    )
+    .all();
   res.json({ users });
 });
 

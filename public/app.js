@@ -28,30 +28,31 @@ function addChatBubble(text, who = 'bot') {
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
+function bookCard(book) {
+  return `
+    <div class="col-sm-6 col-xl-4">
+      <div class="card h-100 shadow-sm border-0 book-card">
+        <img src="${book.AnhBia || 'https://placehold.co/640x360'}" class="card-img-top" alt="${book.TenSach}">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">${book.TenSach}</h5>
+          <p class="card-text mb-1"><strong>Tác giả:</strong> ${book.NguonGoc || 'Đang cập nhật'}</p>
+          <p class="card-text mb-1"><strong>Thể loại:</strong> ${book.TheLoai || 'Đang cập nhật'}</p>
+          <p class="card-text mb-3"><strong>Còn lại:</strong> ${book.SoQuyen} quyển</p>
+          <div class="mt-auto d-flex gap-2">
+            <a href="/book-detail.html?id=${encodeURIComponent(book.MaSach)}" class="btn btn-outline-dark btn-sm flex-fill">Xem chi tiết</a>
+            <button class="btn btn-primary btn-sm borrow-btn" data-id="${book.MaSach}">Mượn sách</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 async function fetchBooks(q = '') {
   const res = await fetch(`/api/search-books?q=${encodeURIComponent(q)}`);
   const data = await res.json();
 
-  bookList.innerHTML = '';
-  data.books.forEach((book) => {
-    const col = document.createElement('div');
-    col.className = 'col-md-6';
-    col.innerHTML = `
-      <div class="card h-100 shadow-sm book-card">
-        <img src="${book.AnhBia || 'https://placehold.co/300x220'}" class="card-img-top" alt="${book.TenSach}">
-        <div class="card-body">
-          <h5 class="card-title">${book.TenSach}</h5>
-          <p class="card-text mb-1"><strong>Tác giả/Nguồn gốc:</strong> ${book.NguonGoc || 'Đang cập nhật'}</p>
-          <p class="card-text mb-1"><strong>Thể loại:</strong> ${book.TheLoai || 'Đang cập nhật'}</p>
-          <p class="card-text mb-1"><strong>Số quyển:</strong> ${book.SoQuyen}</p>
-          <p class="card-text">${book.MoTa || ''}</p>
-          <button class="btn btn-sm btn-primary borrow-btn" data-id="${book.MaSach}">Mượn sách</button>
-        </div>
-      </div>
-    `;
-    bookList.appendChild(col);
-  });
-
+  bookList.innerHTML = data.books.map(bookCard).join('');
   document.querySelectorAll('.borrow-btn').forEach((btn) => {
     btn.addEventListener('click', () => borrowBook(btn.dataset.id));
   });
@@ -73,12 +74,15 @@ async function borrowBook(MaSach) {
   });
 
   const data = await res.json();
-  alert(data.message);
+  alert(data.message || 'Đã gửi yêu cầu mượn sách');
   await fetchBooks(searchInput.value);
   await loadMyLoans();
 }
 
 searchBtn.addEventListener('click', () => fetchBooks(searchInput.value));
+searchInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') fetchBooks(searchInput.value);
+});
 
 voiceBtn.addEventListener('click', () => {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -175,12 +179,12 @@ async function loadMyLoans() {
 
   data.loans.forEach((loan) => {
     const item = document.createElement('li');
-    item.className = 'list-group-item';
-    item.textContent = `${loan.TenSach} - ${loan.TrangThai} (Hạn trả: ${new Date(loan.HanTra).toLocaleDateString('vi-VN')})`;
+    item.className = 'list-group-item d-flex justify-content-between align-items-center';
+    item.innerHTML = `<span>${loan.TenSach} - ${loan.TrangThai}</span><span class="badge text-bg-light">Hạn: ${new Date(loan.HanTra).toLocaleDateString('vi-VN')}</span>`;
     loanList.appendChild(item);
   });
 }
 
-addChatBubble('Xin chào! Mình có thể gợi ý sách hoặc hướng dẫn mượn sách cho bạn.');
+addChatBubble('Xin chào! Mình có thể gợi ý sách và tư vấn mượn sách cho bạn.');
 fetchBooks();
 loadMyLoans();

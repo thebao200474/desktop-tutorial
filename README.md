@@ -4,9 +4,10 @@ Dự án demo full-stack theo yêu cầu:
 
 - Giao diện người dùng + quản trị dùng **Bootstrap 5**.
 - **Tìm kiếm giọng nói** với Web Speech API.
-- **AI Chatbot** (luật đơn giản, có thể mở rộng Dialogflow/Rasa).
+- **AI Chatbot** hỗ trợ gợi ý, trả lời câu hỏi nhanh.
 - **Đăng nhập OTP qua Gmail** bằng Nodemailer.
 - **Dashboard quản trị** + quản lý sách/độc giả/lượt mượn.
+- **Trang chi tiết sách** có đánh giá sao, nhận xét và nút mượn sách.
 
 ## Công nghệ
 
@@ -40,6 +41,7 @@ npm start
 Mở:
 
 - Trang người dùng: `http://localhost:3000/`
+- Trang chi tiết sách: `http://localhost:3000/book-detail.html?id=S001`
 - Trang quản trị: `http://localhost:3000/admin.html`
 
 ## Tài khoản mẫu (seed)

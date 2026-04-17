@@ -8,34 +8,32 @@
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <div class="container py-4">
-      <div class="hero p-4 mb-4">
-        <h1>BookHub - Quản lý mượn sách thông minh</h1>
-        <p class="mb-0">Tích hợp AI Chatbot, tìm kiếm giọng nói, OTP Gmail và quản trị thư viện.</p>
-      </div>
-
-      <div class="row g-3">
-        <div class="col-lg-8">
-          <div class="card shadow-sm mb-3">
-            <div class="card-body">
-              <h5 class="section-title">Tìm sách bằng văn bản / giọng nói</h5>
-              <div class="input-group mb-2">
-                <input type="text" id="search-input" class="form-control" placeholder="Nhập tên sách, tác giả hoặc thể loại" />
-                <button class="btn btn-outline-secondary" id="voice-btn">🎤 Tìm kiếm giọng nói</button>
-                <button class="btn btn-primary" id="search-btn">Tìm kiếm</button>
-              </div>
-              <small class="text-muted" id="voice-status">Nhấn micro để bắt đầu tìm kiếm giọng nói.</small>
-            </div>
-          </div>
-
-          <div id="book-list" class="row g-3"></div>
+    <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
+      <div class="container">
+        <a class="navbar-brand fw-bold text-brown" href="/">📚 BookHub</a>
+        <div class="ms-auto d-flex gap-2">
+          <a class="btn btn-outline-dark btn-sm" href="/admin.html">Trang quản trị</a>
         </div>
+      </div>
+    </nav>
 
-        <div class="col-lg-4">
-          <div class="card shadow-sm mb-3">
-            <div class="card-body">
-              <h5 class="section-title">Đăng nhập độc giả bằng OTP Gmail</h5>
-              <input id="reader-email" class="form-control mb-2" placeholder="Email độc giả (mặc định: docgia1@example.com)" />
+    <header class="container py-4">
+      <div class="hero p-4 p-lg-5 shadow-sm">
+        <div class="row align-items-center g-4">
+          <div class="col-lg-7">
+            <h1 class="display-6 fw-bold mb-3">Khám phá thế giới sách theo cách thông minh</h1>
+            <p class="mb-3 opacity-90">Tìm sách bằng văn bản/giọng nói, mượn sách nhanh bằng OTP Gmail và nhận hỗ trợ từ chatbot AI.</p>
+            <div class="input-group input-group-lg">
+              <input type="text" id="search-input" class="form-control" placeholder="Tìm sách, tác giả hoặc thể loại" />
+              <button class="btn btn-light" id="voice-btn">🎤 Giọng nói</button>
+              <button class="btn btn-warning" id="search-btn">Tìm kiếm</button>
+            </div>
+            <small class="d-block mt-2" id="voice-status">Nhấn nút micro để bắt đầu nhận diện giọng nói.</small>
+          </div>
+          <div class="col-lg-5">
+            <div class="otp-panel p-3 rounded-3 bg-white text-dark shadow-sm">
+              <h5 class="fw-bold">Đăng nhập độc giả bằng OTP Gmail</h5>
+              <input id="reader-email" class="form-control mb-2" placeholder="Email độc giả" />
               <div class="d-flex gap-2 mb-2">
                 <button class="btn btn-outline-primary flex-fill" id="send-otp-reader">Gửi OTP</button>
                 <input id="reader-otp" class="form-control" placeholder="Nhập OTP" />
@@ -44,31 +42,56 @@
               <small class="text-muted d-block mt-2" id="auth-status"></small>
             </div>
           </div>
+        </div>
+      </div>
+    </header>
 
-          <div class="card shadow-sm mb-3">
+    <main class="container pb-4">
+      <section class="mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h3 class="section-title mb-0">Sách gợi ý</h3>
+          <span class="badge text-bg-light">Responsive Bootstrap Cards</span>
+        </div>
+        <div id="book-list" class="row g-3"></div>
+      </section>
+
+      <section class="row g-3">
+        <div class="col-lg-7">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <h5 class="section-title">Hướng dẫn nhanh</h5>
+              <ol class="small mb-0 ps-3">
+                <li>Tìm sách bằng văn bản hoặc giọng nói.</li>
+                <li>Nhấn <strong>Xem chi tiết</strong> để xem thông tin đầy đủ và đánh giá sách.</li>
+                <li>Xác thực OTP để mượn sách và theo dõi lịch sử mượn.</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-5">
+          <div class="card shadow-sm border-0">
             <div class="card-body">
               <h5 class="section-title">Chatbot AI hỗ trợ</h5>
               <div class="chat-box mb-2" id="chat-box"></div>
               <div class="input-group">
-                <input id="chat-input" class="form-control" placeholder="Hỏi chatbot: Sách nào hay?" />
+                <input id="chat-input" class="form-control" placeholder="Ví dụ: Gợi ý sách kỹ năng sống" />
                 <button class="btn btn-dark" id="chat-send">Gửi</button>
               </div>
             </div>
           </div>
+        </div>
+      </section>
 
-          <div class="card shadow-sm">
-            <div class="card-body">
-              <h6 class="section-title">Lịch sử mượn của tôi</h6>
-              <ul id="loan-list" class="list-group small"></ul>
-            </div>
+      <section class="mt-3">
+        <div class="card shadow-sm border-0">
+          <div class="card-body">
+            <h6 class="section-title">Lịch sử mượn của tôi</h6>
+            <ul id="loan-list" class="list-group list-group-flush small"></ul>
           </div>
         </div>
-      </div>
-
-      <p class="mt-4 text-center text-muted">
-        Trang quản trị: <a href="/admin.html">admin.html</a> (email mẫu: admin@example.com)
-      </p>
-    </div>
+      </section>
+    </main>
 
     <script src="/app.js"></script>
   </body>

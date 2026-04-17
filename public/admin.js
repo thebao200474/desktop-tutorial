@@ -51,6 +51,7 @@ document.getElementById('add-book-btn').addEventListener('click', async () => {
     MaNXB: 'NXB01',
     NamXuatBan: 2024
   };
+
   const res = await fetch('/api/admin/books', {
     method: 'POST',
     headers: {
@@ -65,13 +66,43 @@ document.getElementById('add-book-btn').addEventListener('click', async () => {
   loadAll();
 });
 
-async function api(path) {
+async function api(path, options = {}) {
   const res = await fetch(path, {
+    ...options,
     headers: {
+      ...(options.headers || {}),
       Authorization: `Bearer ${adminState.token}`
     }
   });
   return res.json();
+}
+
+async function editBook(book) {
+  const TenSach = prompt('Tên sách mới:', book.TenSach);
+  if (!TenSach) return;
+  const NguonGoc = prompt('Tác giả / Nguồn gốc:', book.NguonGoc || '');
+  if (NguonGoc === null) return;
+  const qtyInput = prompt('Số lượng:', String(book.SoQuyen));
+  const SoQuyen = Number(qtyInput);
+  if (Number.isNaN(SoQuyen)) return;
+
+  await api(`/api/admin/books/${book.MaSach}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      TenSach,
+      NguonGoc,
+      SoQuyen,
+      DonGia: book.DonGia,
+      NamXuatBan: book.NamXuatBan,
+      MaNXB: book.MaNXB,
+      MoTa: book.MoTa,
+      TheLoai: book.TheLoai,
+      AnhBia: book.AnhBia
+    })
+  });
+
+  loadAll();
 }
 
 async function loadAll() {
@@ -92,24 +123,37 @@ async function loadAll() {
   booksTable.innerHTML = '';
   (books.books || []).forEach((b) => {
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${b.MaSach}</td><td>${b.TenSach}</td><td>${b.NguonGoc || ''}</td><td>${b.SoQuyen}</td><td><button class="btn btn-sm btn-danger" data-id="${b.MaSach}">Xóa</button></td>`;
-    booksTable.appendChild(tr);
-  });
+    tr.innerHTML = `
+      <td>${b.MaSach}</td>
+      <td>${b.TenSach}</td>
+      <td>${b.NguonGoc || ''}</td>
+      <td><span class="badge text-bg-light">${b.SoQuyen}</span></td>
+      <td>
+        <button class="btn btn-sm btn-warning me-1 edit-btn">Sửa</button>
+        <button class="btn btn-sm btn-danger delete-btn">Xóa</button>
+      </td>
+    `;
 
-  booksTable.querySelectorAll('button').forEach((btn) => {
-    btn.addEventListener('click', async () => {
-      await fetch(`/api/admin/books/${btn.dataset.id}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${adminState.token}` }
-      });
+    tr.querySelector('.edit-btn').addEventListener('click', () => editBook(b));
+    tr.querySelector('.delete-btn').addEventListener('click', async () => {
+      await api(`/api/admin/books/${b.MaSach}`, { method: 'DELETE' });
       loadAll();
     });
+
+    booksTable.appendChild(tr);
   });
 
   usersTable.innerHTML = '';
   (users.users || []).forEach((u) => {
+    const badge = u.TrangThai === 'Đang mượn' ? 'text-bg-warning' : 'text-bg-success';
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${u.MaDocGia}</td><td>${u.HoLot} ${u.Ten}</td><td>${u.Email || ''}</td><td>${u.DienThoai || ''}</td>`;
+    tr.innerHTML = `
+      <td>${u.MaDocGia}</td>
+      <td>${u.HoLot} ${u.Ten}</td>
+      <td>${u.Email || ''}</td>
+      <td>${u.DienThoai || ''}</td>
+      <td><span class="badge ${badge}">${u.TrangThai}</span></td>
+    `;
     usersTable.appendChild(tr);
   });
 
