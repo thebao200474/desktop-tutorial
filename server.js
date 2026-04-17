@@ -743,6 +743,155 @@ app.get('/api/admin/loans', authMiddleware, adminOnly, (req, res) => {
   res.json({ loans });
 });
 
+
+app.get('/api/admin/borrows', authMiddleware, adminOnly, (req, res) => {
+  const { search = '', status = 'all', period = 'all', page = 1, pageSize = 10 } = req.query;
+  const filters = ['1=1'];
+  const params = [];
+
+  if (search) {
+    filters.push('(CAST(l.MaMuon AS TEXT) LIKE ? OR d.HoLot || " " || d.Ten LIKE ? OR s.TenSach LIKE ?)');
+    params.push(`%${search}%`, `%${search}%`, `%${search}%`);
+  }
+
+  if (status !== 'all') {
+    filters.push('l.TrangThai = ?');
+    params.push(status);
+  }
+
+  if (period === 'today') {
+    filters.push("date(l.NgayMuon) = date('now')");
+  } else if (period === '7days') {
+    filters.push("date(l.NgayMuon) >= date('now', '-7 day')");
+  } else if (period === '30days') {
+    filters.push("date(l.NgayMuon) >= date('now', '-30 day')");
+  } else if (period === 'month') {
+    filters.push("strftime('%Y-%m', l.NgayMuon) = strftime('%Y-%m', 'now')");
+  }
+
+  const baseFrom = `
+    FROM TheoDoiMuonSach l
+    JOIN Docgia d ON d.MaDocGia = l.MaDocGia
+    JOIN Sach s ON s.MaSach = l.MaSach
+    WHERE ${filters.join(' AND ')}
+  `;
+
+  const total = db.prepare(`SELECT COUNT(*) AS c ${baseFrom}`).get(...params).c;
+
+  const stats = db
+    .prepare(
+      `SELECT
+        COUNT(*) AS total,
+        SUM(CASE WHEN l.TrangThai = 'dang_muon' THEN 1 ELSE 0 END) AS dangMuon,
+        SUM(CASE WHEN l.TrangThai = 'da_tra' THEN 1 ELSE 0 END) AS daTra,
+        SUM(CASE WHEN l.TrangThai = 'cho_duyet' THEN 1 ELSE 0 END) AS choDuyet,
+        SUM(CASE WHEN l.TrangThai = 'da_huy' THEN 1 ELSE 0 END) AS daHuy,
+        SUM(CASE WHEN l.TrangThai = 'dang_muon' AND date(l.HanTra) < date('now') THEN 1 ELSE 0 END) AS quaHan
+       FROM TheoDoiMuonSach l`
+    )
+    .get();
+
+  const limit = Math.max(1, Number(pageSize) || 10);
+  const offset = (Math.max(1, Number(page) || 1) - 1) * limit;
+
+  const items = db
+    .prepare(
+      `SELECT l.MaMuon, l.MaDocGia, l.MaSach, d.HoLot || ' ' || d.Ten AS DocGia, d.Email, d.DienThoai,
+              s.TenSach, s.NguonGoc AS TacGia, l.NgayMuon, l.HanTra, l.NgayTra, l.TrangThai
+       ${baseFrom}
+       ORDER BY l.MaMuon DESC
+       LIMIT ? OFFSET ?`
+    )
+    .all(...params, limit, offset);
+
+  return res.json({
+    items,
+    stats: {
+      total: stats.total || 0,
+      dangMuon: stats.dangMuon || 0,
+      quaHan: stats.quaHan || 0,
+      daTra: stats.daTra || 0
+    },
+    pagination: {
+      total,
+      page: Math.max(1, Number(page) || 1),
+      pageSize: limit,
+      totalPages: Math.max(1, Math.ceil(total / limit))
+    }
+  });
+});
+
+app.get('/api/admin/borrows/:id', authMiddleware, adminOnly, (req, res) => {
+  const item = db
+    .prepare(
+      `SELECT l.*, d.HoLot || ' ' || d.Ten AS DocGia, d.Email, d.DienThoai, s.TenSach, s.NguonGoc AS TacGia
+       FROM TheoDoiMuonSach l
+       JOIN Docgia d ON d.MaDocGia = l.MaDocGia
+       JOIN Sach s ON s.MaSach = l.MaSach
+       WHERE l.MaMuon = ?`
+    )
+    .get(req.params.id);
+
+  if (!item) return res.status(404).json({ message: 'Không tìm thấy phiếu mượn.' });
+  return res.json({ item });
+});
+
+app.post('/api/admin/borrows', authMiddleware, adminOnly, (req, res) => {
+  const { MaDocGia, MaSach, NgayMuon, HanTra, TrangThai = 'cho_duyet' } = req.body;
+  if (!MaDocGia || !MaSach || !NgayMuon || !HanTra) {
+    return res.status(400).json({ message: 'Thiếu thông tin tạo phiếu mượn.' });
+  }
+
+  const result = db
+    .prepare('INSERT INTO TheoDoiMuonSach(MaDocGia, MaSach, NgayMuon, HanTra, TrangThai) VALUES (?, ?, ?, ?, ?)')
+    .run(MaDocGia, MaSach, NgayMuon, HanTra, TrangThai);
+
+  return res.json({ message: 'Đã tạo phiếu mượn.', MaMuon: result.lastInsertRowid });
+});
+
+app.put('/api/admin/borrows/:id/approve', authMiddleware, adminOnly, (req, res) => {
+  const loan = db.prepare('SELECT * FROM TheoDoiMuonSach WHERE MaMuon = ?').get(req.params.id);
+  if (!loan) return res.status(404).json({ message: 'Không tìm thấy phiếu mượn.' });
+
+  const book = db.prepare('SELECT * FROM Sach WHERE MaSach = ?').get(loan.MaSach);
+  if (!book || book.SoQuyen <= 0) return res.status(400).json({ message: 'Sách không còn sẵn để duyệt mượn.' });
+
+  const tx = db.transaction(() => {
+    db.prepare('UPDATE TheoDoiMuonSach SET TrangThai = ? WHERE MaMuon = ?').run('dang_muon', req.params.id);
+    db.prepare('UPDATE Sach SET SoQuyen = SoQuyen - 1 WHERE MaSach = ?').run(loan.MaSach);
+  });
+  tx();
+
+  return res.json({ message: 'Đã duyệt phiếu mượn.' });
+});
+
+app.put('/api/admin/borrows/:id/return', authMiddleware, adminOnly, (req, res) => {
+  const loan = db.prepare('SELECT * FROM TheoDoiMuonSach WHERE MaMuon = ?').get(req.params.id);
+  if (!loan) return res.status(404).json({ message: 'Không tìm thấy phiếu mượn.' });
+
+  const tx = db.transaction(() => {
+    db.prepare('UPDATE TheoDoiMuonSach SET TrangThai = ?, NgayTra = ? WHERE MaMuon = ?').run('da_tra', new Date().toISOString(), req.params.id);
+    if (loan.TrangThai === 'dang_muon') {
+      db.prepare('UPDATE Sach SET SoQuyen = SoQuyen + 1 WHERE MaSach = ?').run(loan.MaSach);
+    }
+  });
+  tx();
+
+  return res.json({ message: 'Đã xác nhận trả sách.' });
+});
+
+app.put('/api/admin/borrows/:id/extend', authMiddleware, adminOnly, (req, res) => {
+  const { HanTra } = req.body;
+  if (!HanTra) return res.status(400).json({ message: 'Thiếu hạn trả mới.' });
+  db.prepare('UPDATE TheoDoiMuonSach SET HanTra = ? WHERE MaMuon = ?').run(HanTra, req.params.id);
+  return res.json({ message: 'Đã gia hạn phiếu mượn.' });
+});
+
+app.delete('/api/admin/borrows/:id', authMiddleware, adminOnly, (req, res) => {
+  db.prepare('UPDATE TheoDoiMuonSach SET TrangThai = ? WHERE MaMuon = ?').run('da_huy', req.params.id);
+  return res.json({ message: 'Đã hủy phiếu mượn.' });
+});
+
 app.get('/health', (req, res) => res.json({ ok: true }));
 
 app.listen(PORT, () => {

@@ -49,6 +49,7 @@ Mở:
 - Trang chi tiết sách: `http://localhost:3000/book-detail.html?id=S001`
 - Trang đăng nhập quản trị: `http://localhost:3000/admin-login.html`
 - Trang quản trị: `http://localhost:3000/admin.html` (yêu cầu đăng nhập admin)
+- Trang quản lý mượn sách: `http://localhost:3000/admin-borrows.html`
 
 ## Tài khoản mẫu (seed)
 
@@ -113,3 +114,12 @@ Nếu thiếu `BREVO_API_KEY` hoặc `BREVO_SENDER_EMAIL`, API gửi OTP sẽ tr
 
 
 - Có thể đổi mặc định bằng `.env`: `ADMIN_DEFAULT_EMAIL`, `ADMIN_DEFAULT_PASSWORD` (server sẽ đồng bộ tài khoản admin mặc định khi khởi động).
+
+
+- `GET /api/admin/borrows`: danh sách phiếu mượn có lọc/tìm kiếm/phân trang.
+- `GET /api/admin/borrows/:id`: chi tiết phiếu mượn.
+- `POST /api/admin/borrows`: tạo phiếu mượn mới.
+- `PUT /api/admin/borrows/:id/approve`: duyệt phiếu mượn.
+- `PUT /api/admin/borrows/:id/return`: xác nhận trả sách.
+- `PUT /api/admin/borrows/:id/extend`: gia hạn hạn trả.
+- `DELETE /api/admin/borrows/:id`: hủy phiếu mượn.
