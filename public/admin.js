@@ -69,9 +69,9 @@ function renderTrafficChart(labels = [], values = []) {
           data: values,
           borderColor: '#94a3b8',
           backgroundColor: 'rgba(148, 163, 184, 0.18)',
-          tension: 0.3,
+          tension: 0,
           fill: true,
-          pointRadius: 3,
+          pointRadius: 2,
           pointBackgroundColor: '#64748b'
         }
       ]
@@ -79,6 +79,7 @@ function renderTrafficChart(labels = [], values = []) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      animation: false,
       scales: {
         y: { beginAtZero: true, ticks: { precision: 0 } }
       },
