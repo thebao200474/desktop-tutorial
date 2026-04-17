@@ -67,10 +67,16 @@ BREVO_SENDER_NAME=BookHub
 OTP_EXPIRE_MINUTES=5
 ```
 
-Nếu chưa cấu hình Brevo, hệ thống chạy ở chế độ demo (in OTP ra terminal, không gửi mail ra ngoài).
+Nếu thiếu biến Brevo, API gửi OTP sẽ trả lỗi để tránh báo thành công giả.
 
 
 ## API đăng ký OTP
 
-- `POST /api/auth/send-otp-register`: gửi OTP đăng ký qua Brevo (hoặc demo console nếu thiếu env).
+- `POST /api/auth/send-otp-register`: gửi OTP đăng ký qua Brevo; nếu thiếu cấu hình sẽ trả lỗi rõ ràng.
 - `POST /api/auth/register`: đăng ký độc giả với OTP + thông tin bảng `Docgia`.
+
+
+## API test gửi mail
+
+- `GET /api/test-send-mail?email=your_email@gmail.com`: gửi mail test nhanh qua Brevo.
+- Hoặc đặt `TEST_RECEIVER_EMAIL` trong `.env` rồi gọi `GET /api/test-send-mail`.

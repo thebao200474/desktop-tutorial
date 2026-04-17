@@ -108,17 +108,21 @@ if (process.env.BREVO_API_KEY) {
 }
 const brevoEmailApi = new SibApiV3Sdk.TransactionalEmailsApi();
 
+function getMissingBrevoEnv() {
+  return ['BREVO_API_KEY', 'BREVO_SENDER_EMAIL', 'BREVO_SENDER_NAME'].filter((name) => !process.env[name]);
+}
+
 async function sendOTPEmail(email, otp, purpose = 'register') {
-  if (!process.env.BREVO_API_KEY || !process.env.BREVO_SENDER_EMAIL) {
-    console.log(`[DEMO OTP][${purpose}] ${email}: ${otp}`);
-    return { mode: 'demo-console' };
+  const missingEnv = getMissingBrevoEnv();
+  if (missingEnv.length > 0) {
+    throw new Error(`Thiếu cấu hình Brevo: ${missingEnv.join(', ')}`);
   }
 
   const subject = purpose === 'register' ? 'Mã OTP đăng ký BookHub' : 'Mã OTP đăng nhập BookHub';
   const sendSmtpEmail = {
     sender: {
       email: process.env.BREVO_SENDER_EMAIL,
-      name: process.env.BREVO_SENDER_NAME || 'BookHub'
+      name: process.env.BREVO_SENDER_NAME
     },
     to: [{ email }],
     subject,
@@ -130,8 +134,15 @@ async function sendOTPEmail(email, otp, purpose = 'register') {
     `
   };
 
-  await brevoEmailApi.sendTransacEmail(sendSmtpEmail);
-  return { mode: 'brevo' };
+  console.log(`[OTP][${purpose}] Đang gửi tới: ${email}`);
+  try {
+    const response = await brevoEmailApi.sendTransacEmail(sendSmtpEmail);
+    console.log(`[OTP][${purpose}] Gửi thành công tới ${email}. messageId=${response?.messageId || 'n/a'}`);
+    return response;
+  } catch (err) {
+    console.error('BREVO ERROR:', err?.response?.body || err);
+    throw err;
+  }
 }
 
 function generateDocGiaId() {
@@ -143,7 +154,7 @@ function generateDocGiaId() {
 const otpCooldown = new Map();
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-app.post('/api/auth/send-otp-register', (req, res) => {
+app.post('/api/auth/send-otp-register', async (req, res) => {
   const email = String(req.body.email || '').trim().toLowerCase();
   if (!EMAIL_REGEX.test(email)) {
     return res.status(400).json({ success: false, message: 'Email không hợp lệ.' });
@@ -164,18 +175,34 @@ app.post('/api/auth/send-otp-register', (req, res) => {
   const otpExpireMinutes = Number(process.env.OTP_EXPIRE_MINUTES || 5);
   const expiresAt = Date.now() + otpExpireMinutes * 60 * 1000;
   const createdAt = new Date().toISOString();
-  db.prepare('UPDATE OTPToken SET isUsed = 1 WHERE email = ? AND purpose = ?').run(email, 'register');
-  db.prepare('INSERT INTO OTPToken(email, otp, role, purpose, expiresAt, isUsed, createdAt) VALUES (?, ?, ?, ?, ?, 0, ?)').run(email, otp, 'reader', 'register', expiresAt, createdAt);
 
-  sendOTPEmail(email, otp, 'register')
-    .then(() => {
-      otpCooldown.set(email, now + 60 * 1000);
-      return res.json({ success: true, message: 'Đã gửi OTP về email' });
-    })
-    .catch((error) => {
-      console.error('Lỗi gửi OTP register:', error.message);
-      return res.status(500).json({ success: false, message: 'Không gửi được OTP.' });
-    });
+  try {
+    await sendOTPEmail(email, otp, 'register');
+    db.prepare('UPDATE OTPToken SET isUsed = 1 WHERE email = ? AND purpose = ?').run(email, 'register');
+    db.prepare('INSERT INTO OTPToken(email, otp, role, purpose, expiresAt, isUsed, createdAt) VALUES (?, ?, ?, ?, ?, 0, ?)').run(email, otp, 'reader', 'register', expiresAt, createdAt);
+    otpCooldown.set(email, now + 60 * 1000);
+    return res.json({ success: true, message: 'Đã gửi OTP về email' });
+  } catch (err) {
+    console.error('BREVO ERROR:', err?.response?.body || err);
+    return res.status(500).json({ success: false, message: 'Gửi OTP thất bại' });
+  }
+});
+
+
+app.get('/api/test-send-mail', async (req, res) => {
+  const targetEmail = String(req.query.email || process.env.TEST_RECEIVER_EMAIL || '').trim().toLowerCase();
+  if (!EMAIL_REGEX.test(targetEmail)) {
+    return res.status(400).json({ success: false, message: 'Thiếu email test hợp lệ (query ?email=...) hoặc TEST_RECEIVER_EMAIL.' });
+  }
+
+  const otp = '123456';
+  try {
+    await sendOTPEmail(targetEmail, otp, 'register');
+    return res.json({ success: true, message: `Đã gửi mail test tới ${targetEmail}` });
+  } catch (err) {
+    console.error('BREVO ERROR:', err?.response?.body || err);
+    return res.status(500).json({ success: false, message: 'Gửi mail test thất bại' });
+  }
 });
 
 app.post('/api/auth/register', (req, res) => {
@@ -251,10 +278,10 @@ app.post('/api/auth/login', (req, res) => {
   });
 });
 
-app.post('/api/auth/send-otp', (req, res) => {
+app.post('/api/auth/send-otp', async (req, res) => {
   const { email, role = 'reader' } = req.body;
   if (!email) {
-    return res.status(400).json({ message: 'Email là bắt buộc.' });
+    return res.status(400).json({ success: false, message: 'Email là bắt buộc.' });
   }
 
   const userExists =
@@ -263,7 +290,7 @@ app.post('/api/auth/send-otp', (req, res) => {
       : db.prepare('SELECT 1 FROM Docgia WHERE Email = ?').get(email);
 
   if (!userExists) {
-    return res.status(404).json({ message: 'Không tìm thấy tài khoản với email này.' });
+    return res.status(404).json({ success: false, message: 'Không tìm thấy tài khoản với email này.' });
   }
 
   const otp = `${Math.floor(100000 + Math.random() * 900000)}`;
@@ -271,19 +298,15 @@ app.post('/api/auth/send-otp', (req, res) => {
   const expiresAt = Date.now() + otpExpireMinutes * 60 * 1000;
   const createdAt = new Date().toISOString();
 
-  db.prepare('UPDATE OTPToken SET isUsed = 1 WHERE email = ? AND role = ?').run(email, role);
-  db.prepare('INSERT INTO OTPToken(email, otp, role, purpose, expiresAt, isUsed, createdAt) VALUES (?, ?, ?, ?, ?, 0, ?)').run(email, otp, role, 'login', expiresAt, createdAt);
-
-  sendOTPEmail(email, otp, 'login')
-    .then((result) => {
-      return res.json({
-        message: 'Đã gửi OTP thành công.',
-        mode: result.mode
-      });
-    })
-    .catch((error) => {
-      return res.status(500).json({ message: 'Gửi OTP thất bại.', error: error.message });
-    });
+  try {
+    await sendOTPEmail(email, otp, 'login');
+    db.prepare('UPDATE OTPToken SET isUsed = 1 WHERE email = ? AND role = ?').run(email, role);
+    db.prepare('INSERT INTO OTPToken(email, otp, role, purpose, expiresAt, isUsed, createdAt) VALUES (?, ?, ?, ?, ?, 0, ?)').run(email, otp, role, 'login', expiresAt, createdAt);
+    return res.json({ success: true, message: 'Đã gửi OTP thành công.' });
+  } catch (err) {
+    console.error('BREVO ERROR:', err?.response?.body || err);
+    return res.status(500).json({ success: false, message: 'Gửi OTP thất bại' });
+  }
 });
 
 app.post('/api/auth/verify-otp', (req, res) => {
