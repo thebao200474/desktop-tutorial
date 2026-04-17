@@ -130,3 +130,37 @@ body {
   max-height: 220px;
   overflow: hidden;
 }
+
+.btn-brown {
+  background: var(--admin-active);
+  border-color: var(--admin-active);
+  color: #fff;
+}
+
+.btn-brown:hover,
+.btn-brown:focus {
+  background: #7f4f28;
+  border-color: #7f4f28;
+  color: #fff;
+}
+
+.admin-books-table td {
+  vertical-align: middle;
+}
+
+.admin-book-thumb {
+  width: 46px;
+  height: 62px;
+  object-fit: cover;
+  border-radius: 0.45rem;
+  border: 1px solid var(--admin-border);
+}
+
+.pagination .page-link {
+  color: #4b5563;
+}
+
+.pagination .page-item.active .page-link {
+  background: var(--admin-active);
+  border-color: var(--admin-active);
+}
