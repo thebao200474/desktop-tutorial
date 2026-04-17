@@ -47,7 +47,8 @@ Mở:
 - Trang đăng nhập: `http://localhost:3000/login.html`
 - Trang đăng ký: `http://localhost:3000/register.html`
 - Trang chi tiết sách: `http://localhost:3000/book-detail.html?id=S001`
-- Trang quản trị: `http://localhost:3000/admin.html`
+- Trang đăng nhập quản trị: `http://localhost:3000/admin-login.html`
+- Trang quản trị: `http://localhost:3000/admin.html` (yêu cầu đăng nhập admin)
 
 ## Tài khoản mẫu (seed)
 
@@ -98,3 +99,6 @@ Nếu thiếu `BREVO_API_KEY` hoặc `BREVO_SENDER_EMAIL`, API gửi OTP sẽ tr
 - Nếu lỗi liên quan `sender`:
   - `BREVO_SENDER_EMAIL` chưa verify. Vào Brevo > Senders để verify email gửi.
 - Sau khi sửa `.env`, nhớ restart server (`Ctrl + C` rồi `npm start`).
+
+
+- `POST /api/admin/login`: đăng nhập quản trị viên bằng email + mật khẩu.

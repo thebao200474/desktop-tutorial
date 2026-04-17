@@ -1,9 +1,13 @@
-const adminState = { token: localStorage.getItem('adminToken') || '' };
+const adminState = {
+  token: localStorage.getItem('adminToken') || '',
+  profile: JSON.parse(localStorage.getItem('adminProfile') || 'null')
+};
 
-const adminEmail = document.getElementById('admin-email');
-const adminOtp = document.getElementById('admin-otp');
+if (!adminState.token) {
+  window.location.href = '/admin-login.html';
+}
+
 const adminStatus = document.getElementById('admin-status');
-
 const sTotalBooks = document.getElementById('s-total-books');
 const sReaders = document.getElementById('s-readers');
 const sBorrowed = document.getElementById('s-borrowed');
@@ -13,32 +17,14 @@ const booksTable = document.getElementById('books-table');
 const usersTable = document.getElementById('users-table');
 const loansTable = document.getElementById('loans-table');
 
-document.getElementById('admin-send-otp').addEventListener('click', async () => {
-  const res = await fetch('/api/auth/send-otp', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: adminEmail.value.trim(), role: 'admin' })
+const logoutBtn = document.getElementById('admin-logout');
+if (logoutBtn) {
+  logoutBtn.addEventListener('click', () => {
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminProfile');
+    window.location.href = '/admin-login.html';
   });
-  const data = await res.json();
-  adminStatus.textContent = data.message || data.error;
-});
-
-document.getElementById('admin-verify').addEventListener('click', async () => {
-  const res = await fetch('/api/auth/verify-otp', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: adminEmail.value.trim(), otp: adminOtp.value.trim(), role: 'admin' })
-  });
-  const data = await res.json();
-  if (data.token) {
-    adminState.token = data.token;
-    localStorage.setItem('adminToken', data.token);
-    adminStatus.textContent = 'Xác thực admin thành công.';
-    loadAll();
-  } else {
-    adminStatus.textContent = data.message || 'Thất bại';
-  }
-});
+}
 
 document.getElementById('add-book-btn').addEventListener('click', async () => {
   if (!adminState.token) return;
@@ -74,6 +60,14 @@ async function api(path, options = {}) {
       Authorization: `Bearer ${adminState.token}`
     }
   });
+
+  if (res.status === 401) {
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminProfile');
+    window.location.href = '/admin-login.html';
+    return {};
+  }
+
   return res.json();
 }
 
@@ -107,6 +101,10 @@ async function editBook(book) {
 
 async function loadAll() {
   if (!adminState.token) return;
+
+  adminStatus.textContent = adminState.profile?.name
+    ? `Xin chào ${adminState.profile.name}.`
+    : 'Đang tải dữ liệu...';
 
   const [dashboard, books, users, loans] = await Promise.all([
     api('/api/admin/dashboard'),

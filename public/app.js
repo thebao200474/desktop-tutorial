@@ -32,7 +32,7 @@ function renderAuthActions() {
     authActions.innerHTML = `
       <a class="btn btn-outline-secondary btn-sm" href="/login.html">Đăng nhập</a>
       <a class="btn btn-primary btn-sm" href="/register.html">Đăng ký</a>
-      <a class="btn btn-outline-dark btn-sm" href="/admin.html">Admin</a>
+      <a class="btn btn-outline-dark btn-sm" href="/admin-login.html">Admin</a>
     `;
     if (borrowLoginCta) borrowLoginCta.classList.remove('d-none');
     return;
@@ -45,7 +45,7 @@ function renderAuthActions() {
       <span class="auth-username">${safeName}</span>
     </a>
     <button class="btn btn-outline-danger btn-sm" id="logout-btn" type="button">Đăng xuất</button>
-    <a class="btn btn-outline-dark btn-sm" href="/admin.html">Admin</a>
+    <a class="btn btn-outline-dark btn-sm" href="/admin-login.html">Admin</a>
   `;
 
   if (borrowLoginCta) borrowLoginCta.classList.add('d-none');

@@ -299,6 +299,31 @@ app.post('/api/auth/login', (req, res) => {
   });
 });
 
+
+app.post('/api/admin/login', (req, res) => {
+  const { email = '', password = '' } = req.body;
+  const normalizedEmail = String(email).trim().toLowerCase();
+  if (!normalizedEmail || !password) {
+    return res.status(400).json({ success: false, message: 'Email và mật khẩu là bắt buộc.' });
+  }
+
+  const admin = db
+    .prepare('SELECT MSNV, HoTenNV, Email, Password FROM NhanVien WHERE lower(Email) = ?')
+    .get(normalizedEmail);
+
+  if (!admin || !admin.Password || !bcrypt.compareSync(password, admin.Password)) {
+    return res.status(401).json({ success: false, message: 'Email hoặc mật khẩu admin không đúng.' });
+  }
+
+  const token = jwt.sign({ sub: admin.MSNV, role: 'admin', email: admin.Email }, JWT_SECRET, { expiresIn: '8h' });
+  return res.json({
+    success: true,
+    message: 'Đăng nhập admin thành công.',
+    token,
+    profile: { id: admin.MSNV, name: admin.HoTenNV, Email: admin.Email, role: 'admin' }
+  });
+});
+
 app.post('/api/auth/send-otp', async (req, res) => {
   const { email, role = 'reader' } = req.body;
   if (!email) {
