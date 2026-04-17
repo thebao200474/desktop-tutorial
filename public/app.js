@@ -18,6 +18,52 @@ const chatInput = document.getElementById('chat-input');
 const chatSend = document.getElementById('chat-send');
 const loanList = document.getElementById('loan-list');
 
+const authActions = document.getElementById('auth-actions');
+const borrowLoginCta = document.getElementById('borrow-login-cta');
+
+function getDefaultAvatar() {
+  return '/images/users/user-1.svg';
+}
+
+function renderAuthActions() {
+  if (!authActions) return;
+
+  if (!state.token || !state.profile) {
+    authActions.innerHTML = `
+      <a class="btn btn-outline-secondary btn-sm" href="/login.html">Đăng nhập</a>
+      <a class="btn btn-primary btn-sm" href="/register.html">Đăng ký</a>
+      <a class="btn btn-outline-dark btn-sm" href="/admin.html">Admin</a>
+    `;
+    if (borrowLoginCta) borrowLoginCta.classList.remove('d-none');
+    return;
+  }
+
+  const safeName = (state.profile.name || state.profile.Email || 'Độc giả').trim();
+  authActions.innerHTML = `
+    <a class="auth-user-chip" href="/my-library.html" title="Tủ sách của tôi">
+      <img src="${getDefaultAvatar()}" alt="avatar" class="auth-avatar" />
+      <span class="auth-username">${safeName}</span>
+    </a>
+    <button class="btn btn-outline-danger btn-sm" id="logout-btn" type="button">Đăng xuất</button>
+    <a class="btn btn-outline-dark btn-sm" href="/admin.html">Admin</a>
+  `;
+
+  if (borrowLoginCta) borrowLoginCta.classList.add('d-none');
+
+  const logoutBtn = document.getElementById('logout-btn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem('readerToken');
+      localStorage.removeItem('readerProfile');
+      state.token = '';
+      state.profile = null;
+      renderAuthActions();
+      loadMyLoans();
+    });
+  }
+}
+
+
 if (readerEmailInput) readerEmailInput.value = 'docgia1@example.com';
 
 function addChatBubble(text, who = 'bot') {
@@ -140,6 +186,7 @@ if (sendOtpReader && verifyOtpReader && readerEmailInput && readerOtpInput && au
       localStorage.setItem('readerToken', data.token);
       localStorage.setItem('readerProfile', JSON.stringify(data.profile));
       authStatus.textContent = `Xin chào ${data.profile.name}, xác thực thành công.`;
+      renderAuthActions();
       loadMyLoans();
     } else {
       authStatus.textContent = data.message || 'Xác thực thất bại.';
@@ -188,5 +235,6 @@ async function loadMyLoans() {
 }
 
 addChatBubble('Xin chào! Mình có thể gợi ý sách và tư vấn mượn sách cho bạn.');
+renderAuthActions();
 fetchBooks();
 loadMyLoans();

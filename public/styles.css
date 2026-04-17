@@ -241,3 +241,37 @@ body {
   aspect-ratio: 3 / 4;
   object-fit: cover;
 }
+
+
+.auth-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #e4d5c6;
+}
+
+
+.auth-username {
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.auth-user-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.22rem 0.55rem;
+  border: 1px solid #e4d5c6;
+  border-radius: 999px;
+  background: #fff;
+  color: #3a2616;
+  text-decoration: none;
+}
+
+.auth-user-chip:hover {
+  background: #faf2e8;
+  color: #3a2616;
+}
