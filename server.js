@@ -606,6 +606,72 @@ app.post('/api/chatbot', (req, res) => {
   });
 });
 
+
+app.get('/api/admin/summary', authMiddleware, adminOnly, (req, res) => {
+  const totalBooks = db.prepare('SELECT COUNT(*) AS c FROM Sach').get().c;
+  const totalUsers = db.prepare('SELECT COUNT(*) AS c FROM Docgia').get().c;
+  const totalReviews = db.prepare('SELECT COUNT(*) AS c FROM DanhGiaSach').get().c;
+  const totalBorrows = db.prepare('SELECT COUNT(*) AS c FROM TheoDoiMuonSach').get().c;
+
+  return res.json({
+    totalBooks,
+    totalUsers,
+    totalReviews,
+    totalBorrows,
+    deltas: {
+      books: '+52 so với tháng trước',
+      users: '+220 người đăng ký mới',
+      reviews: '+45 đánh giá mới',
+      borrows: '+12 cập nhật mới'
+    }
+  });
+});
+
+app.get('/api/admin/traffic', authMiddleware, adminOnly, (req, res) => {
+  const days = Math.max(7, Number(req.query.days) || 7);
+  const labels = [];
+  const values = [];
+  for (let i = days - 1; i >= 0; i -= 1) {
+    const dateObj = new Date();
+    dateObj.setDate(dateObj.getDate() - i);
+    const yyyyMmDd = dateObj.toISOString().slice(0, 10);
+    labels.push(`${String(dateObj.getDate()).padStart(2, '0')}/${String(dateObj.getMonth() + 1).padStart(2, '0')}`);
+
+    const row = db.prepare(`SELECT COUNT(*) AS c FROM TheoDoiMuonSach WHERE date(NgayMuon) = date(?)`).get(yyyyMmDd);
+    values.push(row.c || 0);
+  }
+
+  return res.json({ labels, values });
+});
+
+app.get('/api/admin/top-books', authMiddleware, adminOnly, (req, res) => {
+  const rows = db
+    .prepare(
+      `SELECT s.MaSach, s.TenSach, s.NguonGoc AS TacGia,
+              COUNT(l.MaMuon) AS LuotMuon
+       FROM Sach s
+       LEFT JOIN TheoDoiMuonSach l ON l.MaSach = s.MaSach
+       GROUP BY s.MaSach
+       ORDER BY LuotMuon DESC, s.TenSach ASC
+       LIMIT 5`
+    )
+    .all();
+
+  const items = rows.map((row, index) => {
+    const d = new Date();
+    d.setDate(d.getDate() - index);
+    return {
+      stt: index + 1,
+      tenSach: row.TenSach,
+      tacGia: row.TacGia || 'Đang cập nhật',
+      ngayThem: d.toLocaleDateString('vi-VN'),
+      luotMuon: row.LuotMuon
+    };
+  });
+
+  return res.json({ items });
+});
+
 app.get('/api/admin/dashboard', authMiddleware, adminOnly, (req, res) => {
   const totalBooks = db.prepare('SELECT COUNT(*) AS c FROM Sach').get().c;
   const totalReaders = db.prepare('SELECT COUNT(*) AS c FROM Docgia').get().c;

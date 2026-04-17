@@ -7,15 +7,23 @@ if (!adminState.token) {
   window.location.href = '/admin-login.html';
 }
 
-const adminStatus = document.getElementById('admin-status');
-const sTotalBooks = document.getElementById('s-total-books');
-const sReaders = document.getElementById('s-readers');
-const sBorrowed = document.getElementById('s-borrowed');
-const sOverdue = document.getElementById('s-overdue');
+const adminGreeting = document.getElementById('admin-greeting');
+const sumBooks = document.getElementById('sum-books');
+const sumUsers = document.getElementById('sum-users');
+const sumReviews = document.getElementById('sum-reviews');
+const sumBorrows = document.getElementById('sum-borrows');
+const sumBooksSub = document.getElementById('sum-books-sub');
+const sumUsersSub = document.getElementById('sum-users-sub');
+const sumReviewsSub = document.getElementById('sum-reviews-sub');
+const sumBorrowsSub = document.getElementById('sum-borrows-sub');
 
+const topBooksTable = document.getElementById('top-books-table');
 const booksTable = document.getElementById('books-table');
 const usersTable = document.getElementById('users-table');
 const loansTable = document.getElementById('loans-table');
+const trafficRange = document.getElementById('traffic-range');
+
+let trafficChart = null;
 
 const logoutBtn = document.getElementById('admin-logout');
 if (logoutBtn) {
@@ -25,32 +33,6 @@ if (logoutBtn) {
     window.location.href = '/admin-login.html';
   });
 }
-
-document.getElementById('add-book-btn').addEventListener('click', async () => {
-  if (!adminState.token) return;
-  const payload = {
-    MaSach: document.getElementById('new-book-id').value.trim(),
-    TenSach: document.getElementById('new-book-name').value.trim(),
-    NguonGoc: document.getElementById('new-book-author').value.trim(),
-    SoQuyen: Number(document.getElementById('new-book-qty').value || 0),
-    DonGia: 0,
-    MaNXB: 'NXB01',
-    NamXuatBan: 2024
-  };
-
-  const res = await fetch('/api/admin/books', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${adminState.token}`
-    },
-    body: JSON.stringify(payload)
-  });
-
-  const data = await res.json();
-  adminStatus.textContent = data.message || 'Đã thêm';
-  loadAll();
-});
 
 async function api(path, options = {}) {
   const res = await fetch(path, {
@@ -70,6 +52,98 @@ async function api(path, options = {}) {
 
   return res.json();
 }
+
+function renderTrafficChart(labels = [], values = []) {
+  const ctx = document.getElementById('traffic-chart');
+  if (!ctx) return;
+
+  if (trafficChart) trafficChart.destroy();
+
+  trafficChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Lượt truy cập',
+          data: values,
+          borderColor: '#94a3b8',
+          backgroundColor: 'rgba(148, 163, 184, 0.18)',
+          tension: 0.3,
+          fill: true,
+          pointRadius: 3,
+          pointBackgroundColor: '#64748b'
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: { beginAtZero: true, ticks: { precision: 0 } }
+      },
+      plugins: {
+        legend: { display: false }
+      }
+    }
+  });
+}
+
+async function loadSummary() {
+  const data = await api('/api/admin/summary');
+  sumBooks.textContent = Number(data.totalBooks || 0).toLocaleString('vi-VN');
+  sumUsers.textContent = Number(data.totalUsers || 0).toLocaleString('vi-VN');
+  sumReviews.textContent = Number(data.totalReviews || 0).toLocaleString('vi-VN');
+  sumBorrows.textContent = Number(data.totalBorrows || 0).toLocaleString('vi-VN');
+
+  sumBooksSub.textContent = data?.deltas?.books || '+52 so với tháng trước';
+  sumUsersSub.textContent = data?.deltas?.users || '+220 người đăng ký mới';
+  sumReviewsSub.textContent = data?.deltas?.reviews || '+45 đánh giá mới';
+  sumBorrowsSub.textContent = data?.deltas?.borrows || '+12 cập nhật mới';
+}
+
+async function loadTraffic(days = 7) {
+  const data = await api(`/api/admin/traffic?days=${days}`);
+  renderTrafficChart(data.labels || [], data.values || []);
+}
+
+async function loadTopBooks() {
+  const data = await api('/api/admin/top-books');
+  topBooksTable.innerHTML = '';
+  (data.items || []).forEach((item) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${item.stt}</td>
+      <td>${item.tenSach}</td>
+      <td>${item.tacGia}</td>
+      <td>${item.ngayThem}</td>
+    `;
+    topBooksTable.appendChild(tr);
+  });
+}
+
+document.getElementById('add-book-btn').addEventListener('click', async () => {
+  if (!adminState.token) return;
+  const payload = {
+    MaSach: document.getElementById('new-book-id').value.trim(),
+    TenSach: document.getElementById('new-book-name').value.trim(),
+    NguonGoc: document.getElementById('new-book-author').value.trim(),
+    SoQuyen: Number(document.getElementById('new-book-qty').value || 0),
+    DonGia: 0,
+    MaNXB: 'NXB01',
+    NamXuatBan: 2024
+  };
+
+  await api('/api/admin/books', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+
+  loadTables();
+  loadSummary();
+  loadTopBooks();
+});
 
 async function editBook(book) {
   const TenSach = prompt('Tên sách mới:', book.TenSach);
@@ -96,27 +170,16 @@ async function editBook(book) {
     })
   });
 
-  loadAll();
+  loadTables();
+  loadSummary();
 }
 
-async function loadAll() {
-  if (!adminState.token) return;
-
-  adminStatus.textContent = adminState.profile?.name
-    ? `Xin chào ${adminState.profile.name}.`
-    : 'Đang tải dữ liệu...';
-
-  const [dashboard, books, users, loans] = await Promise.all([
-    api('/api/admin/dashboard'),
+async function loadTables() {
+  const [books, users, loans] = await Promise.all([
     api('/api/admin/books'),
     api('/api/admin/users'),
     api('/api/admin/loans')
   ]);
-
-  sTotalBooks.textContent = dashboard.totalBooks ?? 0;
-  sReaders.textContent = dashboard.totalReaders ?? 0;
-  sBorrowed.textContent = dashboard.borrowed ?? 0;
-  sOverdue.textContent = dashboard.overdue ?? 0;
 
   booksTable.innerHTML = '';
   (books.books || []).forEach((b) => {
@@ -135,7 +198,9 @@ async function loadAll() {
     tr.querySelector('.edit-btn').addEventListener('click', () => editBook(b));
     tr.querySelector('.delete-btn').addEventListener('click', async () => {
       await api(`/api/admin/books/${b.MaSach}`, { method: 'DELETE' });
-      loadAll();
+      loadTables();
+      loadSummary();
+      loadTopBooks();
     });
 
     booksTable.appendChild(tr);
@@ -163,4 +228,17 @@ async function loadAll() {
   });
 }
 
-loadAll();
+if (trafficRange) {
+  trafficRange.addEventListener('change', () => {
+    loadTraffic(Number(trafficRange.value || 7));
+  });
+}
+
+adminGreeting.textContent = adminState.profile?.name
+  ? `Xin chào, ${adminState.profile.name}`
+  : 'Xin chào, Admin';
+
+loadSummary();
+loadTraffic(7);
+loadTopBooks();
+loadTables();

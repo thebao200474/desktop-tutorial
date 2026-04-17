@@ -1,0 +1,124 @@
+:root {
+  --admin-bg: #f5f5f3;
+  --admin-card-bg: #ffffff;
+  --admin-sidebar: #1f2937;
+  --admin-active: #9a6333;
+  --admin-text: #1f1f1f;
+  --admin-muted: #6b7280;
+  --admin-border: #e5e7eb;
+  --admin-chart: #94a3b8;
+}
+
+body {
+  background: var(--admin-bg);
+  color: var(--admin-text);
+}
+
+.admin-overview-page {
+  padding: 24px 14px;
+}
+
+.admin-page-title {
+  text-align: center;
+  font-weight: 700;
+  margin-bottom: 18px;
+}
+
+.admin-layout-card {
+  background: var(--admin-card-bg);
+  border: 1px solid var(--admin-border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.admin-sidebar {
+  background: var(--admin-sidebar);
+  color: #e5e7eb;
+  min-height: 100%;
+  padding: 18px 12px;
+}
+
+.admin-brand-wrap {
+  padding: 8px 10px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 12px;
+}
+
+.admin-brand {
+  color: #f5f5f5;
+}
+
+.admin-menu .nav-link {
+  color: #d7dee7;
+  border-radius: 10px;
+  padding: 9px 10px;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.93rem;
+}
+
+.admin-menu .nav-link:hover {
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.admin-menu .nav-link.active {
+  background: var(--admin-active);
+  color: #fff;
+}
+
+.admin-content {
+  background: #f9fafb;
+  padding: 20px;
+}
+
+.admin-section-title {
+  font-weight: 700;
+}
+
+.admin-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--admin-border);
+}
+
+.stat-card {
+  background: #fff;
+  border: 1px solid var(--admin-border);
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+}
+
+.stat-label {
+  color: var(--admin-muted);
+  font-size: 0.9rem;
+}
+
+.stat-number {
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.stat-sub {
+  color: #7b8794;
+  font-size: 0.83rem;
+}
+
+.traffic-select {
+  width: 140px;
+}
+
+.table thead th {
+  background: #f3f4f6;
+  color: #374151;
+  font-weight: 600;
+}
+
+@media (max-width: 991.98px) {
+  .admin-sidebar {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+}
