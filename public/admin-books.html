@@ -22,62 +22,113 @@
               <a class="nav-link" href="/admin.html"><i class="bi bi-grid"></i>Tổng quan</a>
               <a class="nav-link active" href="/admin-books.html"><i class="bi bi-book"></i>Quản lý sách</a>
               <a class="nav-link" href="/admin-users.html"><i class="bi bi-people"></i>Quản lý độc giả</a>
-              <a class="nav-link" href="/admin-borrows.html"><i class="bi bi-journal-check"></i>Quản lý mượn trả</a>
+              <a class="nav-link" href="/admin-borrows.html"><i class="bi bi-journal-check"></i>Quản lý mượn sách</a>
+              <a class="nav-link" href="#"><i class="bi bi-tags"></i>Quản lý danh mục</a>
+              <a class="nav-link" href="#"><i class="bi bi-star"></i>Quản lý đánh giá</a>
+              <a class="nav-link" href="#"><i class="bi bi-pencil-square"></i>Quản trị biên tập</a>
+              <a class="nav-link" href="/admin.html#traffic-card"><i class="bi bi-graph-up"></i>Thống kê</a>
+              <a class="nav-link" href="#"><i class="bi bi-gear"></i>Cài đặt hệ thống</a>
             </nav>
           </aside>
 
           <section class="col-lg-9 col-xl-10 admin-content">
             <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
               <h3 class="admin-section-title mb-0">Quản lý sách</h3>
-              <div class="d-flex gap-2">
+              <div class="d-flex align-items-center gap-2">
+                <span class="text-muted small">Xin chào, Admin</span>
+                <img src="/images/users/user-1.svg" alt="admin" class="admin-avatar" />
                 <button class="btn btn-brown" data-bs-toggle="modal" data-bs-target="#book-modal">
-                  <i class="bi bi-plus-lg me-1"></i>Thêm sách
+                  <i class="bi bi-plus-lg me-1"></i>Thêm sách mới
                 </button>
                 <button id="admin-logout" class="btn btn-outline-danger btn-sm">Đăng xuất</button>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-sm-6 col-xl-3">
+                <article class="quick-stat-card">
+                  <span class="quick-stat-icon text-primary-emphasis bg-primary-subtle"><i class="bi bi-book"></i></span>
+                  <div><div class="quick-stat-label">Tổng sách</div><div id="stat-total" class="quick-stat-value">0</div></div>
+                </article>
+              </div>
+              <div class="col-sm-6 col-xl-3">
+                <article class="quick-stat-card">
+                  <span class="quick-stat-icon text-success-emphasis bg-success-subtle"><i class="bi bi-check2-square"></i></span>
+                  <div><div class="quick-stat-label">Sách còn</div><div id="stat-available" class="quick-stat-value">0</div></div>
+                </article>
+              </div>
+              <div class="col-sm-6 col-xl-3">
+                <article class="quick-stat-card">
+                  <span class="quick-stat-icon text-danger-emphasis bg-danger-subtle"><i class="bi bi-x-octagon"></i></span>
+                  <div><div class="quick-stat-label">Sách hết</div><div id="stat-out" class="quick-stat-value">0</div></div>
+                </article>
+              </div>
+              <div class="col-sm-6 col-xl-3">
+                <article class="quick-stat-card">
+                  <span class="quick-stat-icon text-warning-emphasis bg-warning-subtle"><i class="bi bi-fire"></i></span>
+                  <div><div class="quick-stat-label">Sách hot</div><div id="stat-hot" class="quick-stat-value">0</div></div>
+                </article>
               </div>
             </div>
 
             <section class="card border-0 shadow-sm mb-3">
               <div class="card-body">
                 <div class="row g-2 align-items-center mb-3">
-                  <div class="col-lg-7">
+                  <div class="col-lg-6">
                     <div class="input-group">
                       <span class="input-group-text"><i class="bi bi-search"></i></span>
-                      <input
-                        id="book-search"
-                        class="form-control"
-                        placeholder="Tìm theo mã, tên sách, tác giả, thể loại, mô tả..."
-                      />
+                      <input id="book-search" class="form-control" placeholder="Tìm theo tên sách, tác giả, ISBN..." />
                       <button class="btn btn-outline-secondary" id="book-voice-btn" type="button" title="Tìm bằng giọng nói">
                         <i class="bi bi-mic-fill"></i>
                       </button>
                     </div>
                     <small id="voice-status" class="text-muted"></small>
                   </div>
-                  <div class="col-lg-5 text-lg-end">
-                    <span class="text-muted small">Mỗi trang hiển thị 5 sách</span>
+                  <div class="col-sm-6 col-lg-2">
+                    <select id="book-category-filter" class="form-select">
+                      <option value="all">Tất cả danh mục</option>
+                    </select>
                   </div>
+                  <div class="col-sm-6 col-lg-2">
+                    <select id="book-status-filter" class="form-select">
+                      <option value="all">Tất cả trạng thái</option>
+                      <option value="available">Còn sách</option>
+                      <option value="low">Còn ít</option>
+                      <option value="out">Hết sách</option>
+                      <option value="hot">Hot</option>
+                    </select>
+                  </div>
+                  <div class="col-lg-2 d-grid">
+                    <button id="advanced-filter-btn" class="btn btn-outline-secondary"><i class="bi bi-funnel me-1"></i>Lọc nâng cao</button>
+                  </div>
+                </div>
+
+                <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between mb-3">
+                  <div class="d-flex flex-wrap gap-2" id="book-filter-chips"></div>
+                  <button id="clear-book-filters" class="btn btn-link btn-sm text-muted text-decoration-none">Xóa tất cả</button>
                 </div>
 
                 <div class="table-responsive">
                   <table class="table table-hover align-middle admin-books-table">
                     <thead>
                       <tr>
+                        <th>#</th>
                         <th>Ảnh</th>
-                        <th>Mã</th>
                         <th>Tên sách</th>
                         <th>Tác giả</th>
-                        <th>Thể loại</th>
+                        <th>Danh mục</th>
                         <th>Số lượng</th>
-                        <th>Thao tác</th>
+                        <th>Trạng thái</th>
+                        <th>Hành động</th>
                       </tr>
                     </thead>
                     <tbody id="books-table"></tbody>
                   </table>
                 </div>
-                <nav>
-                  <ul id="books-pagination" class="pagination pagination-sm justify-content-end mb-0"></ul>
-                </nav>
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                  <small id="books-count" class="text-muted"></small>
+                  <ul id="books-pagination" class="pagination pagination-sm mb-0"></ul>
+                </div>
               </div>
             </section>
           </section>
@@ -94,46 +145,16 @@
           </div>
           <div class="modal-body">
             <div class="row g-3">
-              <div class="col-md-4">
-                <label class="form-label">Mã sách</label>
-                <input id="book-id" class="form-control" required />
-              </div>
-              <div class="col-md-8">
-                <label class="form-label">Tên sách</label>
-                <input id="book-name" class="form-control" required />
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Tác giả / Nguồn gốc</label>
-                <input id="book-author" class="form-control" required />
-              </div>
-              <div class="col-md-3">
-                <label class="form-label">Thể loại</label>
-                <input id="book-category" class="form-control" />
-              </div>
-              <div class="col-md-3">
-                <label class="form-label">Số lượng</label>
-                <input id="book-qty" type="number" min="0" class="form-control" required />
-              </div>
-              <div class="col-md-4">
-                <label class="form-label">Giá</label>
-                <input id="book-price" type="number" min="0" class="form-control" />
-              </div>
-              <div class="col-md-4">
-                <label class="form-label">Năm xuất bản</label>
-                <input id="book-year" type="number" min="1900" class="form-control" />
-              </div>
-              <div class="col-md-4">
-                <label class="form-label">Mã NXB</label>
-                <input id="book-publisher" class="form-control" value="NXB01" />
-              </div>
-              <div class="col-12">
-                <label class="form-label">Ảnh bìa (URL/path)</label>
-                <input id="book-cover" class="form-control" value="/images/books/placeholder-book.svg" />
-              </div>
-              <div class="col-12">
-                <label class="form-label">Mô tả</label>
-                <textarea id="book-description" class="form-control" rows="2"></textarea>
-              </div>
+              <div class="col-md-4"><label class="form-label">Mã sách</label><input id="book-id" class="form-control" required /></div>
+              <div class="col-md-8"><label class="form-label">Tên sách</label><input id="book-name" class="form-control" required /></div>
+              <div class="col-md-6"><label class="form-label">Tác giả / Nguồn gốc</label><input id="book-author" class="form-control" required /></div>
+              <div class="col-md-3"><label class="form-label">Thể loại</label><input id="book-category" class="form-control" /></div>
+              <div class="col-md-3"><label class="form-label">Số lượng</label><input id="book-qty" type="number" min="0" class="form-control" required /></div>
+              <div class="col-md-4"><label class="form-label">Giá</label><input id="book-price" type="number" min="0" class="form-control" /></div>
+              <div class="col-md-4"><label class="form-label">Năm xuất bản</label><input id="book-year" type="number" min="1900" class="form-control" /></div>
+              <div class="col-md-4"><label class="form-label">Mã NXB</label><input id="book-publisher" class="form-control" value="NXB01" /></div>
+              <div class="col-12"><label class="form-label">Ảnh bìa (URL/path)</label><input id="book-cover" class="form-control" value="/images/books/placeholder-book.svg" /></div>
+              <div class="col-12"><label class="form-label">Mô tả</label><textarea id="book-description" class="form-control" rows="2"></textarea></div>
             </div>
           </div>
           <div class="modal-footer">
