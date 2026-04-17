@@ -12,6 +12,8 @@
       <div class="container">
         <a class="navbar-brand fw-bold text-brown" href="/">📚 BookHub</a>
         <div class="ms-auto d-flex gap-2">
+          <a class="btn btn-outline-secondary btn-sm" href="/login.html">Đăng nhập</a>
+          <a class="btn btn-primary btn-sm" href="/register.html">Đăng ký</a>
           <a class="btn btn-outline-dark btn-sm" href="/admin.html">Trang quản trị</a>
         </div>
       </div>
@@ -32,14 +34,13 @@
           </div>
           <div class="col-lg-5">
             <div class="otp-panel p-3 rounded-3 bg-white text-dark shadow-sm">
-              <h5 class="fw-bold">Đăng nhập độc giả bằng OTP Gmail</h5>
-              <input id="reader-email" class="form-control mb-2" placeholder="Email độc giả" />
-              <div class="d-flex gap-2 mb-2">
-                <button class="btn btn-outline-primary flex-fill" id="send-otp-reader">Gửi OTP</button>
-                <input id="reader-otp" class="form-control" placeholder="Nhập OTP" />
+              <h5 class="fw-bold">Đăng nhập / Đăng ký tách riêng</h5>
+              <p class="small text-muted mb-3">Giao diện xác thực đã được tách thành 2 trang riêng để dễ sử dụng hơn.</p>
+              <div class="d-grid gap-2">
+                <a class="btn btn-primary" href="/login.html">Đi đến trang đăng nhập</a>
+                <a class="btn btn-outline-success" href="/register.html">Đi đến trang đăng ký</a>
               </div>
-              <button class="btn btn-primary w-100" id="verify-otp-reader">Xác thực</button>
-              <small class="text-muted d-block mt-2" id="auth-status"></small>
+              <small class="text-muted d-block mt-2">Bạn vẫn có thể dùng OTP sau khi đăng nhập tại trang riêng.</small>
             </div>
           </div>
         </div>

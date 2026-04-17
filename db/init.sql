@@ -8,7 +8,8 @@ CREATE TABLE IF NOT EXISTS Docgia (
   Phai TEXT,
   DiaChi TEXT,
   DienThoai TEXT,
-  Email TEXT UNIQUE
+  Email TEXT UNIQUE,
+  Password TEXT
 );
 
 CREATE TABLE IF NOT EXISTS NhaXuatBan (

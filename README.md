@@ -6,6 +6,7 @@ Dự án demo full-stack theo yêu cầu:
 - **Tìm kiếm giọng nói** với Web Speech API.
 - **AI Chatbot** hỗ trợ gợi ý, trả lời câu hỏi nhanh.
 - **Đăng nhập OTP qua Gmail** bằng Nodemailer.
+- **Tách riêng trang đăng nhập và đăng ký** để UX gọn gàng, dễ dùng.
 - **Dashboard quản trị** + quản lý sách/độc giả/lượt mượn.
 - **Trang chi tiết sách** có đánh giá sao, nhận xét và nút mượn sách.
 
@@ -20,7 +21,7 @@ Dự án demo full-stack theo yêu cầu:
 
 Các bảng chính theo đề bài:
 
-- `Docgia(MaDocGia, HoLot, Ten, NgaySinh, Phai, DiaChi, DienThoai, Email)`
+- `Docgia(MaDocGia, HoLot, Ten, NgaySinh, Phai, DiaChi, DienThoai, Email, Password)`
 - `Sach(MaSach, TenSach, DonGia, SoQuyen, NamXuatBan, MaNXB, NguonGoc, MoTa, TheLoai, AnhBia)`
 - `NhaXuatBan(MaNXB, TenNXB, DiaChi)`
 - `TheoDoiMuonSach(MaDocGia, MaSach, NgayMuon, NgayTra)` (mở rộng thêm `HanTra`, `TrangThai`, `MaMuon`)
@@ -41,12 +42,14 @@ npm start
 Mở:
 
 - Trang người dùng: `http://localhost:3000/`
+- Trang đăng nhập: `http://localhost:3000/login.html`
+- Trang đăng ký: `http://localhost:3000/register.html`
 - Trang chi tiết sách: `http://localhost:3000/book-detail.html?id=S001`
 - Trang quản trị: `http://localhost:3000/admin.html`
 
 ## Tài khoản mẫu (seed)
 
-- Độc giả: `docgia1@example.com`
+- Độc giả: `docgia1@example.com` / `reader123`
 - Admin: `admin@example.com`
 
 ## Cấu hình Gmail OTP (tuỳ chọn)

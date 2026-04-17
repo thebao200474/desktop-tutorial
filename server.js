@@ -20,11 +20,22 @@ const db = new Database(dbPath);
 db.pragma('journal_mode = WAL');
 db.exec(fs.readFileSync(path.join(__dirname, 'db', 'init.sql'), 'utf-8'));
 
+function ensureDocgiaPasswordColumn() {
+  const cols = db.prepare("PRAGMA table_info(Docgia)").all();
+  const hasPassword = cols.some((x) => x.name === 'Password');
+  if (!hasPassword) {
+    db.exec('ALTER TABLE Docgia ADD COLUMN Password TEXT');
+  }
+}
+
+ensureDocgiaPasswordColumn();
+
 function seedData() {
   const hasPublisher = db.prepare('SELECT COUNT(*) AS count FROM NhaXuatBan').get().count;
   if (hasPublisher > 0) return;
 
   const adminPassword = bcrypt.hashSync('admin123', 10);
+  const readerPassword = bcrypt.hashSync('reader123', 10);
 
   db.prepare('INSERT INTO NhaXuatBan(MaNXB, TenNXB, DiaChi) VALUES (?, ?, ?)').run('NXB01', 'NXB Tre', 'TP.HCM');
   db.prepare('INSERT INTO NhaXuatBan(MaNXB, TenNXB, DiaChi) VALUES (?, ?, ?)').run('NXB02', 'Nha Nam', 'Ha Noi');
@@ -43,9 +54,9 @@ function seedData() {
   books.forEach((book) => insertBook.run(...book));
 
   db.prepare(`
-    INSERT INTO Docgia(MaDocGia, HoLot, Ten, NgaySinh, Phai, DiaChi, DienThoai, Email)
-    VALUES ('DG001', 'Nguyen Van', 'An', '2001-05-10', 'Nam', 'Can Tho', '0900000001', 'docgia1@example.com')
-  `).run();
+    INSERT INTO Docgia(MaDocGia, HoLot, Ten, NgaySinh, Phai, DiaChi, DienThoai, Email, Password)
+    VALUES ('DG001', 'Nguyen Van', 'An', '2001-05-10', 'Nam', 'Can Tho', '0900000001', 'docgia1@example.com', ?)
+  `).run(readerPassword);
 
   db.prepare(`
     INSERT INTO NhanVien(MSNV, HoTenNV, Password, ChucVu, DiaChi, SoDienThoai, Email)
@@ -94,6 +105,48 @@ function buildMailer() {
     buffer: true
   });
 }
+
+function generateDocGiaId() {
+  const last = db.prepare("SELECT MaDocGia FROM Docgia ORDER BY MaDocGia DESC LIMIT 1").get();
+  const num = last ? Number(String(last.MaDocGia).replace('DG', '')) + 1 : 1;
+  return `DG${String(num).padStart(3, '0')}`;
+}
+
+app.post('/api/auth/register', (req, res) => {
+  const { HoLot = '', Ten = '', Email, Password, DienThoai = '', DiaChi = '', NgaySinh = null, Phai = null } = req.body;
+  if (!Email || !Password || !Ten) {
+    return res.status(400).json({ message: 'Tên, email và mật khẩu là bắt buộc.' });
+  }
+
+  const exists = db.prepare('SELECT 1 FROM Docgia WHERE Email = ?').get(Email);
+  if (exists) {
+    return res.status(409).json({ message: 'Email đã tồn tại.' });
+  }
+
+  const MaDocGia = generateDocGiaId();
+  const passwordHash = bcrypt.hashSync(Password, 10);
+  db.prepare(
+    `INSERT INTO Docgia(MaDocGia, HoLot, Ten, NgaySinh, Phai, DiaChi, DienThoai, Email, Password)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+  ).run(MaDocGia, HoLot, Ten, NgaySinh, Phai, DiaChi, DienThoai, Email, passwordHash);
+
+  return res.json({ message: 'Đăng ký thành công. Vui lòng đăng nhập.' });
+});
+
+app.post('/api/auth/login', (req, res) => {
+  const { email, password } = req.body;
+  const user = db.prepare('SELECT MaDocGia, HoLot, Ten, Email, Password FROM Docgia WHERE Email = ?').get(email);
+  if (!user || !user.Password || !bcrypt.compareSync(password, user.Password)) {
+    return res.status(401).json({ message: 'Email hoặc mật khẩu không đúng.' });
+  }
+
+  const token = jwt.sign({ sub: user.MaDocGia, role: 'reader', email: user.Email }, JWT_SECRET, { expiresIn: '8h' });
+  return res.json({
+    message: 'Đăng nhập thành công.',
+    token,
+    profile: { id: user.MaDocGia, name: `${user.HoLot} ${user.Ten}`.trim(), Email: user.Email, role: 'reader' }
+  });
+});
 
 app.post('/api/auth/send-otp', (req, res) => {
   const { email, role = 'reader' } = req.body;

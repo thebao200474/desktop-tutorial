@@ -18,7 +18,7 @@ const chatInput = document.getElementById('chat-input');
 const chatSend = document.getElementById('chat-send');
 const loanList = document.getElementById('loan-list');
 
-readerEmailInput.value = 'docgia1@example.com';
+if (readerEmailInput) readerEmailInput.value = 'docgia1@example.com';
 
 function addChatBubble(text, who = 'bot') {
   const bubble = document.createElement('div');
@@ -111,39 +111,41 @@ voiceBtn.addEventListener('click', () => {
   };
 });
 
-sendOtpReader.addEventListener('click', async () => {
-  const email = readerEmailInput.value.trim();
-  const res = await fetch('/api/auth/send-otp', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, role: 'reader' })
-  });
-  const data = await res.json();
-  authStatus.textContent = data.message || data.error;
-});
-
-verifyOtpReader.addEventListener('click', async () => {
-  const email = readerEmailInput.value.trim();
-  const otp = readerOtpInput.value.trim();
-
-  const res = await fetch('/api/auth/verify-otp', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, otp, role: 'reader' })
+if (sendOtpReader && verifyOtpReader && readerEmailInput && readerOtpInput && authStatus) {
+  sendOtpReader.addEventListener('click', async () => {
+    const email = readerEmailInput.value.trim();
+    const res = await fetch('/api/auth/send-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, role: 'reader' })
+    });
+    const data = await res.json();
+    authStatus.textContent = data.message || data.error;
   });
 
-  const data = await res.json();
-  if (data.token) {
-    state.token = data.token;
-    state.profile = data.profile;
-    localStorage.setItem('readerToken', data.token);
-    localStorage.setItem('readerProfile', JSON.stringify(data.profile));
-    authStatus.textContent = `Xin chào ${data.profile.name}, xác thực thành công.`;
-    loadMyLoans();
-  } else {
-    authStatus.textContent = data.message || 'Xác thực thất bại.';
-  }
-});
+  verifyOtpReader.addEventListener('click', async () => {
+    const email = readerEmailInput.value.trim();
+    const otp = readerOtpInput.value.trim();
+
+    const res = await fetch('/api/auth/verify-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, otp, role: 'reader' })
+    });
+
+    const data = await res.json();
+    if (data.token) {
+      state.token = data.token;
+      state.profile = data.profile;
+      localStorage.setItem('readerToken', data.token);
+      localStorage.setItem('readerProfile', JSON.stringify(data.profile));
+      authStatus.textContent = `Xin chào ${data.profile.name}, xác thực thành công.`;
+      loadMyLoans();
+    } else {
+      authStatus.textContent = data.message || 'Xác thực thất bại.';
+    }
+  });
+}
 
 chatSend.addEventListener('click', async () => {
   const message = chatInput.value.trim();
