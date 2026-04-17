@@ -11,19 +11,14 @@
   <body>
     <main class="admin-overview-page">
       <h2 class="admin-page-title">2. Dashboard (Tổng quan)</h2>
-
       <section class="admin-layout-card shadow-sm">
         <div class="row g-0">
           <aside class="col-lg-3 col-xl-2 admin-sidebar">
-            <div class="admin-brand-wrap">
-              <h4 class="admin-brand mb-1">📚 BookHub</h4>
-              <small>Quản trị hệ thống</small>
-            </div>
-
+            <div class="admin-brand-wrap"><h4 class="admin-brand mb-1">📚 BookHub</h4><small>Quản trị hệ thống</small></div>
             <nav class="admin-menu nav flex-column">
-              <a class="nav-link active" href="#"><i class="bi bi-grid"></i>Tổng quan</a>
-              <a class="nav-link" href="#books-section"><i class="bi bi-book"></i>Quản lý sách</a>
-              <a class="nav-link" href="#users-section"><i class="bi bi-people"></i>Quản lý độc giả</a>
+              <a class="nav-link active" href="/admin.html"><i class="bi bi-grid"></i>Tổng quan</a>
+              <a class="nav-link" href="/admin-books.html"><i class="bi bi-book"></i>Quản lý sách</a>
+              <a class="nav-link" href="/admin-users.html"><i class="bi bi-people"></i>Quản lý độc giả</a>
               <a class="nav-link" href="/admin-borrows.html"><i class="bi bi-journal-check"></i>Quản lý mượn trả</a>
               <a class="nav-link" href="#"><i class="bi bi-tags"></i>Quản lý danh mục</a>
               <a class="nav-link" href="#"><i class="bi bi-star"></i>Quản lý đánh giá</a>
@@ -44,113 +39,15 @@
             </div>
 
             <div class="row g-3 mb-3" id="summary-cards">
-              <div class="col-12 col-md-6 col-xl-3">
-                <article class="stat-card">
-                  <div class="stat-label">Tổng sách</div>
-                  <div class="stat-number" id="sum-books">0</div>
-                  <div class="stat-sub" id="sum-books-sub">-</div>
-                </article>
-              </div>
-              <div class="col-12 col-md-6 col-xl-3">
-                <article class="stat-card">
-                  <div class="stat-label">Tổng người dùng</div>
-                  <div class="stat-number" id="sum-users">0</div>
-                  <div class="stat-sub" id="sum-users-sub">-</div>
-                </article>
-              </div>
-              <div class="col-12 col-md-6 col-xl-3">
-                <article class="stat-card">
-                  <div class="stat-label">Tổng đánh giá</div>
-                  <div class="stat-number" id="sum-reviews">0</div>
-                  <div class="stat-sub" id="sum-reviews-sub">-</div>
-                </article>
-              </div>
-              <div class="col-12 col-md-6 col-xl-3">
-                <article class="stat-card">
-                  <div class="stat-label">Tổng lượt mượn</div>
-                  <div class="stat-number" id="sum-borrows">0</div>
-                  <div class="stat-sub" id="sum-borrows-sub">-</div>
-                </article>
-              </div>
+              <div class="col-12 col-md-6 col-xl-3"><article class="stat-card"><div class="stat-label">Tổng sách</div><div class="stat-number" id="sum-books">0</div><div class="stat-sub" id="sum-books-sub">-</div></article></div>
+              <div class="col-12 col-md-6 col-xl-3"><article class="stat-card"><div class="stat-label">Tổng người dùng</div><div class="stat-number" id="sum-users">0</div><div class="stat-sub" id="sum-users-sub">-</div></article></div>
+              <div class="col-12 col-md-6 col-xl-3"><article class="stat-card"><div class="stat-label">Tổng đánh giá</div><div class="stat-number" id="sum-reviews">0</div><div class="stat-sub" id="sum-reviews-sub">-</div></article></div>
+              <div class="col-12 col-md-6 col-xl-3"><article class="stat-card"><div class="stat-label">Tổng lượt mượn</div><div class="stat-number" id="sum-borrows">0</div><div class="stat-sub" id="sum-borrows-sub">-</div></article></div>
             </div>
 
-            <section class="card border-0 shadow-sm mb-3" id="traffic-card">
-              <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                  <h5 class="mb-0">Thống kê lượt truy cập</h5>
-                  <select class="form-select form-select-sm traffic-select" id="traffic-range">
-                    <option value="7">7 ngày qua</option>
-                    <option value="30">30 ngày qua</option>
-                  </select>
-                </div>
-                <div class="traffic-chart-wrap"><canvas id="traffic-chart"></canvas></div>
-              </div>
-            </section>
+            <section class="card border-0 shadow-sm mb-3" id="traffic-card"><div class="card-body"><div class="d-flex justify-content-between align-items-center mb-2"><h5 class="mb-0">Thống kê lượt truy cập</h5><select class="form-select form-select-sm traffic-select" id="traffic-range"><option value="7">7 ngày qua</option><option value="30">30 ngày qua</option></select></div><div class="traffic-chart-wrap"><canvas id="traffic-chart"></canvas></div></div></section>
 
-            <section class="card border-0 shadow-sm mb-3">
-              <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                  <h5 class="mb-0">Sách nổi nhất</h5>
-                  <a href="#books-section" class="small text-decoration-none">Xem tất cả</a>
-                </div>
-                <div class="table-responsive">
-                  <table class="table table-hover align-middle">
-                    <thead>
-                      <tr><th>STT</th><th>Tên sách</th><th>Tác giả</th><th>Ngày thêm</th></tr>
-                    </thead>
-                    <tbody id="top-books-table"></tbody>
-                  </table>
-                </div>
-              </div>
-            </section>
-
-            <section class="card border-0 shadow-sm mb-3" id="books-section">
-              <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                  <h5 class="mb-0">Quản lý sách</h5>
-                  <div class="small text-muted">Thêm / sửa / xóa</div>
-                </div>
-                <div class="table-responsive">
-                  <table class="table table-hover align-middle">
-                    <thead><tr><th>Mã</th><th>Tên sách</th><th>Tác giả</th><th>Số lượng</th><th>Thao tác</th></tr></thead>
-                    <tbody id="books-table"></tbody>
-                  </table>
-                </div>
-                <hr>
-                <h6>Thêm sách nhanh</h6>
-                <div class="row g-2">
-                  <div class="col-md-2"><input id="new-book-id" class="form-control" placeholder="Mã sách" /></div>
-                  <div class="col-md-4"><input id="new-book-name" class="form-control" placeholder="Tên sách" /></div>
-                  <div class="col-md-3"><input id="new-book-author" class="form-control" placeholder="Tác giả" /></div>
-                  <div class="col-md-2"><input id="new-book-qty" type="number" class="form-control" placeholder="Số lượng" /></div>
-                  <div class="col-md-1 d-grid"><button id="add-book-btn" class="btn btn-dark">Thêm</button></div>
-                </div>
-              </div>
-            </section>
-
-            <section class="card border-0 shadow-sm mb-3" id="users-section">
-              <div class="card-body">
-                <h5>Quản lý độc giả</h5>
-                <div class="table-responsive">
-                  <table class="table table-striped align-middle">
-                    <thead><tr><th>Mã</th><th>Họ tên</th><th>Email</th><th>Điện thoại</th><th>Trạng thái</th></tr></thead>
-                    <tbody id="users-table"></tbody>
-                  </table>
-                </div>
-              </div>
-            </section>
-
-            <section class="card border-0 shadow-sm" id="loans-section">
-              <div class="card-body">
-                <h5>Theo dõi mượn sách</h5>
-                <div class="table-responsive">
-                  <table class="table table-striped align-middle">
-                    <thead><tr><th>Mã mượn</th><th>Độc giả</th><th>Sách</th><th>Ngày mượn</th><th>Hạn trả</th><th>Trạng thái</th></tr></thead>
-                    <tbody id="loans-table"></tbody>
-                  </table>
-                </div>
-              </div>
-            </section>
+            <section class="card border-0 shadow-sm"><div class="card-body"><div class="d-flex justify-content-between align-items-center mb-2"><h5 class="mb-0">Sách nổi nhất</h5><a href="/admin-books.html" class="small text-decoration-none">Xem tất cả</a></div><div class="table-responsive"><table class="table table-hover align-middle"><thead><tr><th>STT</th><th>Tên sách</th><th>Tác giả</th><th>Ngày thêm</th></tr></thead><tbody id="top-books-table"></tbody></table></div></div></section>
           </section>
         </div>
       </section>

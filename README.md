@@ -49,6 +49,8 @@ Mở:
 - Trang chi tiết sách: `http://localhost:3000/book-detail.html?id=S001`
 - Trang đăng nhập quản trị: `http://localhost:3000/admin-login.html`
 - Trang quản trị: `http://localhost:3000/admin.html` (yêu cầu đăng nhập admin)
+- Trang quản lý sách (admin): `http://localhost:3000/admin-books.html`
+- Trang quản lý người dùng (admin): `http://localhost:3000/admin-users.html`
 - Trang quản lý mượn sách: `http://localhost:3000/admin-borrows.html`
 
 ## Tài khoản mẫu (seed)
