@@ -109,20 +109,25 @@ if (process.env.BREVO_API_KEY) {
 const brevoEmailApi = new SibApiV3Sdk.TransactionalEmailsApi();
 
 function getMissingBrevoEnv() {
-  return ['BREVO_API_KEY', 'BREVO_SENDER_EMAIL', 'BREVO_SENDER_NAME'].filter((name) => !process.env[name]);
+  return ['BREVO_API_KEY', 'BREVO_SENDER_EMAIL'].filter((name) => !process.env[name]);
+}
+
+const missingBrevoAtStartup = getMissingBrevoEnv();
+if (missingBrevoAtStartup.length > 0) {
+  console.warn(`[BREVO CONFIG] Thiếu biến môi trường: ${missingBrevoAtStartup.join(', ')}`);
 }
 
 async function sendOTPEmail(email, otp, purpose = 'register') {
   const missingEnv = getMissingBrevoEnv();
   if (missingEnv.length > 0) {
-    throw new Error(`Thiếu cấu hình Brevo: ${missingEnv.join(', ')}`);
+    throw new Error(`Thiếu cấu hình Brevo trong file .env: ${missingEnv.join(', ')}`);
   }
 
   const subject = purpose === 'register' ? 'Mã OTP đăng ký BookHub' : 'Mã OTP đăng nhập BookHub';
   const sendSmtpEmail = {
     sender: {
       email: process.env.BREVO_SENDER_EMAIL,
-      name: process.env.BREVO_SENDER_NAME
+      name: process.env.BREVO_SENDER_NAME || 'BookHub'
     },
     to: [{ email }],
     subject,
@@ -184,7 +189,7 @@ app.post('/api/auth/send-otp-register', async (req, res) => {
     return res.json({ success: true, message: 'Đã gửi OTP về email' });
   } catch (err) {
     console.error('BREVO ERROR:', err?.response?.body || err);
-    return res.status(500).json({ success: false, message: 'Gửi OTP thất bại' });
+    return res.status(500).json({ success: false, message: err?.message || 'Gửi OTP thất bại' });
   }
 });
 
@@ -305,7 +310,7 @@ app.post('/api/auth/send-otp', async (req, res) => {
     return res.json({ success: true, message: 'Đã gửi OTP thành công.' });
   } catch (err) {
     console.error('BREVO ERROR:', err?.response?.body || err);
-    return res.status(500).json({ success: false, message: 'Gửi OTP thất bại' });
+    return res.status(500).json({ success: false, message: err?.message || 'Gửi OTP thất bại' });
   }
 });
 

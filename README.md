@@ -63,11 +63,11 @@ PORT=3000
 JWT_SECRET=replace_me
 BREVO_API_KEY=your_brevo_api_key
 BREVO_SENDER_EMAIL=sender_verified_on_brevo@example.com
-BREVO_SENDER_NAME=BookHub
+BREVO_SENDER_NAME=BookHub  # optional, mặc định BookHub
 OTP_EXPIRE_MINUTES=5
 ```
 
-Nếu thiếu biến Brevo, API gửi OTP sẽ trả lỗi để tránh báo thành công giả.
+Nếu thiếu `BREVO_API_KEY` hoặc `BREVO_SENDER_EMAIL`, API gửi OTP sẽ trả lỗi rõ ràng để tránh báo thành công giả.
 
 
 ## API đăng ký OTP
