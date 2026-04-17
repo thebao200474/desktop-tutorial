@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS OTPToken (
   purpose TEXT DEFAULT "login",
   expiresAt INTEGER NOT NULL,
   isUsed INTEGER DEFAULT 0,
-  createdAt INTEGER DEFAULT (strftime("%s","now"))
+  createdAt TEXT DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS DanhGiaSach (

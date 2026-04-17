@@ -29,9 +29,9 @@ function ensureSchemaCompatibility() {
   const otpCols = db.prepare("PRAGMA table_info(OTPToken)").all();
   if (!otpCols.some((x) => x.name === 'purpose')) db.exec("ALTER TABLE OTPToken ADD COLUMN purpose TEXT DEFAULT 'login'");
   if (!otpCols.some((x) => x.name === 'isUsed')) db.exec('ALTER TABLE OTPToken ADD COLUMN isUsed INTEGER DEFAULT 0');
-  if (!otpCols.some((x) => x.name === 'createdAt')) db.exec('ALTER TABLE OTPToken ADD COLUMN createdAt INTEGER');
+  if (!otpCols.some((x) => x.name === 'createdAt')) db.exec('ALTER TABLE OTPToken ADD COLUMN createdAt TEXT');
 
-  db.exec("UPDATE OTPToken SET createdAt = strftime('%s','now') WHERE createdAt IS NULL");
+  db.exec("UPDATE OTPToken SET createdAt = CURRENT_TIMESTAMP WHERE createdAt IS NULL");
 }
 
 ensureSchemaCompatibility();
@@ -163,8 +163,9 @@ app.post('/api/auth/send-otp-register', (req, res) => {
   const otp = `${Math.floor(100000 + Math.random() * 900000)}`;
   const otpExpireMinutes = Number(process.env.OTP_EXPIRE_MINUTES || 5);
   const expiresAt = Date.now() + otpExpireMinutes * 60 * 1000;
+  const createdAt = new Date().toISOString();
   db.prepare('UPDATE OTPToken SET isUsed = 1 WHERE email = ? AND purpose = ?').run(email, 'register');
-  db.prepare('INSERT INTO OTPToken(email, otp, role, purpose, expiresAt, isUsed, createdAt) VALUES (?, ?, ?, ?, ?, 0, ?)').run(email, otp, 'reader', 'register', expiresAt, Math.floor(Date.now() / 1000));
+  db.prepare('INSERT INTO OTPToken(email, otp, role, purpose, expiresAt, isUsed, createdAt) VALUES (?, ?, ?, ?, ?, 0, ?)').run(email, otp, 'reader', 'register', expiresAt, createdAt);
 
   sendOTPEmail(email, otp, 'register')
     .then(() => {
@@ -268,9 +269,10 @@ app.post('/api/auth/send-otp', (req, res) => {
   const otp = `${Math.floor(100000 + Math.random() * 900000)}`;
   const otpExpireMinutes = Number(process.env.OTP_EXPIRE_MINUTES || 5);
   const expiresAt = Date.now() + otpExpireMinutes * 60 * 1000;
+  const createdAt = new Date().toISOString();
 
   db.prepare('UPDATE OTPToken SET isUsed = 1 WHERE email = ? AND role = ?').run(email, role);
-  db.prepare('INSERT INTO OTPToken(email, otp, role, purpose, expiresAt, isUsed, createdAt) VALUES (?, ?, ?, ?, ?, 0, ?)').run(email, otp, role, 'login', expiresAt, Math.floor(Date.now() / 1000));
+  db.prepare('INSERT INTO OTPToken(email, otp, role, purpose, expiresAt, isUsed, createdAt) VALUES (?, ?, ?, ?, ?, 0, ?)').run(email, otp, role, 'login', expiresAt, createdAt);
 
   sendOTPEmail(email, otp, 'login')
     .then((result) => {
