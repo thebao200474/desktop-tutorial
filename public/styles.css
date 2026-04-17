@@ -200,3 +200,44 @@ body {
   object-fit: cover;
   flex-shrink: 0;
 }
+
+.library-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.library-menu-item {
+  border: 1px solid #ead8c8;
+  border-radius: 0.6rem;
+  color: #5b4636;
+  padding: 0.45rem 0.6rem;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.library-menu-item:hover {
+  background: #f5ece2;
+}
+
+.library-menu-item.active {
+  background: #e7d7c7;
+  border-color: #cfb79e;
+  color: #3d2818;
+  font-weight: 600;
+}
+
+.library-book-card {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.library-book-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.1);
+}
+
+.library-book-cover {
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+}
