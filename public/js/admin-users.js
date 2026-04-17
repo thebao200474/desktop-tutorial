@@ -36,13 +36,36 @@ async function api(path) {
   return response.json();
 }
 
+async function requestJson(path, options = {}) {
+  const response = await fetch(path, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${state.token}`,
+      ...(options.headers || {})
+    }
+  });
+
+  if (response.status === 401) {
+    localStorage.removeItem('adminToken');
+    window.location.href = '/admin-login.html';
+    return null;
+  }
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data.message || 'Có lỗi xảy ra.');
+  }
+  return data;
+}
+
 document.getElementById('admin-logout').addEventListener('click', () => {
   localStorage.removeItem('adminToken');
   window.location.href = '/admin-login.html';
 });
 
 document.getElementById('add-user-btn').addEventListener('click', () => {
-  alert('Chức năng thêm người dùng đang sẵn sàng nối modal/API.');
+  openCreateUserFlow();
 });
 
 document.getElementById('user-advanced-filter').addEventListener('click', () => {
@@ -54,8 +77,8 @@ function userRole(user) {
 }
 
 function userStatus(user) {
-  if (user.TrangThai === 'Bị khóa') return 'locked';
-  if (user.TrangThai === 'Không hoạt động') return 'inactive';
+  if (user.TrangThai === 'locked' || user.TrangThai === 'Bị khóa') return 'locked';
+  if (user.TrangThai === 'inactive' || user.TrangThai === 'Không hoạt động') return 'inactive';
   return 'active';
 }
 
@@ -161,10 +184,12 @@ function renderUsers() {
       <td>${roleLabel(role)}</td>
       <td>${statusBadge(status)}</td>
       <td>
-        <button class="btn action-icon-btn" title="Xem chi tiết"><i class="bi bi-eye"></i></button>
-        <button class="btn action-icon-btn" title="Chỉnh sửa"><i class="bi bi-pencil"></i></button>
-        <button class="btn action-icon-btn" title="Khóa/Mở khóa"><i class="bi bi-lock"></i></button>
-        <button class="btn action-icon-btn" title="Xóa"><i class="bi bi-trash"></i></button>
+        <button class="btn action-icon-btn" title="Xem chi tiết" data-action="view" data-id="${user.MaDocGia}"><i class="bi bi-eye"></i></button>
+        <button class="btn action-icon-btn" title="Chỉnh sửa" data-action="edit" data-id="${user.MaDocGia}"><i class="bi bi-pencil"></i></button>
+        <button class="btn action-icon-btn" title="Khóa/Mở khóa" data-action="toggle-lock" data-id="${user.MaDocGia}">
+          <i class="bi ${status === 'locked' ? 'bi-unlock' : 'bi-lock'}"></i>
+        </button>
+        <button class="btn action-icon-btn" title="Xóa" data-action="delete" data-id="${user.MaDocGia}"><i class="bi bi-trash"></i></button>
       </td>
     `;
 
@@ -174,6 +199,112 @@ function renderUsers() {
   countEl.textContent = `Hiển thị ${start + 1}-${Math.min(start + state.pageSize, users.length)} / ${users.length} người dùng`;
   renderPagination(users.length);
   renderChips();
+}
+
+function refreshUsersKeepPage() {
+  return loadUsers(true);
+}
+
+async function openCreateUserFlow() {
+  const hoLot = prompt('Nhập họ lót:');
+  if (!hoLot) return;
+  const ten = prompt('Nhập tên:');
+  if (!ten) return;
+  const email = prompt('Nhập email:');
+  if (!email) return;
+  const dienThoai = prompt('Nhập số điện thoại:') || '';
+  const diaChi = prompt('Nhập địa chỉ:') || '';
+  const phai = prompt('Nhập phái (Nam/Nữ/Khác):', 'Nam') || 'Nam';
+  const ngaySinh = prompt('Nhập ngày sinh (YYYY-MM-DD):', '2000-01-01') || '2000-01-01';
+  const password = prompt('Nhập mật khẩu (>= 6 ký tự):', '123456') || '123456';
+
+  try {
+    await requestJson('/api/admin/users', {
+      method: 'POST',
+      body: JSON.stringify({
+        hoLot,
+        ten,
+        email,
+        dienThoai,
+        diaChi,
+        phai,
+        ngaySinh,
+        password
+      })
+    });
+    alert('Đã thêm người dùng mới.');
+    await refreshUsersKeepPage();
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+async function handleUserAction(action, id) {
+  const user = state.users.find((item) => item.MaDocGia === id);
+  if (!user) return;
+
+  if (action === 'view') {
+    alert(
+      [
+        `Mã độc giả: ${user.MaDocGia}`,
+        `Họ tên: ${user.HoLot} ${user.Ten}`,
+        `Email: ${user.Email || '-'}`,
+        `SĐT: ${user.DienThoai || '-'}`,
+        `Địa chỉ: ${user.DiaChi || '-'}`,
+        `Trạng thái: ${user.TrangThai || 'Hoạt động'}`
+      ].join('\n')
+    );
+    return;
+  }
+
+  if (action === 'edit') {
+    const hoLot = prompt('Họ lót:', user.HoLot || '');
+    if (hoLot === null) return;
+    const ten = prompt('Tên:', user.Ten || '');
+    if (ten === null) return;
+    const dienThoai = prompt('Số điện thoại:', user.DienThoai || '');
+    if (dienThoai === null) return;
+    const diaChi = prompt('Địa chỉ:', user.DiaChi || '');
+    if (diaChi === null) return;
+    const phai = prompt('Phái (Nam/Nữ/Khác):', user.Phai || 'Nam');
+    if (phai === null) return;
+    const ngaySinh = prompt('Ngày sinh (YYYY-MM-DD):', user.NgaySinh || '2000-01-01');
+    if (ngaySinh === null) return;
+
+    try {
+      await requestJson(`/api/admin/users/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ hoLot, ten, dienThoai, diaChi, phai, ngaySinh })
+      });
+      alert('Đã cập nhật người dùng.');
+      await refreshUsersKeepPage();
+    } catch (error) {
+      alert(error.message);
+    }
+    return;
+  }
+
+  if (action === 'toggle-lock') {
+    try {
+      await requestJson(`/api/admin/users/${id}/toggle-lock`, { method: 'PUT' });
+      await refreshUsersKeepPage();
+    } catch (error) {
+      alert(error.message);
+    }
+    return;
+  }
+
+  if (action === 'delete') {
+    const ok = confirm(`Bạn có chắc muốn xóa độc giả ${user.HoLot} ${user.Ten}?`);
+    if (!ok) return;
+    try {
+      await requestJson(`/api/admin/users/${id}`, { method: 'DELETE' });
+      alert('Đã xóa người dùng.');
+      await refreshUsersKeepPage();
+    } catch (error) {
+      alert(error.message);
+    }
+  }
 }
 
 function syncFilterInputs() {
@@ -209,9 +340,41 @@ document.getElementById('clear-user-filters').addEventListener('click', () => {
   renderUsers();
 });
 
-async function loadUsers() {
+usersTable.addEventListener('click', (event) => {
+  const button = event.target.closest('button[data-action]');
+  if (!button) return;
+  const { action, id } = button.dataset;
+  handleUserAction(action, id);
+});
+
+function startUserVoiceSearch() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    alert('Trình duyệt chưa hỗ trợ tìm kiếm giọng nói.');
+    return;
+  }
+  const recognition = new SpeechRecognition();
+  recognition.lang = 'vi-VN';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript || '';
+    state.query = transcript.trim();
+    searchInput.value = state.query;
+    state.page = 1;
+    renderUsers();
+  };
+  recognition.onerror = () => alert('Không nhận diện được giọng nói. Vui lòng thử lại.');
+  recognition.start();
+}
+
+document.getElementById('user-voice-search').addEventListener('click', startUserVoiceSearch);
+
+async function loadUsers(keepPage = false) {
+  const prevPage = state.page;
   const data = await api('/api/admin/users');
   state.users = data.users || [];
+  if (keepPage) state.page = prevPage;
   renderStats();
   renderUsers();
 }

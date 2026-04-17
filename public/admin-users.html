@@ -49,7 +49,15 @@
             <section class="card border-0 shadow-sm mb-3">
               <div class="card-body">
                 <div class="row g-2 align-items-center mb-3">
-                  <div class="col-lg-5"><div class="input-group"><span class="input-group-text"><i class="bi bi-search"></i></span><input id="user-search" class="form-control" placeholder="Tìm theo tên, email, SĐT..." /></div></div>
+                  <div class="col-lg-5">
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="bi bi-search"></i></span>
+                      <input id="user-search" class="form-control" placeholder="Tìm theo tên, email, SĐT..." />
+                      <button id="user-voice-search" class="btn btn-outline-secondary" type="button" title="Tìm kiếm giọng nói">
+                        <i class="bi bi-mic"></i>
+                      </button>
+                    </div>
+                  </div>
                   <div class="col-sm-6 col-lg-2"><select id="user-role-filter" class="form-select"><option value="all">Tất cả vai trò</option><option value="user">Người dùng</option><option value="admin">Quản trị viên</option></select></div>
                   <div class="col-sm-6 col-lg-2"><select id="user-status-filter" class="form-select"><option value="all">Tất cả trạng thái</option><option value="active">Hoạt động</option><option value="locked">Bị khóa</option><option value="inactive">Không hoạt động</option></select></div>
                   <div class="col-lg-3 d-grid"><button id="user-advanced-filter" class="btn btn-outline-secondary"><i class="bi bi-funnel me-1"></i>Lọc nâng cao</button></div>
@@ -77,6 +85,7 @@
       </section>
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/admin-users.js"></script>
   </body>
 </html>

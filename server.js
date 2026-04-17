@@ -27,6 +27,7 @@ function ensureSchemaCompatibility() {
   if (!docgiaCols.some((x) => x.name === 'Password')) db.exec('ALTER TABLE Docgia ADD COLUMN Password TEXT');
   if (!docgiaCols.some((x) => x.name === 'PasswordHash')) db.exec('ALTER TABLE Docgia ADD COLUMN PasswordHash TEXT');
   if (!docgiaCols.some((x) => x.name === 'Email')) db.exec('ALTER TABLE Docgia ADD COLUMN Email TEXT');
+  if (!docgiaCols.some((x) => x.name === 'AccountStatus')) db.exec("ALTER TABLE Docgia ADD COLUMN AccountStatus TEXT DEFAULT 'active'");
 
   const otpCols = db.prepare("PRAGMA table_info(OTPToken)").all();
   if (!otpCols.some((x) => x.name === 'purpose')) db.exec("ALTER TABLE OTPToken ADD COLUMN purpose TEXT DEFAULT 'login'");
@@ -715,19 +716,72 @@ app.delete('/api/admin/books/:id', authMiddleware, adminOnly, (req, res) => {
 app.get('/api/admin/users', authMiddleware, adminOnly, (req, res) => {
   const users = db
     .prepare(
-      `SELECT d.MaDocGia, d.HoLot, d.Ten, d.Email, d.DienThoai, d.DiaChi,
-              CASE
-                WHEN EXISTS (
-                  SELECT 1 FROM TheoDoiMuonSach l
-                  WHERE l.MaDocGia = d.MaDocGia AND l.TrangThai = 'dang_muon'
-                ) THEN 'Đang mượn'
-                ELSE 'Bình thường'
-              END AS TrangThai
+      `SELECT d.MaDocGia, d.HoLot, d.Ten, d.Email, d.DienThoai, d.DiaChi, d.Phai, d.NgaySinh,
+              COALESCE(d.AccountStatus, 'active') AS TrangThai
        FROM Docgia d
        ORDER BY d.MaDocGia`
     )
     .all();
   res.json({ users });
+});
+
+app.post('/api/admin/users', authMiddleware, adminOnly, (req, res) => {
+  const { hoLot = '', ten = '', ngaySinh = null, phai = 'Nam', diaChi = '', dienThoai = '', email = '', password = '' } = req.body;
+  const normalizedEmail = String(email || '').trim().toLowerCase();
+  if (!hoLot || !ten || !normalizedEmail || !password) {
+    return res.status(400).json({ message: 'Thiếu trường bắt buộc.' });
+  }
+  if (!EMAIL_REGEX.test(normalizedEmail)) {
+    return res.status(400).json({ message: 'Email không hợp lệ.' });
+  }
+  if (password.length < 6) {
+    return res.status(400).json({ message: 'Mật khẩu tối thiểu 6 ký tự.' });
+  }
+  const existed = db.prepare('SELECT 1 FROM Docgia WHERE lower(Email) = ?').get(normalizedEmail);
+  if (existed) return res.status(409).json({ message: 'Email đã tồn tại.' });
+
+  const id = generateDocGiaId();
+  const hash = bcrypt.hashSync(password, 10);
+  db.prepare(
+    `INSERT INTO Docgia(MaDocGia, HoLot, Ten, NgaySinh, Phai, DiaChi, DienThoai, Email, Password, PasswordHash, AccountStatus)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active')`
+  ).run(id, hoLot, ten, ngaySinh, phai, diaChi, dienThoai, normalizedEmail, hash, hash);
+
+  return res.json({ message: 'Đã thêm người dùng.', MaDocGia: id });
+});
+
+app.put('/api/admin/users/:id', authMiddleware, adminOnly, (req, res) => {
+  const { hoLot = '', ten = '', ngaySinh = null, phai = 'Nam', diaChi = '', dienThoai = '' } = req.body;
+  const existed = db.prepare('SELECT 1 FROM Docgia WHERE MaDocGia = ?').get(req.params.id);
+  if (!existed) return res.status(404).json({ message: 'Không tìm thấy độc giả.' });
+  if (!hoLot || !ten) return res.status(400).json({ message: 'Họ tên không được để trống.' });
+
+  db.prepare(
+    `UPDATE Docgia
+     SET HoLot = ?, Ten = ?, NgaySinh = ?, Phai = ?, DiaChi = ?, DienThoai = ?
+     WHERE MaDocGia = ?`
+  ).run(hoLot, ten, ngaySinh, phai, diaChi, dienThoai, req.params.id);
+
+  return res.json({ message: 'Đã cập nhật người dùng.' });
+});
+
+app.put('/api/admin/users/:id/toggle-lock', authMiddleware, adminOnly, (req, res) => {
+  const user = db.prepare('SELECT MaDocGia, COALESCE(AccountStatus, "active") AS AccountStatus FROM Docgia WHERE MaDocGia = ?').get(req.params.id);
+  if (!user) return res.status(404).json({ message: 'Không tìm thấy độc giả.' });
+
+  const nextStatus = user.AccountStatus === 'locked' ? 'active' : 'locked';
+  db.prepare('UPDATE Docgia SET AccountStatus = ? WHERE MaDocGia = ?').run(nextStatus, req.params.id);
+  return res.json({ message: nextStatus === 'locked' ? 'Đã khóa tài khoản.' : 'Đã mở khóa tài khoản.' });
+});
+
+app.delete('/api/admin/users/:id', authMiddleware, adminOnly, (req, res) => {
+  const inLoan = db.prepare("SELECT 1 FROM TheoDoiMuonSach WHERE MaDocGia = ? AND TrangThai IN ('dang_muon','cho_duyet')").get(req.params.id);
+  if (inLoan) {
+    return res.status(400).json({ message: 'Không thể xóa độc giả đang có phiếu mượn/chờ duyệt.' });
+  }
+  const result = db.prepare('DELETE FROM Docgia WHERE MaDocGia = ?').run(req.params.id);
+  if (result.changes === 0) return res.status(404).json({ message: 'Không tìm thấy độc giả.' });
+  return res.json({ message: 'Đã xóa độc giả.' });
 });
 
 app.get('/api/admin/loans', authMiddleware, adminOnly, (req, res) => {
