@@ -5,7 +5,7 @@ Dự án demo full-stack theo yêu cầu:
 - Giao diện người dùng + quản trị dùng **Bootstrap 5**.
 - **Tìm kiếm giọng nói** với Web Speech API.
 - **AI Chatbot** hỗ trợ gợi ý, trả lời câu hỏi nhanh.
-- **Đăng nhập OTP qua Gmail** bằng Nodemailer.
+- **Đăng nhập/đăng ký OTP qua Brevo** bằng API key.
 - **Tách riêng trang đăng nhập và đăng ký** để UX gọn gàng, dễ dùng.
 - **Dashboard quản trị** + quản lý sách/độc giả/lượt mượn.
 - **Trang chi tiết sách** có đánh giá sao, nhận xét và nút mượn sách.
@@ -15,7 +15,7 @@ Dự án demo full-stack theo yêu cầu:
 - Node.js + Express
 - SQLite (better-sqlite3)
 - JWT
-- Nodemailer
+- Brevo Transactional Email API (`sib-api-v3-sdk`)
 
 ## Cơ sở dữ liệu
 
@@ -54,21 +54,23 @@ Mở:
 - Độc giả: `docgia1@example.com` / `reader123`
 - Admin: `admin@example.com`
 
-## Cấu hình Gmail OTP (tuỳ chọn)
+## Cấu hình Brevo OTP (tuỳ chọn)
 
 Tạo `.env`:
 
 ```bash
 PORT=3000
 JWT_SECRET=replace_me
-GMAIL_USER=your_email@gmail.com
-GMAIL_APP_PASSWORD=your_gmail_app_password
+BREVO_API_KEY=your_brevo_api_key
+BREVO_SENDER_EMAIL=sender_verified_on_brevo@example.com
+BREVO_SENDER_NAME=BookHub
+OTP_EXPIRE_MINUTES=5
 ```
 
-Nếu chưa cấu hình Gmail, hệ thống chạy ở chế độ demo mail nội bộ (không gửi ra ngoài).
+Nếu chưa cấu hình Brevo, hệ thống chạy ở chế độ demo (in OTP ra terminal, không gửi mail ra ngoài).
 
 
 ## API đăng ký OTP
 
-- `POST /api/auth/send-otp-register`: gửi OTP đăng ký qua Gmail.
+- `POST /api/auth/send-otp-register`: gửi OTP đăng ký qua Brevo (hoặc demo console nếu thiếu env).
 - `POST /api/auth/register`: đăng ký độc giả với OTP + thông tin bảng `Docgia`.

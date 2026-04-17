@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const Database = require('better-sqlite3');
-const nodemailer = require('nodemailer');
+const SibApiV3Sdk = require('sib-api-v3-sdk');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
@@ -99,22 +99,37 @@ function adminOnly(req, res, next) {
   return next();
 }
 
-function buildMailer() {
-  if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
-    return nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_APP_PASSWORD
-      }
-    });
+const brevoClient = SibApiV3Sdk.ApiClient.instance;
+const brevoApiKey = brevoClient.authentications['api-key'];
+if (process.env.BREVO_API_KEY) {
+  brevoApiKey.apiKey = process.env.BREVO_API_KEY;
+}
+const brevoEmailApi = new SibApiV3Sdk.TransactionalEmailsApi();
+
+async function sendOTPEmail(email, otp, purpose = 'register') {
+  if (!process.env.BREVO_API_KEY || !process.env.BREVO_SENDER_EMAIL) {
+    console.log(`[DEMO OTP][${purpose}] ${email}: ${otp}`);
+    return { mode: 'demo-console' };
   }
 
-  return nodemailer.createTransport({
-    streamTransport: true,
-    newline: 'unix',
-    buffer: true
-  });
+  const subject = purpose === 'register' ? 'Mã OTP đăng ký BookHub' : 'Mã OTP đăng nhập BookHub';
+  const sendSmtpEmail = {
+    sender: {
+      email: process.env.BREVO_SENDER_EMAIL,
+      name: process.env.BREVO_SENDER_NAME || 'BookHub'
+    },
+    to: [{ email }],
+    subject,
+    htmlContent: `
+      <h2>BookHub</h2>
+      <p>Mã OTP của bạn là:</p>
+      <h1 style="color:#2e7d32;">${otp}</h1>
+      <p>OTP có hiệu lực trong ${process.env.OTP_EXPIRE_MINUTES || 5} phút.</p>
+    `
+  };
+
+  await brevoEmailApi.sendTransacEmail(sendSmtpEmail);
+  return { mode: 'brevo' };
 }
 
 function generateDocGiaId() {
@@ -144,24 +159,20 @@ app.post('/api/auth/send-otp-register', (req, res) => {
   }
 
   const otp = `${Math.floor(100000 + Math.random() * 900000)}`;
-  const expiresAt = Date.now() + 5 * 60 * 1000;
+  const otpExpireMinutes = Number(process.env.OTP_EXPIRE_MINUTES || 5);
+  const expiresAt = Date.now() + otpExpireMinutes * 60 * 1000;
   db.prepare('UPDATE OTPToken SET isUsed = 1 WHERE email = ? AND purpose = ?').run(email, 'register');
   db.prepare('INSERT INTO OTPToken(email, otp, role, purpose, expiresAt, isUsed, createdAt) VALUES (?, ?, ?, ?, ?, 0, ?)').run(email, otp, 'reader', 'register', expiresAt, Math.floor(Date.now() / 1000));
 
-  const transporter = buildMailer();
-  transporter.sendMail(
-    {
-      from: process.env.GMAIL_USER || 'no-reply@bookhub.local',
-      to: email,
-      subject: 'Mã OTP đăng ký tài khoản BookHub',
-      html: `<div style="font-family:Arial,sans-serif"><h2>BookHub</h2><p>Mã OTP của bạn là <b style="font-size:24px">${otp}</b></p><p>OTP có hiệu lực trong 5 phút.</p></div>`
-    },
-    (error) => {
-      if (error) return res.status(500).json({ success: false, message: 'Không gửi được OTP.' });
+  sendOTPEmail(email, otp, 'register')
+    .then(() => {
       otpCooldown.set(email, now + 60 * 1000);
       return res.json({ success: true, message: 'Đã gửi OTP về email' });
-    }
-  );
+    })
+    .catch((error) => {
+      console.error('Lỗi gửi OTP register:', error.message);
+      return res.status(500).json({ success: false, message: 'Không gửi được OTP.' });
+    });
 });
 
 app.post('/api/auth/register', (req, res) => {
@@ -253,31 +264,22 @@ app.post('/api/auth/send-otp', (req, res) => {
   }
 
   const otp = `${Math.floor(100000 + Math.random() * 900000)}`;
-  const expiresAt = Date.now() + 5 * 60 * 1000;
+  const otpExpireMinutes = Number(process.env.OTP_EXPIRE_MINUTES || 5);
+  const expiresAt = Date.now() + otpExpireMinutes * 60 * 1000;
 
   db.prepare('UPDATE OTPToken SET isUsed = 1 WHERE email = ? AND role = ?').run(email, role);
   db.prepare('INSERT INTO OTPToken(email, otp, role, purpose, expiresAt, isUsed, createdAt) VALUES (?, ?, ?, ?, ?, 0, ?)').run(email, otp, role, 'login', expiresAt, Math.floor(Date.now() / 1000));
 
-  const transporter = buildMailer();
-  transporter.sendMail(
-    {
-      from: process.env.GMAIL_USER || 'no-reply@bookhub.local',
-      to: email,
-      subject: 'Mã OTP đăng nhập BookHub',
-      text: `Mã OTP của bạn là ${otp}. Mã có hiệu lực trong 5 phút.`
-    },
-    (error, info) => {
-      if (error) {
-        return res.status(500).json({ message: 'Gửi OTP thất bại.', error: error.message });
-      }
-
+  sendOTPEmail(email, otp, 'login')
+    .then((result) => {
       return res.json({
         message: 'Đã gửi OTP thành công.',
-        mode: process.env.GMAIL_USER ? 'gmail' : 'demo-console',
-        preview: process.env.GMAIL_USER ? undefined : info.message.toString()
+        mode: result.mode
       });
-    }
-  );
+    })
+    .catch((error) => {
+      return res.status(500).json({ message: 'Gửi OTP thất bại.', error: error.message });
+    });
 });
 
 app.post('/api/auth/verify-otp', (req, res) => {

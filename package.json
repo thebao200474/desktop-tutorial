@@ -1,7 +1,7 @@
 {
   "name": "quan-ly-muon-sach-ai",
   "version": "1.0.0",
-  "description": "He thong quan ly muon sach voi voice search, chatbot va OTP Gmail",
+  "description": "He thong quan ly muon sach voi voice search, chatbot va OTP Brevo",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -14,6 +14,6 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
-    "nodemailer": "^6.10.0"
+    "sib-api-v3-sdk": "^8.5.0"
   }
 }
