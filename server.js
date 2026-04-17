@@ -766,7 +766,7 @@ app.put('/api/admin/users/:id', authMiddleware, adminOnly, (req, res) => {
 });
 
 app.put('/api/admin/users/:id/toggle-lock', authMiddleware, adminOnly, (req, res) => {
-  const user = db.prepare('SELECT MaDocGia, COALESCE(AccountStatus, "active") AS AccountStatus FROM Docgia WHERE MaDocGia = ?').get(req.params.id);
+  const user = db.prepare("SELECT MaDocGia, COALESCE(AccountStatus, 'active') AS AccountStatus FROM Docgia WHERE MaDocGia = ?").get(req.params.id);
   if (!user) return res.status(404).json({ message: 'Không tìm thấy độc giả.' });
 
   const nextStatus = user.AccountStatus === 'locked' ? 'active' : 'locked';
