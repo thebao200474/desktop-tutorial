@@ -89,3 +89,12 @@ Nếu thiếu `BREVO_API_KEY` hoặc `BREVO_SENDER_EMAIL`, API gửi OTP sẽ tr
 
 - `GET /api/test-send-mail?email=your_email@gmail.com`: gửi mail test nhanh qua Brevo.
 - Hoặc đặt `TEST_RECEIVER_EMAIL` trong `.env` rồi gọi `GET /api/test-send-mail`.
+
+
+## Xử lý lỗi OTP thường gặp
+
+- Nếu thấy lỗi `Unauthorized` hoặc `Key not found`:
+  - API key Brevo sai/hết hạn. Tạo key mới ở Brevo rồi cập nhật `BREVO_API_KEY` trong `.env`.
+- Nếu lỗi liên quan `sender`:
+  - `BREVO_SENDER_EMAIL` chưa verify. Vào Brevo > Senders để verify email gửi.
+- Sau khi sửa `.env`, nhớ restart server (`Ctrl + C` rồi `npm start`).

@@ -117,6 +117,22 @@ if (missingBrevoAtStartup.length > 0) {
   console.warn(`[BREVO CONFIG] Thiếu biến môi trường: ${missingBrevoAtStartup.join(', ')}`);
 }
 
+
+function getBrevoFriendlyError(err) {
+  const code = err?.response?.body?.code;
+  const message = String(err?.response?.body?.message || err?.message || '');
+
+  if (code === 'unauthorized' || /key not found/i.test(message) || /unauthorized/i.test(message)) {
+    return 'BREVO_API_KEY không hợp lệ hoặc đã hết hạn. Vui lòng tạo API key mới trong Brevo và cập nhật file .env.';
+  }
+
+  if (/sender/i.test(message) && /verify|verified|unverified|not valid/i.test(message)) {
+    return 'BREVO_SENDER_EMAIL chưa được verify trong Brevo. Hãy verify sender trước khi gửi OTP.';
+  }
+
+  return `Gửi mail qua Brevo thất bại: ${message || 'Lỗi không xác định'}`;
+}
+
 async function sendOTPEmail(email, otp, purpose = 'register') {
   const missingEnv = getMissingBrevoEnv();
   if (missingEnv.length > 0) {
@@ -146,7 +162,7 @@ async function sendOTPEmail(email, otp, purpose = 'register') {
     return response;
   } catch (err) {
     console.error('BREVO ERROR:', err?.response?.body || err);
-    throw err;
+    throw new Error(getBrevoFriendlyError(err));
   }
 }
 
