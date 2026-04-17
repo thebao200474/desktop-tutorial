@@ -1,0 +1,178 @@
+:root {
+  --admin-bg: #f5f1ea;
+  --admin-shell: #efe8dd;
+  --admin-primary: #8b5a2b;
+  --admin-primary-hover: #73461f;
+  --admin-text: #2d2d2d;
+  --admin-muted: #777;
+  --admin-border: #ddd;
+}
+
+body {
+  margin: 0;
+  font-family: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+  background: var(--admin-bg);
+  color: var(--admin-text);
+}
+
+.admin-login-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 14px;
+}
+
+.admin-login-page-title {
+  font-weight: 700;
+  font-size: clamp(1.35rem, 2vw, 1.85rem);
+  margin-bottom: 1.2rem;
+  color: #1f1f1f;
+  text-align: center;
+}
+
+.admin-login-shell {
+  width: min(100%, 520px);
+  background: var(--admin-shell);
+  border-radius: 14px;
+  padding: 30px 24px 22px;
+}
+
+.admin-brand {
+  text-align: center;
+  font-weight: 700;
+  color: var(--admin-primary);
+  font-size: 1.85rem;
+  margin-bottom: 1rem;
+}
+
+.admin-brand span {
+  font-size: 1.95rem;
+}
+
+.admin-form-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px 20px;
+  border: 1px solid #f0ece8;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
+}
+
+.admin-form-title {
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.9rem;
+  margin-bottom: 0.25rem;
+}
+
+.admin-form-subtitle {
+  text-align: center;
+  color: var(--admin-muted);
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  font-weight: 600;
+}
+
+.form-control {
+  border: 1px solid var(--admin-border);
+  border-radius: 10px;
+  min-height: 45px;
+}
+
+.form-control:focus {
+  border-color: #c39a73;
+  box-shadow: 0 0 0 0.2rem rgba(139, 90, 43, 0.14);
+}
+
+.password-wrap {
+  position: relative;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  color: #666;
+  cursor: pointer;
+}
+
+.admin-options-row {
+  font-size: 0.93rem;
+}
+
+.forgot-link {
+  color: #5f4630;
+  text-decoration: none;
+}
+
+.forgot-link:hover {
+  text-decoration: underline;
+  color: #3f2f21;
+}
+
+.admin-login-btn {
+  border: none;
+  border-radius: 10px;
+  min-height: 46px;
+  color: #fff;
+  background: var(--admin-primary);
+  transition: background-color 0.2s ease;
+  font-weight: 600;
+}
+
+.admin-login-btn:hover,
+.admin-login-btn:focus {
+  color: #fff;
+  background: var(--admin-primary-hover);
+}
+
+.admin-login-footer {
+  text-align: center;
+  color: #8d8d8d;
+  font-size: 0.82rem;
+  margin-top: 1rem;
+}
+
+@media (max-width: 576px) {
+  .admin-login-shell {
+    padding: 22px 14px 16px;
+  }
+
+  .admin-form-card {
+    padding: 18px 14px;
+  }
+
+  .admin-form-title {
+    font-size: 1.55rem;
+  }
+
+  .admin-brand {
+    font-size: 1.55rem;
+  }
+
+  .admin-brand span {
+    font-size: 1.7rem;
+  }
+}
+
+
+.admin-manual-note {
+  background: #fff6f6;
+  border: 1px dashed #f1b7b7;
+  border-radius: 10px;
+  padding: 0.55rem 0.7rem;
+  margin-bottom: 0.85rem;
+  font-size: 0.88rem;
+  color: #6a4a4a;
+}
+
+.manual-fill {
+  color: #c1121f;
+  font-weight: 700;
+}

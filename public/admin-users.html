@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BookHub - Quản lý người dùng</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/admin.css" />
+  </head>
+  <body>
+    <main class="admin-overview-page">
+      <h2 class="admin-page-title">4. Quản lý người dùng</h2>
+      <section class="admin-layout-card shadow-sm">
+        <div class="row g-0">
+          <aside class="col-lg-3 col-xl-2 admin-sidebar">
+            <div class="admin-brand-wrap"><h4 class="admin-brand mb-1">📚 BookHub</h4><small>Quản trị hệ thống</small></div>
+            <nav class="admin-menu nav flex-column">
+              <a class="nav-link" href="/admin.html"><i class="bi bi-grid"></i>Tổng quan</a>
+              <a class="nav-link" href="/admin-books.html"><i class="bi bi-book"></i>Quản lý sách</a>
+              <a class="nav-link active" href="/admin-users.html"><i class="bi bi-people"></i>Quản lý độc giả</a>
+              <a class="nav-link" href="/admin-borrows.html"><i class="bi bi-journal-check"></i>Quản lý mượn sách</a>
+              <a class="nav-link" href="#"><i class="bi bi-tags"></i>Quản lý danh mục</a>
+              <a class="nav-link" href="#"><i class="bi bi-star"></i>Quản lý đánh giá</a>
+              <a class="nav-link" href="#"><i class="bi bi-pencil-square"></i>Quản trị biên tập</a>
+              <a class="nav-link" href="/admin.html#traffic-card"><i class="bi bi-graph-up"></i>Thống kê</a>
+              <a class="nav-link" href="#"><i class="bi bi-gear"></i>Cài đặt hệ thống</a>
+            </nav>
+          </aside>
+
+          <section class="col-lg-9 col-xl-10 admin-content">
+            <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
+              <h3 class="admin-section-title mb-0">Quản lý người dùng</h3>
+              <div class="d-flex align-items-center gap-2">
+                <span class="text-muted small">Xin chào, Admin</span>
+                <img src="/images/users/user-1.svg" alt="admin" class="admin-avatar" />
+                <button id="add-user-btn" class="btn btn-brown" data-bs-toggle="modal" data-bs-target="#user-create-modal">
+                  <i class="bi bi-plus-lg me-1"></i>Thêm người dùng
+                </button>
+                <button id="admin-logout" class="btn btn-outline-danger btn-sm">Đăng xuất</button>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-sm-6 col-xl-3"><article class="quick-stat-card"><span class="quick-stat-icon text-primary-emphasis bg-primary-subtle"><i class="bi bi-people"></i></span><div><div class="quick-stat-label">Tổng người dùng</div><div id="user-stat-total" class="quick-stat-value">0</div></div></article></div>
+              <div class="col-sm-6 col-xl-3"><article class="quick-stat-card"><span class="quick-stat-icon text-success-emphasis bg-success-subtle"><i class="bi bi-check-circle"></i></span><div><div class="quick-stat-label">Đang hoạt động</div><div id="user-stat-active" class="quick-stat-value">0</div></div></article></div>
+              <div class="col-sm-6 col-xl-3"><article class="quick-stat-card"><span class="quick-stat-icon text-danger-emphasis bg-danger-subtle"><i class="bi bi-lock"></i></span><div><div class="quick-stat-label">Bị khóa</div><div id="user-stat-locked" class="quick-stat-value">0</div></div></article></div>
+              <div class="col-sm-6 col-xl-3"><article class="quick-stat-card"><span class="quick-stat-icon text-secondary-emphasis bg-secondary-subtle"><i class="bi bi-person-plus"></i></span><div><div class="quick-stat-label">Mới tháng này</div><div id="user-stat-new" class="quick-stat-value">0</div></div></article></div>
+            </div>
+
+            <section class="card border-0 shadow-sm mb-3">
+              <div class="card-body">
+                <div class="row g-2 align-items-center mb-3">
+                  <div class="col-lg-5">
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="bi bi-search"></i></span>
+                      <input id="user-search" class="form-control" placeholder="Tìm theo tên, email, SĐT..." />
+                      <button id="user-voice-search" class="btn btn-outline-secondary" type="button" title="Tìm kiếm giọng nói">
+                        <i class="bi bi-mic"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="col-sm-6 col-lg-2"><select id="user-role-filter" class="form-select"><option value="all">Tất cả vai trò</option><option value="user">Người dùng</option><option value="admin">Quản trị viên</option></select></div>
+                  <div class="col-sm-6 col-lg-2"><select id="user-status-filter" class="form-select"><option value="all">Tất cả trạng thái</option><option value="active">Hoạt động</option><option value="locked">Bị khóa</option><option value="inactive">Không hoạt động</option></select></div>
+                  <div class="col-lg-3 d-grid"><button id="user-advanced-filter" class="btn btn-outline-secondary"><i class="bi bi-funnel me-1"></i>Lọc nâng cao</button></div>
+                </div>
+
+                <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between mb-3">
+                  <div class="d-flex flex-wrap gap-2" id="user-filter-chips"></div>
+                  <button id="clear-user-filters" class="btn btn-link btn-sm text-muted text-decoration-none">Xóa tất cả</button>
+                </div>
+
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle">
+                    <thead><tr><th>#</th><th>Avatar</th><th>Họ tên</th><th>Email</th><th>Vai trò</th><th>Trạng thái</th><th>Hành động</th></tr></thead>
+                    <tbody id="users-table"></tbody>
+                  </table>
+                </div>
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                  <small id="users-count" class="text-muted"></small>
+                  <ul id="users-pagination" class="pagination pagination-sm mb-0"></ul>
+                </div>
+              </div>
+            </section>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <div class="modal fade" id="user-create-modal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <form id="user-create-form" class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Thêm người dùng mới</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Họ lót</label>
+                <input id="create-ho-lot" class="form-control" required />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Tên</label>
+                <input id="create-ten" class="form-control" required />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Email</label>
+                <input id="create-email" type="email" class="form-control" required />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Số điện thoại</label>
+                <input id="create-phone" class="form-control" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Ngày sinh</label>
+                <input id="create-birthday" type="date" class="form-control" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Phái</label>
+                <select id="create-gender" class="form-select">
+                  <option>Nam</option>
+                  <option>Nữ</option>
+                  <option>Khác</option>
+                </select>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Địa chỉ</label>
+                <input id="create-address" class="form-control" />
+              </div>
+              <div class="col-12">
+                <label class="form-label">Mật khẩu</label>
+                <input id="create-password" type="password" class="form-control" minlength="6" required />
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+            <button type="submit" class="btn btn-brown">Lưu người dùng</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal fade" id="user-view-modal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Chi tiết người dùng</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <ul class="list-group list-group-flush small">
+              <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Mã độc giả</span><strong id="view-ma-doc-gia">-</strong></li>
+              <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Họ tên</span><strong id="view-fullname">-</strong></li>
+              <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Email</span><strong id="view-email">-</strong></li>
+              <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Số điện thoại</span><strong id="view-phone">-</strong></li>
+              <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Phái</span><strong id="view-gender">-</strong></li>
+              <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Ngày sinh</span><strong id="view-birthday">-</strong></li>
+              <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Trạng thái</span><strong id="view-status">-</strong></li>
+              <li class="list-group-item"><span class="text-muted d-block mb-1">Địa chỉ</span><strong id="view-address">-</strong></li>
+            </ul>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Đóng</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/admin-users.js"></script>
+  </body>
+</html>

@@ -1,0 +1,277 @@
+:root {
+  --brown-900: #3a2616;
+  --brown-700: #6f4e37;
+  --brown-100: #efe3d6;
+}
+
+body {
+  background: #f6f3ef;
+}
+
+.text-brown {
+  color: var(--brown-900);
+}
+
+.btn-brown {
+  background: var(--brown-700);
+  color: #fff;
+}
+
+.btn-brown:hover {
+  background: var(--brown-900);
+  color: #fff;
+}
+
+.hero {
+  background: linear-gradient(130deg, var(--brown-900), var(--brown-700));
+  color: #fff;
+  border-radius: 1rem;
+}
+
+.hero-lite {
+  background: #fbf5ee;
+  border: 1px solid #efdfcf;
+}
+
+.home-hero-img {
+  max-height: 220px;
+  object-fit: cover;
+}
+
+.otp-panel {
+  border: 1px solid #e8dccf;
+}
+
+.book-card img {
+  height: 240px;
+  object-fit: cover;
+}
+
+.book-card .card-title {
+  min-height: 3rem;
+}
+
+.chat-box {
+  height: 220px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #e9e1d9;
+  border-radius: 0.6rem;
+  padding: 0.75rem;
+}
+
+.chat-bubble {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.75rem;
+  margin-bottom: 0.5rem;
+  max-width: 85%;
+}
+
+.chat-user {
+  margin-left: auto;
+  background: var(--brown-700);
+  color: #fff;
+}
+
+.chat-bot {
+  background: var(--brown-100);
+}
+
+.section-title {
+  font-weight: 700;
+  color: var(--brown-900);
+}
+
+.category-pill {
+  background: #fff;
+  border: 1px solid #ead8c8;
+  border-radius: 999px;
+  padding: 0.4rem 0.5rem;
+}
+
+.table thead th {
+  background-color: #fff7ef;
+  color: var(--brown-900);
+}
+
+.explore-sidebar {
+  top: 1rem;
+}
+
+.filter-list {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.filter-item {
+  border: 1px solid #ead8c8;
+  background: #fff;
+  border-radius: 0.5rem;
+  text-align: left;
+  padding: 0.35rem 0.55rem;
+  font-size: 0.85rem;
+}
+
+.filter-item.active {
+  background: #f5e6d7;
+  border-color: #d8b798;
+  color: #432818;
+  font-weight: 600;
+}
+
+.book-row {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.book-row:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.4rem 1rem rgba(0, 0, 0, 0.08);
+}
+
+.book-row-cover {
+  width: 78px;
+  height: 112px;
+  object-fit: cover;
+  border-radius: 0.5rem;
+}
+
+.chat-fab {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: none;
+  background: var(--brown-700);
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.chat-fab-panel {
+  position: fixed;
+  right: 18px;
+  bottom: 80px;
+  width: 300px;
+  background: #fff;
+  border: 1px solid #ead8c8;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.15);
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@media (max-width: 991.98px) {
+  .explore-sidebar {
+    position: static !important;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .book-row-cover {
+    width: 64px;
+    height: 92px;
+  }
+
+  .chat-fab-panel {
+    width: calc(100vw - 24px);
+    right: 12px;
+    bottom: 72px;
+  }
+}
+
+.detail-cover {
+  width: min(100%, 280px);
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: 0.75rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.review-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.library-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.library-menu-item {
+  border: 1px solid #ead8c8;
+  border-radius: 0.6rem;
+  color: #5b4636;
+  padding: 0.45rem 0.6rem;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.library-menu-item:hover {
+  background: #f5ece2;
+}
+
+.library-menu-item.active {
+  background: #e7d7c7;
+  border-color: #cfb79e;
+  color: #3d2818;
+  font-weight: 600;
+}
+
+.library-book-card {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.library-book-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.1);
+}
+
+.library-book-cover {
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+}
+
+
+.auth-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #e4d5c6;
+}
+
+
+.auth-username {
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.auth-user-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.22rem 0.55rem;
+  border: 1px solid #e4d5c6;
+  border-radius: 999px;
+  background: #fff;
+  color: #3a2616;
+  text-decoration: none;
+}
+
+.auth-user-chip:hover {
+  background: #faf2e8;
+  color: #3a2616;
+}
