@@ -21,6 +21,7 @@ const voiceStatus = document.getElementById('voice-status');
 const bookForm = document.getElementById('book-form');
 const bookModalEl = document.getElementById('book-modal');
 const bookModal = new bootstrap.Modal(bookModalEl);
+const bookViewModal = new bootstrap.Modal(document.getElementById('book-view-modal'));
 const modalTitle = document.getElementById('book-modal-title');
 const submitBtn = document.getElementById('book-submit-btn');
 const categoryFilter = document.getElementById('book-category-filter');
@@ -200,7 +201,7 @@ function renderTable() {
       </td>
     `;
 
-    tr.querySelector('.view').addEventListener('click', () => alert(`${book.TenSach}\nTác giả: ${book.NguonGoc || '-'}`));
+    tr.querySelector('.view').addEventListener('click', () => openViewModal(book));
     tr.querySelector('.edit').addEventListener('click', () => openEditModal(book));
     tr.querySelector('.delete').addEventListener('click', async () => {
       if (!window.confirm(`Xóa sách ${book.TenSach}?`)) return;
@@ -218,6 +219,22 @@ function renderTable() {
 
   renderPagination(filtered.length);
   renderFilterChips();
+}
+
+function openViewModal(book) {
+  const status = bookStatus(book);
+  document.getElementById('view-book-cover').src = book.AnhBia || '/images/books/placeholder-book.svg';
+  document.getElementById('view-book-name').textContent = book.TenSach || '-';
+  document.getElementById('view-book-author').textContent = `Tác giả: ${book.NguonGoc || '-'}`;
+  document.getElementById('view-book-id').textContent = book.MaSach || '-';
+  document.getElementById('view-book-category').textContent = book.TheLoai || '-';
+  document.getElementById('view-book-qty').textContent = book.SoQuyen ?? 0;
+  document.getElementById('view-book-status').textContent = status.label;
+  document.getElementById('view-book-price').textContent = `${Number(book.DonGia || 0).toLocaleString('vi-VN')} đ`;
+  document.getElementById('view-book-year').textContent = book.NamXuatBan || '-';
+  document.getElementById('view-book-publisher').textContent = book.MaNXB || '-';
+  document.getElementById('view-book-description').textContent = book.MoTa || 'Chưa có mô tả.';
+  bookViewModal.show();
 }
 
 function fillForm(book = null) {
